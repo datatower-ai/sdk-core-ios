@@ -1,9 +1,9 @@
 Pod::Spec.new do |spec|
   
-  spec.name = "report"
+  spec.name = "DTSDK"
   spec.version = '0.01'
-  spec.summary = "report"
-  spec.description = "report"
+  spec.summary = "DTSDK"
+  spec.description = "DTSDK"
   spec.ios.deployment_target  = '10.0'
   spec.requires_arc = true
   spec.homepage = "https://gitlab.com/nodetower/roiquery-sdk/ios/ios-roiquery-sdk.git"
