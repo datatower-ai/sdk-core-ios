@@ -11,6 +11,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*
+  线程安全，可以在任意线程调用，
+  初始化建议在主线程。
+ */
+
 @interface DTEventDBQueue : NSObject
 
 /*
