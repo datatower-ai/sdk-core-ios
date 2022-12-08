@@ -6,12 +6,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DTAnalyticsConfig.h"
+#import "DTConfig.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DTAnalytics : NSObject
 
-+ (void)initializeWithConfig:(DTAnalyticsConfig *)config;
++ (void)initializeWithConfig:(DTConfig *)config;
 
 + (void)trackEventName:(NSString *)eventName properties:(NSDictionary *)properties;
 

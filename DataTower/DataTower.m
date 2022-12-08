@@ -6,7 +6,7 @@
 //
 
 #import "DataTower.h"
-#import "DTAnalyticsConfig.h"
+#import "DTConfig.h"
 #import "DTAnalytics.h"
 @implementation DataTower
 
@@ -15,7 +15,7 @@
                  isDebug:(BOOL)debug
              dtLogDegree:(DTLogDegree)log
         commonProperties:(NSDictionary *)commonProperties {
-    DTAnalyticsConfig *config = [[DTAnalyticsConfig alloc] init];
+    DTConfig *config = [[DTConfig alloc] init];
     config.appid = appid;
     config.channel = [self channelTextWithChannel:channel];
     config.enabledDebug = debug;

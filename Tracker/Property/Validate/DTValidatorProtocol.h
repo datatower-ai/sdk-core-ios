@@ -43,4 +43,4 @@
 
 @end
 
-#endif /* TAValidatorProtocol_h */
+#endif /* DTValidatorProtocol_h */

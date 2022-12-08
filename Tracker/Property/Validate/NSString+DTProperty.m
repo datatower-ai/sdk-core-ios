@@ -7,7 +7,7 @@ static NSInteger kTAPropertyNameMaxLength = 50;
 
 @implementation NSString (DTProperty)
 
-- (void)ta_validatePropertyKeyWithError:(NSError *__autoreleasing  _Nullable *)error {
+- (void)dt_validatePropertyKeyWithError:(NSError *__autoreleasing  _Nullable *)error {
     if (self.length == 0) {
         NSString *errorMsg = @"Property key or Event name is empty";
         DTLogError(errorMsg);
@@ -24,7 +24,7 @@ static NSInteger kTAPropertyNameMaxLength = 50;
     *error = nil;
 }
 
-- (void)ta_validatePropertyValueWithError:(NSError *__autoreleasing  _Nullable *)error {
+- (void)dt_validatePropertyValueWithError:(NSError *__autoreleasing  _Nullable *)error {
     
 }
 

@@ -102,10 +102,10 @@
 - (NSUInteger)queryEventCount {
     NSString *query = @"select count(*) from DTDataBase";
     NSInteger count = 0;
-    
+
     sqlite3_stmt *stmt = NULL;
     int rc = sqlite3_prepare_v2(_database, [query UTF8String], -1, &stmt, NULL);
-    
+
     if (rc == SQLITE_OK) {
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             count = sqlite3_column_int(stmt, 0);

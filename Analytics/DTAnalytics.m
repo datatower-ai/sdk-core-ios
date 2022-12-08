@@ -9,7 +9,7 @@
 #import "DTAnalyticsManager.h"
 @implementation DTAnalytics
 
-+ (void)initializeWithConfig:(DTAnalyticsConfig *)config {
++ (void)initializeWithConfig:(DTConfig *)config {
     [[DTAnalyticsManager shareInstance] initializeWithConfig:config];
 }
 

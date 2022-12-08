@@ -9,7 +9,7 @@
 #import "DTConstant.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DTAnalyticsConfig : NSObject
+@interface DTConfig : NSObject
 
 @property (nonatomic, copy) NSString *appid;
 @property (nonatomic, copy) NSString *channel;

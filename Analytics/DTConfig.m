@@ -5,9 +5,9 @@
 //  Created by NEO on 2022/12/5.
 //
 
-#import "DTAnalyticsConfig.h"
+#import "DTConfig.h"
 
-@implementation DTAnalyticsConfig
+@implementation DTConfig
 
 
 @end
