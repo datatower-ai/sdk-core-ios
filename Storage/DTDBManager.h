@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DTDBManager : NSObject
 
++ (DTDBManager *)sharedInstance;
+
+
 /*
   初始化数据库，建议在主线程完成。
  */

@@ -52,6 +52,42 @@ typedef NS_OPTIONS(NSInteger, DTLoggingLevel) {
 };
 
 
+/**
+ 自动采集事件
+
+ -
+ */
+typedef NS_OPTIONS(NSInteger, DTAutoTrackEventType) {
+    
+    DTAutoTrackEventTypeNone = 0,
+    /**
+     SDK 初始化
+     */
+    DTAutoTrackEventTypeInitialize    = 1 << 0,
+    
+    /*
+     APP 启动或从后台恢复事件
+     */
+    DTAutoTrackEventTypeAppStart      = 1 << 1,
+    
+    /**
+     APP 进入后台事件
+     */
+    DTAutoTrackEventTypeAppEnd        = 1 << 2,
+    
+    /**
+     APP 安装之后的首次打开
+     */
+    DTAutoTrackEventTypeAppInstall    = 1 << 3,
+    /**
+     
+     
+     以上全部 APP 事件
+     */
+    DTAutoTrackEventTypeAll    = DTAutoTrackEventTypeInitialize |DTAutoTrackEventTypeAppInstall | DTAutoTrackEventTypeAppStart | DTAutoTrackEventTypeAppEnd
+
+};
+
 typedef NS_OPTIONS(NSInteger, DTNetworkType) {
     DTNetworkTypeNONE     = 0,
     DTNetworkType2G       = 1 << 0,

@@ -20,6 +20,7 @@ static NSString * const DT_APP_VIEW_EVENT                   = @"ta_app_view";
 static NSString * const DT_APP_CLICK_EVENT                  = @"ta_app_click";
 static NSString * const DT_APP_CRASH_EVENT                  = @"ta_app_crash";
 static NSString * const DT_APP_INSTALL_EVENT                = @"ta_app_install";
+static NSString * const DT_APP_INITIALIZE                   = @"app_initialize";
 
 static NSString * const DT_CRASH_REASON                     = @"#app_crashed_reason";
 static NSString * const DT_RESUME_FROM_BACKGROUND           = @"#resume_from_background";

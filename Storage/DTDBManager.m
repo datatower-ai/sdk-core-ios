@@ -5,8 +5,10 @@
 //  Created by NEO on 2022/12/5.
 //
 
+#import "DTLogging.h"
 #import "DTDBManager.h"
 #import <sqlite3.h>
+
 
 //#define key_event_table_id   @"_id"
 //#define key_event_table_created_at   @"created_at"
@@ -17,12 +19,25 @@
     sqlite3 *_database;
 }
 
++ (DTDBManager *)sharedInstance{
+    static DTDBManager *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSString *filepath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"DT-data.plist"];
+        sharedInstance = [[self alloc] initWithDBPath:filepath];
+        DTLogDebug(@"数据库路径：%@", filepath);
+    });
+    return sharedInstance;
+}
+
+
 - (id)initWithDBPath:(NSString *)dbPath {
     self = [super init];
     if (self) {
         if (sqlite3_initialize() != SQLITE_OK) {
             return nil;
         }
+
         
         if (sqlite3_open_v2([dbPath UTF8String], &_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL) == SQLITE_OK ) {
             NSString *_sql = @"create table if not exists DTDataBase (_id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT, created_at DOUBLE,event_syn TEXT)";

@@ -13,14 +13,17 @@
 #import "DTAppLifeCycle.h"
 #import "DTTrackEvent.h"
 #import "DTTrackTimer.h"
+#import "DTAutoTrackManager.h"
+#import "DTEventTracker.h"
 
 @interface DTAnalyticsManager ()
 
-///  配置
-@property (nonatomic, strong)DTConfig *config;
 
 /// 事件时长统计
 @property (nonatomic, strong)DTTrackTimer *trackTimer;
+
+
+@property (nonatomic, strong)DTEventTracker *eventTracker;
 
 @end
 
@@ -54,16 +57,16 @@ static dispatch_queue_t dt_trackQueue;
     [self initProperties];
     //事件计时
     self.trackTimer = [[DTTrackTimer alloc] init];
+    // 事件入库、上报
+    self.eventTracker = [[DTEventTracker alloc] initWithQueue:dt_trackQueue];
     //生命周期监听
     [self appLifeCycleObserver];
-    
-    //just for 测试
-    [self track:@"sample_name"];
-    
+    //自动采集预置事件
+    [self enableAutoTrack:DTAutoTrackEventTypeAll];
 }
 
 - (void)initLog {
-    
+    [DTLogging sharedInstance].loggingLevel = DTLoggingLevelInfo;
 }
 
 - (void)networkStateObserver {
@@ -129,18 +132,43 @@ static dispatch_queue_t dt_trackQueue;
         backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:endBackgroundTask];
         
         // 进入后台时，事件发送完毕，需要关闭后台任务。
-//        [self.eventTracker _asyncWithCompletion:endBackgroundTask];
+        [self.eventTracker _asyncWithCompletion:endBackgroundTask];
 #else
 //        [self.eventTracker flush];
 #endif
         
     } else if (newState == DTAppLifeCycleStateTerminate) {
         // 保证在app杀掉的时候，同步执行完队列内的任务
-//        dispatch_sync(td_trackQueue, ^{});
-//        [self.eventTracker syncSendAllData];
+        dispatch_sync(dt_trackQueue, ^{});
+        [self.eventTracker syncSendAllData];
     }
 }
 
+//MARK: - Auto Track
+
+- (void)enableAutoTrack:(DTAutoTrackEventType)eventType {
+    [[DTAutoTrackManager sharedManager] trackWithAppid:[self.config appid] withOption:eventType];
+}
+
+- (void)autoTrackWithEvent:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties {
+    DTLogDebug(@"##### autoTrackWithEvent: %@", event.eventName);
+    [self handleTimeEvent:event];
+    [self asyncAutoTrackEventObject:event properties:properties];
+}
+
+/// 将事件加入到事件队列
+/// @param event 事件
+/// @param properties 自定义属性
+- (void)asyncAutoTrackEventObject:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties {
+    // 获取当前的SDK上报状态，并记录
+//    event.isEnabled = self.isEnabled;
+//    event.trackPause = self.isTrackPause;
+//    event.isOptOut = self.isOptOut;
+    
+    dispatch_async(dt_trackQueue, ^{
+        [self trackEvent:event properties:properties isH5:NO];
+    });
+}
 
 //MARK: - Track 事件
 
@@ -224,10 +252,8 @@ static dispatch_queue_t dt_trackQueue;
     jsonObj = [event formatDateWithDict:jsonObj];
     
     // 发送数据
-//    [self.eventTracker track:jsonObj immediately:event.immediately saveOnly:event.isTrackPause];
+    [self.eventTracker track:jsonObj immediately:event.immediately saveOnly:event.isTrackPause];
 }
-
-
 
 
 - (void)handleTimeEvent:(DTTrackEvent *)trackEvent {
@@ -288,5 +314,20 @@ static dispatch_queue_t dt_trackQueue;
 //        event.time = serverDate;
 //    }
 }
+
+- (void)timeEvent:(NSString *)event {
+//    if ([self hasDisabled]) {
+//        return;
+//    }
+    NSError *error = nil;
+    [DTPropertyValidator validateEventOrPropertyName:event withError:&error];
+    if (error) {
+        return;
+    }
+    [self.trackTimer trackEvent:event withSystemUptime:NSProcessInfo.processInfo.systemUptime];
+}
+
+
+
 
 @end
