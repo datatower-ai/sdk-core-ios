@@ -14,11 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (DTNetWorkSuccess)(NSData *data);
 typedef void (DTNetWorkFail)(NSError *error);
 
-+ (void)postRequestWithURL:(NSURL *)URL
++ (BOOL)postRequestWithURL:(NSURL *)URL
                requestBody:(NSData *)requestBody
-                   headers:(nullable NSDictionary<NSString *,NSString *> *)headers
-                   success:(DTNetWorkSuccess)success
-                    failed:(DTNetWorkFail)failed;
+                   headers:(nullable NSDictionary<NSString *,NSString *> *)headers;
 
 @end
 

@@ -10,11 +10,9 @@
 @implementation DTNetWork
 
 
-+ (void)postRequestWithURL:(NSURL *)URL
++ (BOOL)postRequestWithURL:(NSURL *)URL
                requestBody:(NSData *)requestBody
-                   headers:(nullable NSDictionary<NSString *,NSString *> *)headers
-                   success:(DTNetWorkSuccess *)success
-                    failed:(DTNetWorkFail *)failed {
+                   headers:(nullable NSDictionary<NSString *,NSString *> *)headers {
     NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:URL];
     req.HTTPMethod = @"POST";
     req.HTTPBody = requestBody;
@@ -24,35 +22,21 @@
             [req addValue:value forHTTPHeaderField:key];
         }
     }
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    BOOL __block postSuccess = NO;
     NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:req
                                                                      completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if (![response isKindOfClass:[NSHTTPURLResponse class]]) {
-            if (failed) {
-                failed([NSError errorWithDomain:@"not NSHTTPURLResponse" code:-100 userInfo:nil]);
-            }
-            return;
-        }
-        
-        if (error) {
-            if (failed) {
-                failed(error);
-            }
-            return;
-        }
-        
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        if (httpResponse.statusCode == 200) {
-            if (success) {
-                success (data);
-            }
+        if ([response isKindOfClass:[NSHTTPURLResponse class]] && error == NULL) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            postSuccess = (httpResponse.statusCode == 200);
+            dispatch_semaphore_signal(sema);
         } else {
-            if (failed) {
-                failed([NSError errorWithDomain:@"http code not 200" code:-200 userInfo:nil]);
-            }
-            return;
+            dispatch_semaphore_signal(sema);
         }
     }];
     [dataTask resume];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return postSuccess;
 }
 
 
