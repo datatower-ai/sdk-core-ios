@@ -1,9 +1,9 @@
 #import "DTKeychainHelper.h"
 #import "DTLogging.h"
 
-static NSString * const TDKeychainService = @"com.thinkingddata.analytics.service";
-static NSString * const TDInstallTimes = @"com.thinkingddata.analytics.installtimes";
-static NSString * const TDDeviceID = @"com.thinkingddata.analytics.deviceid";
+static NSString * const TDKeychainService = @"com.datatower.analytics.service";
+
+static NSString * const DTDTID = @"com.datatower.analytics.dtid";
 
 @interface DTKeychainHelper ()
 
@@ -34,12 +34,8 @@ static NSString * const TDDeviceID = @"com.thinkingddata.analytics.deviceid";
     }
 }
 
-- (void)saveInstallTimes:(NSString *)string {
-    [self saveItem:string forKey:TDInstallTimes];
-}
-
-- (void)saveDeviceId:(NSString *)string {
-    [self saveItem:string forKey:TDDeviceID];
+- (void)saveDTID:(NSString *)string {
+    [self saveItem:string forKey:DTDTID];
 }
 
 - (NSString *)dataForKey:(NSString *)key {
@@ -88,27 +84,14 @@ static NSString * const TDDeviceID = @"com.thinkingddata.analytics.deviceid";
     }
 }
 
-- (NSString *)getInstallTimesOld {
-    if (self.oldKeychain)
-        return [NSString stringWithFormat:@"%@",[self.oldKeychain objectForKey:@"thinking_setup_index"]];
-    return nil;
-}
 
-- (NSString *)getDeviceIdOld {
-    if (self.oldKeychain)
-        return [self.oldKeychain objectForKey:@"thinking_device_id"];
-    return nil;
-}
 
-- (NSString *)readDeviceId {
-    NSString *data = [self dataForKey:TDDeviceID];
+- (NSString *)readDTID {
+    NSString *data = [self dataForKey:DTDTID];
     return data;
 }
 
-- (NSString *)readInstallTimes {
-    NSString *data = [self dataForKey:TDInstallTimes];
-    return data;
-}
+
 
 - (NSMutableDictionary *)keychainQueryWithAccount:(NSString *)account {
     NSMutableDictionary *query = [NSMutableDictionary dictionary];

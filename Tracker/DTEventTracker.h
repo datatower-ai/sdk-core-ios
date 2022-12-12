@@ -28,9 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)flush;
 
-- (void)track:(NSDictionary *)event immediately:(BOOL)immediately saveOnly:(BOOL)isSaveOnly;
+- (void)track:(NSDictionary *)event sync:(NSString *)sync immediately:(BOOL)immediately;
 
-- (NSInteger)saveEventsData:(NSDictionary *)data;
+- (NSInteger)saveEventsData:(NSDictionary *)data sync:(NSString *)sync;
 
 - (void)_asyncWithCompletion:(void(^)(void))completion;
 

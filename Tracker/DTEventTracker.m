@@ -10,8 +10,10 @@
 #import "DTDBManager.h"
 #import "DTConfig.h"
 #import "DTAnalyticsManager.h"
+#import "DTDBEventModel.h"
 
 static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进行
+static NSUInteger const kBatchSize = 10;
 
 @interface DTEventTracker ()
 @property (atomic, strong) DTNetWork *network;
@@ -50,8 +52,7 @@ static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进�
 
 //MARK: - Public
 
-- (void)track:(NSDictionary *)event immediately:(BOOL)immediately saveOnly:(BOOL)isSaveOnly {
-    NSInteger count = 0;
+- (void)track:(NSDictionary *)event sync:(NSString *)sync immediately:(BOOL)immediately {
     if (immediately) {
         DTLogDebug(@"queueing data flush immediately:%@", event);
         dispatch_async(self.queue, ^{
@@ -62,12 +63,9 @@ static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进�
     } else {
         DTLogDebug(@"queueing data:%@", event);
         // 存入数据库
-        count = [self saveEventsData:event];
+        [self saveEventsData:event sync:sync];
     }
-    if (isSaveOnly) {
-        return;
-    }
-    DTLogDebug(@"flush action, count: %ld, uploadSize: %d",count);
+   
     [self flush];
 }
 
@@ -75,11 +73,11 @@ static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进�
 //    [self.network flushEvents:@[event]];
 }
 
-- (NSInteger)saveEventsData:(NSDictionary *)data {
+- (NSInteger)saveEventsData:(NSDictionary *)data sync:(NSString *)sync{
     NSMutableDictionary *event = [[NSMutableDictionary alloc] initWithDictionary:data];
     NSInteger count = 0;
     @synchronized (DTDBManager.class) {
-//        count = [self.dataQueue addObject:event withAppid:[self.config getMapInstanceToken]];
+        [self.dataQueue addEvent:event eventSyn:sync];
     }
     return count;
 }
@@ -95,7 +93,7 @@ static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进�
     // 在任务队列中异步执行，需要判断当前是否已经在任务队列中，避免重复包装
     void(^block)(void) = ^{
         dispatch_async(td_networkQueue, ^{
-//            [self _syncWithSize:kBatchSize completion:completion];
+            [self _syncWithSize:kBatchSize completion:completion];
         });
     };
     if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(self.queue)) {
@@ -105,75 +103,65 @@ static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进�
     }    
 }
 
-/// 同步数据（将本地数据库中的数据同步到TA）
-/// @param size 每次从数据库中获取的最大条数，默认50条
+/// 同步数据（将本地数据库中的数据同步到后台）
+/// @param size 每次从数据库中获取的最大条数，默认10条
 /// @param completion 同步回调
 /// 该方法需要在networkQueue中进行，会持续的发送网络请求直到数据库的数据被发送完
 - (void)_syncWithSize:(NSUInteger)size completion:(void(^)(void))completion {
     
-    // 获取数据库数据，取前五十条数据，并更新这五十条数据的uuid
-    // uuid的作用是数据库待删除数据的标识
+    // 获取数据库数据，取前十条数据
     NSArray<NSDictionary *> *recordArray;
-    NSArray *recodIds;
-    NSArray *uuids;
-//    @synchronized (TDSqliteDataQueue.class) {
-//        // 数据库里获取前kBatchSize条数据
-//        NSArray<TDEventRecord *> *records = [self.dataQueue getFirstRecords:kBatchSize withAppid:[self.config getMapInstanceToken]];
-//        NSArray<TDEventRecord *> *encryptRecords = [self encryptEventRecords:records];
-//        NSMutableArray *indexs = [[NSMutableArray alloc] initWithCapacity:encryptRecords.count];
-//        NSMutableArray *recordContents = [[NSMutableArray alloc] initWithCapacity:encryptRecords.count];
-//        for (TDEventRecord *record in encryptRecords) {
-//            [indexs addObject:record.index];
-//            [recordContents addObject:record.event];
-//        }
-//        recodIds = indexs;
-//        recordArray = recordContents;
-//
-//        // 更新uuid
-//        uuids = [self.dataQueue upadteRecordIds:recodIds];
-//    }
-//
-//    // 数据库没有数据了
-//    if (recordArray.count == 0 || uuids.count == 0) {
-//        if (completion) {
-//            completion();
-//        }
-//        return;
-//    }
-//
-//    // 网络情况较好，会在此处持续的将数据库中的数据发送完
-//    // 1，保证end事件发送成功
-//    BOOL flushSucc = YES;
-//    while (recordArray.count > 0 && uuids.count > 0 && flushSucc) {
+    NSArray *recodSyns;
+    @synchronized (DTDBManager.class) {
+        // 数据库里获取前kBatchSize条数据
+        NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
+        NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+        NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+        for (DTDBEventModel *eventMode in eventModes) {
+            [syns addObject:eventMode.eventSyn];
+            [contents addObject:eventMode.data];
+        }
+        recodSyns = syns;
+        recordArray = contents;
+    }
+
+    // 数据库没有数据了
+    if (recordArray.count == 0 || recodSyns.count == 0) {
+        if (completion) {
+            completion();
+        }
+        return;
+    }
+
+    // 网络情况较好，会在此处持续的将数据库中的数据发送完
+    // 1，保证end事件发送成功
+    BOOL flushSucc = YES;
+    while (recordArray.count > 0 && recodSyns.count > 0 && flushSucc) {
 //        flushSucc = [self.network flushEvents:recordArray];
-//        if (flushSucc) {
-//            @synchronized (TDSqliteDataQueue.class) {
-//                BOOL ret = [self.dataQueue removeDataWithuids:uuids];
-//                if (!ret) {
-//                    break;
-//                }
-//                // 数据库里获取前50条数据
-//                NSArray<TDEventRecord *> *records = [self.dataQueue getFirstRecords:kBatchSize withAppid:[self.config getMapInstanceToken]];
-//                NSArray<TDEventRecord *> *encryptRecords = [self encryptEventRecords:records];
-//                NSMutableArray *indexs = [[NSMutableArray alloc] initWithCapacity:encryptRecords.count];
-//                NSMutableArray *recordContents = [[NSMutableArray alloc] initWithCapacity:encryptRecords.count];
-//                for (TDEventRecord *record in encryptRecords) {
-//                    [indexs addObject:record.index];
-//                    [recordContents addObject:record.event];
-//                }
-//                recodIds = indexs;
-//                recordArray = recordContents;
-//
-//                // 更新uuid
-//                uuids = [self.dataQueue upadteRecordIds:recodIds];
-//            }
-//        } else {
-//            break;
-//        }
-//    }
-//    if (completion) {
-//        completion();
-//    }
+        if (flushSucc) {
+            @synchronized (DTDBManager.class) {
+                BOOL ret = [self.dataQueue deleteEventsWithSyns:recodSyns];
+                if (!ret) {
+                    break;
+                }
+                // 数据库里获取前kBatchSize条数据
+                NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
+                NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+                NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+                for (DTDBEventModel *eventMode in eventModes) {
+                    [syns addObject:eventMode.eventSyn];
+                    [contents addObject:eventMode.data];
+                }
+                recodSyns = syns;
+                recordArray = contents;
+            }
+        } else {
+            break;
+        }
+    }
+    if (completion) {
+        completion();
+    }
 }
 
 

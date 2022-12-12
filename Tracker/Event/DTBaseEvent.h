@@ -29,6 +29,7 @@ static NSString * const DT_BACKGROUND_DURATION              = @"#background_dura
 
 
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK           = @"track";
+static kEDEventTypeName const DT_EVENT_TYPE_USER            = @"user";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_FIRST     = @"track_first";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_UPDATE    = @"track_update";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_OVERWRITE = @"track_overwrite";
@@ -81,7 +82,10 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 @property (nonatomic, assign) DTEventType eventType;
 @property (nonatomic, copy) NSString *uuid;
 @property (nonatomic, copy) NSString *accountId;
-@property (nonatomic, copy) NSString *distinctId;
+@property (nonatomic, copy) NSString *appid;
+@property (nonatomic, copy) NSString *dtid;
+@property (nonatomic, copy) NSString *bundleId;
+@property (nonatomic, assign) BOOL isDebug;
 @property (nonatomic, strong) NSDate *time;
 @property (nonatomic, strong) NSTimeZone *timeZone;
 @property (nonatomic, strong, readonly) NSDateFormatter *timeFormatter;

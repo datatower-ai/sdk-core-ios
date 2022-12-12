@@ -2,13 +2,9 @@
 
 @interface DTKeychainHelper : NSObject
 
-- (void)saveDeviceId:(NSString *)string;
-- (void)saveInstallTimes:(NSString *)string;
-- (void)readOldKeychain;
+- (void)saveDTID:(NSString *)string;
 
-- (NSString *)readDeviceId;
-- (NSString *)readInstallTimes;
-- (NSString *)getInstallTimesOld;
-- (NSString *)getDeviceIdOld;
+- (NSString *)readDTID;
+
 
 @end

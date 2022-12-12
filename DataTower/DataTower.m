@@ -15,7 +15,7 @@
                  isDebug:(BOOL)debug
              dtLogDegree:(DTLogDegree)log
         commonProperties:(NSDictionary *)commonProperties {
-    DTConfig *config = [[DTConfig alloc] init];
+    DTConfig *config = [DTConfig shareInstance];
     config.appid = appid;
     config.channel = [self channelTextWithChannel:channel];
     config.enabledDebug = debug;

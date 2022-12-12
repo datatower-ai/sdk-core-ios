@@ -16,6 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL enabledDebug;
 @property (nonatomic, assign) DTLogDegree logDegree;
 @property (nonatomic, strong) NSDictionary *commonProperties;
+@property (nonatomic, assign) NSInteger maxNumEvents;
+@property(copy,nonatomic) NSString* version;
+
+
++ (DTConfig *)shareInstance;
+
++ (NSString*)version;
+
 
 @end
 

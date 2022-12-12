@@ -11,6 +11,7 @@
 #import <ThinkingSDK/TDLogging.h>
 #else
 #import "DTLogging.h"
+#import "DTDeviceInfo.h"
 #endif
 
 //#import "ThinkingAnalyticsSDKPrivate.h"
@@ -62,15 +63,36 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
 
 - (NSMutableDictionary *)jsonObject {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    dict[@"#time"] = self.time;
-    dict[@"#uuid"] = self.uuid;
-    dict[@"#type"] = [self eventTypeString];
+//
+//    static let EVENT_INFO_DTID          = "#dt_id"
+//    static let EVENT_INFO_ACID          = "#acid"
+//    static let EVENT_INFO_PKG           = "#pkg"
+//    static let EVENT_INFO_APP_ID        = "#app_id"
+//    static let EVENT_INFO_DEBUG         = "#debug"
+//    static let EVENT_INFO_TIME          = "#event_time"
+//    static let EVENT_INFO_NAME          = "#event_name"
+//    static let EVENT_INFO_SYN           = "#event_syn"
+//    static let EVENT_TYPE               = "#event_type"
+    if (self.dtid) {
+        dict[@"#dt_id"] = self.dtid;
+    }
     if (self.accountId) {
-        dict[@"#account_id"] = self.accountId;
+        dict[@"#acid"] = self.accountId;
     }
-    if (self.distinctId) {
-        dict[@"#distinct_id"] = self.distinctId;
+    if (self.bundleId) {
+        dict[@"#bundle_id"] = self.bundleId;
     }
+    if (self.appid) {
+        dict[@"#app_id"] = self.appid;
+    }
+    if (self.isDebug){
+        dict[@"#debug"] = @YES;
+    }
+    dict[@"#event_time"] = self.time;
+    dict[@"#event_syn"]  = self.uuid;
+    dict[@"#event_type"] = [self eventTypeString];
+    
+    
     dict[@"properties"] = self.properties;
     return dict;
 }
@@ -107,34 +129,34 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
         } break;
         case DTEventTypeTrackFirst: {
             // 首次事件的类型仍然是track
-            return DT_EVENT_TYPE_TRACK_FIRST;
+            return DT_EVENT_TYPE_TRACK;
         } break;
         case DTEventTypeTrackUpdate: {
-            return DT_EVENT_TYPE_TRACK_UPDATE;
+            return DT_EVENT_TYPE_TRACK;
         } break;
         case DTEventTypeTrackOverwrite: {
-            return DT_EVENT_TYPE_TRACK_OVERWRITE;
+            return DT_EVENT_TYPE_TRACK;
         } break;
         case DTEventTypeUserAdd: {
-            return DT_EVENT_TYPE_USER_ADD;
+            return DT_EVENT_TYPE_USER;
         } break;
         case DTEventTypeUserSet: {
-            return DT_EVENT_TYPE_USER_SET;
+            return DT_EVENT_TYPE_USER;
         } break;
         case DTEventTypeUserUnset: {
-            return DT_EVENT_TYPE_USER_UNSET;
+            return DT_EVENT_TYPE_USER;
         } break;
         case DTEventTypeUserAppend: {
-            return DT_EVENT_TYPE_USER_APPEND;
+            return DT_EVENT_TYPE_USER;
         } break;
         case DTEventTypeUserUniqueAppend: {
-            return DT_EVENT_TYPE_USER_UNIQ_APPEND;
+            return DT_EVENT_TYPE_USER;
         } break;
         case DTEventTypeUserDel: {
-            return DT_EVENT_TYPE_USER_DEL;
+            return DT_EVENT_TYPE_USER;
         } break;
         case DTEventTypeUserSetOnce: {
-            return DT_EVENT_TYPE_USER_SETONCE;
+            return DT_EVENT_TYPE_USER;
         } break;
             
         default:

@@ -21,6 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 记录事件发生时的开机时间节点。用于统计事件累计时长
 @property (nonatomic, assign) NSTimeInterval systemUpTime;
 
+/// 记录事件发生时时间节点。
+@property (nonatomic, assign) NSTimeInterval timeInterval;
+
 /// 用于记录动态公共属性，动态公共属性需要在事件发生的当前线程获取
 @property (nonatomic, strong) NSDictionary *dynamicSuperProperties;
 

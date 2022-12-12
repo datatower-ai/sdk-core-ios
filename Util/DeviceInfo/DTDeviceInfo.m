@@ -10,18 +10,13 @@
 #endif
 
 #import "DTKeychainHelper.h"
-//#import "TDPublicConfig.h"
+#import "DTConfig.h"
 //#import "ThinkingAnalyticsSDKPrivate.h"
 //#import "TDFile.h"
 #import "DTPresetProperties+DTDisProperties.h"
 
 #define kTDDyldPropertyNames @[@"DTPerformance"]
 #define kTDGetPropertySelName @"getPresetProperties"
-
-#define kDeviceClass @"XY2HU4AX3JI2JJW5MDhjm6wea2x6ymvm28ylmiyh7jkc8axy9mw3em8w"
-#define kCurrentDevice @"0a223h444j555cm666uw77722rh985jrj323ae44y5xn5ll5tm5mD5wm6e8y9m0vm32y46i7a89x0yl32c44ml4ye5a3a5"
-#define kIdfv @"hj23kik4343j545dk656ke43434hhn534536jj7676tx323423yyx547657iy7678yxf7654hhl32342im3424ww4235w546ew64645w76ll57rx67yF434hj323ao343aa546rk76l323Vx32y32y32x32e3m43w656m76nxy657k657lmd65y657yx5o323aa34kk45rk76k76lm87"
-#define kUUIDStr @"323J342J342K342U657K675A87A87U879H0943AX908IJ214KWD54WW87SX98XY3425At769k93l2l548m7r32xyx76769im3234ww6576n8ax89g98k9l97m1w31242"
 
 #if TARGET_OS_IOS
 static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
@@ -56,13 +51,9 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     self = [super init];
     if (self) {
         self.libName = @"iOS";
-//        self.libVersion = TDPublicConfig.version;
-        
-        NSDictionary *deviceInfo = [self getDeviceUniqueId];
-        _uniqueId = [deviceInfo objectForKey:@"uniqueId"];// 默认访客ID
-        _deviceId = [deviceInfo objectForKey:@"deviceId"];// 默认设备id
+        self.libVersion = DTConfig.version;
+        _deviceId = [self getDTID];
         _appVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
-        
         _automaticData = [self dt_collectProperties];
     }
     return self;
@@ -70,6 +61,10 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 
 + (NSString *)libVersion {
     return [self sharedManager].libVersion;
+}
+
++ (NSString *)deviceId {
+    return [self sharedManager].deviceId;
 }
 
 - (void)dt_updateData {
@@ -244,111 +239,23 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     return platform;
 }
 
-
-/// 获取设备id和默认的访客ID
-- (NSDictionary *)getDeviceUniqueId {
-    // 获取IDFV
-    NSString *defaultDistinctId = [self getIdentifier];
-    // 设备ID
-    NSString *deviceId;
-    // 默认访客ID
-    NSString *uniqueId;
-    
+- (NSString *)getDTID {
+    // DT ID
+    NSString *dtId;
     DTKeychainHelper *wrapper = [[DTKeychainHelper alloc] init];
+
+    NSString *dtIdKeychain = [wrapper readDTID];
     
-    // 获取keychain中的设备ID和安装次数
-    NSString *deviceIdKeychain = [wrapper readDeviceId];
-    NSString *installTimesKeychain = [wrapper readInstallTimes];
-    
-    // 获取安装标识
-    BOOL isExistFirstRecord = [[[NSUserDefaults standardUserDefaults] objectForKey:@"thinking_isfirst"] boolValue];
-    if (!isExistFirstRecord) {
-        _isFirstOpen = YES;
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"thinking_isfirst"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    } else {
-        _isFirstOpen = NO;
-    }
-    
-    // keychain中没有，获取老版本数据
-    if (deviceIdKeychain.length == 0 || installTimesKeychain.length == 0) {
-        [wrapper readOldKeychain];
-        deviceIdKeychain = [wrapper getDeviceIdOld];
-        installTimesKeychain = [wrapper getInstallTimesOld];
-    }
-    
-    // 检查是否持久化过该TA实例的设备ID、安装次数
-//    TDFile *file = [[TDFile alloc] initWithAppid:[ThinkingAnalyticsSDK sharedInstance].appid];
-//    if (deviceIdKeychain.length == 0 || installTimesKeychain.length == 0) {
-//        deviceIdKeychain = [file unarchiveDeviceId];
-//        installTimesKeychain = [file unarchiveInstallTimes];
-//    }
-    
-    if (deviceIdKeychain.length == 0 || installTimesKeychain.length == 0) {
+    if (dtIdKeychain.length == 0) {
         // 新设备、新用户
-        deviceId = defaultDistinctId;
-        installTimesKeychain = @"1";
-    } else {
-        if (!isExistFirstRecord) {
-            int setup_int = [installTimesKeychain intValue];
-            setup_int++;
-            
-            installTimesKeychain = [NSString stringWithFormat:@"%d",setup_int];
-        }
-        
-        deviceId = deviceIdKeychain;
+        dtId = [[NSUUID UUID] UUIDString];
+        [wrapper saveDTID:dtId];
+    }else {
+        dtId = dtIdKeychain;
     }
-    
-    if ([installTimesKeychain isEqualToString:@"1"]) {
-        uniqueId = deviceId;
-    } else {
-        uniqueId = [NSString stringWithFormat:@"%@_%@",deviceId,installTimesKeychain];
-    }
-    
-    // keychain更新设备ID、安装次数
-    // file存储设备ID、安装次数
-    // uniqueId是访客ID，字符串中包含了安装次数，
-    [wrapper saveDeviceId:deviceId];
-    [wrapper saveInstallTimes:installTimesKeychain];
-//    [file archiveDeviceId:deviceId];
-//    [file archiveInstallTimes:installTimesKeychain];
-    return @{@"uniqueId":uniqueId, @"deviceId":deviceId};
+    return dtId;
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-
-- (NSString *)getIdentifier {
-    NSString *anonymityId = NULL;
-    
-    Class deviceCls = NSClassFromString([self dealStringWithRegExp:kDeviceClass]);
-    if (deviceCls) {
-        SEL currentDve = NSSelectorFromString([self dealStringWithRegExp:kCurrentDevice]);
-        SEL idfvor = NSSelectorFromString([self dealStringWithRegExp:kIdfv]);
-        SEL uuidStr = NSSelectorFromString([self dealStringWithRegExp:kUUIDStr]);
-        
-        if ([deviceCls respondsToSelector:currentDve]) {
-            id cls1 = [deviceCls performSelector:currentDve];
-            if (cls1 && [cls1 respondsToSelector:idfvor]) {
-                id cls2 = [cls1 performSelector:idfvor];
-                if (cls2 && [cls2 respondsToSelector:uuidStr]) {
-                    id tempAnonymityId = [cls2 performSelector:uuidStr];
-                    if ([tempAnonymityId isKindOfClass:[NSString class]]) {
-                        anonymityId = tempAnonymityId;
-                    }
-                }
-            }
-        }
-    }
-    
-    if (!anonymityId) {
-        anonymityId = [[NSUUID UUID] UUIDString];
-    }
-    
-    return anonymityId;
-}
-
-#pragma clang diagnostic pop
 
 
 - (NSString *)dealStringWithRegExp:(NSString *)string {

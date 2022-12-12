@@ -18,6 +18,7 @@ FOUNDATION_EXTERN NSString *const VERSION;
 
 + (NSString *)libVersion;
 + (NSString*)bundleId;
++ (NSString*)deviceId;
 
 - (void)dt_updateData;
 - (NSDictionary *)dt_collectProperties;

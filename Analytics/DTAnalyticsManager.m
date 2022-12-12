@@ -15,15 +15,19 @@
 #import "DTTrackTimer.h"
 #import "DTAutoTrackManager.h"
 #import "DTEventTracker.h"
+#import "DTFile.h"
+#import "DTDeviceInfo.h"
 
 @interface DTAnalyticsManager ()
-
 
 /// 事件时长统计
 @property (nonatomic, strong)DTTrackTimer *trackTimer;
 
-
 @property (nonatomic, strong)DTEventTracker *eventTracker;
+
+@property (atomic, copy, nullable) NSString *accountId;
+
+@property (strong,nonatomic) DTFile *file;
 
 @end
 
@@ -53,6 +57,8 @@ static dispatch_queue_t dt_trackQueue;
     [self initLog];
     // 网络变化监听
     [self networkStateObserver];
+    //恢复持久化数据
+    [self retrievePersistedData];
     // 用户属性管理器
     [self initProperties];
     //事件计时
@@ -66,7 +72,9 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)initLog {
-    [DTLogging sharedInstance].loggingLevel = DTLoggingLevelInfo;
+    if ([[self config] enabledDebug]) {
+        [DTLogging sharedInstance].loggingLevel = DTLoggingLevelInfo;
+    }
 }
 
 - (void)networkStateObserver {
@@ -144,6 +152,23 @@ static dispatch_queue_t dt_trackQueue;
     }
 }
 
+- (void)retrievePersistedData {
+    self.file = [[DTFile alloc] initWithAppid:[[self config] appid]];
+    self.accountId = [self.file unarchiveAccountID];
+}
+
+- (void)setAcid:(NSString *)accountId {
+    if (![accountId isKindOfClass:[NSString class]] || accountId.length == 0) {
+        DTLogError(@"accountId invald", accountId);
+        return;
+    }
+
+    self.accountId = accountId;
+    @synchronized (self.file) {
+        [self.file archiveAccountID:accountId];
+    }
+}
+
 //MARK: - Auto Track
 
 - (void)enableAutoTrack:(DTAutoTrackEventType)eventType {
@@ -202,8 +227,6 @@ static dispatch_queue_t dt_trackQueue;
 //    event.trackPause = self.isTrackPause;
 //    event.isOptOut = self.isOptOut;
     
-    // 在当前线程获取动态公共属性
-//    event.dynamicSuperProperties = [self.superProperty obtainDynamicSuperProperties];
     dispatch_async(dt_trackQueue, ^{
         [self trackEvent:event properties:properties isH5:isH5];
     });
@@ -214,10 +237,7 @@ static dispatch_queue_t dt_trackQueue;
 //    if (!event.isEnabled || event.isOptOut) {
 //        return;
 //    }
-    // 当app后台启动时，是否开启数据采集
-//    if ([DTAppState shareInstance].relaunchInBackground && !self.config.trackRelaunchedInBackgroundEvents) {
-//        return;
-//    }
+
     // 组装通用属性
     [self configBaseEvent:event];
     // 验证事件本身的合法性，具体的验证策略由事件对象本身定义。
@@ -226,11 +246,6 @@ static dispatch_queue_t dt_trackQueue;
     if (error) {
         return;
     }
-//    // 过滤事件
-//    if ([self.config.disableEvents containsObject:event.eventName]) {
-//        return;
-//    }
-
     // 是否是从后台启动
     if ([DTAppState shareInstance].relaunchInBackground) {
         event.properties[@"#relaunched_in_background"] = @YES;
@@ -241,6 +256,7 @@ static dispatch_queue_t dt_trackQueue;
     NSMutableDictionary *jsonObj = [NSMutableDictionary dictionary];
     
     [event.properties addEntriesFromDictionary:pluginProperties];
+    
     // 获取当前组装好的最新的属性值
     jsonObj = event.jsonObject;
     
@@ -248,11 +264,8 @@ static dispatch_queue_t dt_trackQueue;
     properties = [DTPropertyValidator validateProperties:properties validator:event];
     [event.properties addEntriesFromDictionary:properties];
     
-    // 将属性中所有NSDate对象，用指定的 timezone 转换成时间字符串
-    jsonObj = [event formatDateWithDict:jsonObj];
-    
-    // 发送数据
-    [self.eventTracker track:jsonObj immediately:event.immediately saveOnly:event.isTrackPause];
+    // 录入数据
+    [self.eventTracker track:jsonObj sync:event.uuid immediately:false];
 }
 
 
@@ -301,12 +314,12 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)configBaseEvent:(DTBaseEvent *)event {
     // 添加通用的属性
-//    event.accountId = self.accountId;
-//    event.distinctId = self.getDistinctId;
-//    // 如果没有设置timezone，则获取config对象中的默认时区
-//    if (event.timeZone == nil) {
-//        event.timeZone = self.config.defaultTimeZone;
-//    }
+    event.accountId = self.accountId;
+    event.dtid = [[DTDeviceInfo sharedManager] deviceId];
+    event.appid = [self.config appid];
+    event.isDebug = [self.config enabledDebug];
+    event.bundleId = [DTDeviceInfo bundleId];
+    
     // 事件如果没有指定时间，那么使用系统时间时需要校准
 //    if (event.timeValueType == DTEventTimeValueTypeNone && calibratedTime && calibratedTime.stopCalibrate == NO) {
 //        NSTimeInterval outTime = NSProcessInfo.processInfo.systemUptime - calibratedTime.systemUptime;
