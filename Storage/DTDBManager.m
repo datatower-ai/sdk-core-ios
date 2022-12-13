@@ -7,6 +7,7 @@
 
 #import "DTLogging.h"
 #import "DTDBManager.h"
+#import "DTASDKQualityHelper.h"
 #import "DTConfig.h"
 #import "DTJSONUtil.h"
 #import <sqlite3.h>
@@ -40,15 +41,19 @@
         if (sqlite3_initialize() != SQLITE_OK) {
             return nil;
         }
-        if (sqlite3_open_v2([dbPath UTF8String], &_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL) == SQLITE_OK ) {
+        int openCode = sqlite3_open_v2([dbPath UTF8String], &_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+        if (openCode == SQLITE_OK ) {
             NSString *_sql = @"create table if not exists DTDataBase (_id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT, created_at DOUBLE,event_syn TEXT)";
             char *errorMsg;
             if (sqlite3_exec(_database, [_sql UTF8String], NULL, NULL, &errorMsg)==SQLITE_OK) {
             } else {
+                NSString *errorMsgString = [[NSString alloc] initWithUTF8String:errorMsg];
+                [DTASDKQualityHelper reportQualityCode:CODE_INIT_DB_ERROR errorMsg:MSG_INIT_DB_ERROR msg:errorMsgString];
                 return nil;
             }
             _allEventCount = [self queryEventCount];
         } else {
+            [DTASDKQualityHelper reportQualityCode:CODE_INIT_DB_ERROR errorMsg:MSG_INIT_DB_ERROR msg:[NSString stringWithFormat:@"sqlite3_open_v2 errorCode = %d",openCode]];
             return nil;
         }
     }
@@ -77,10 +82,19 @@
         sqlite3_bind_text(insertStatement, 1, [jsonStr UTF8String], -1, SQLITE_TRANSIENT);
         sqlite3_bind_double(insertStatement, 2, createdAt);
         sqlite3_bind_text(insertStatement, 3, [eventSyn UTF8String], -1, SQLITE_TRANSIENT);
-        success = (sqlite3_step(insertStatement) == SQLITE_DONE);
+        int code = sqlite3_step(insertStatement);
+        success = (code == SQLITE_DONE);
         if(success){
             _allEventCount ++;
+        } else {
+            [DTASDKQualityHelper reportQualityCode:CODE_UPDATE_DB_EXCEPTION
+                                          errorMsg:MSG_INSERT_DB_EXCEPTION
+                                               msg:[NSString stringWithUTF8String:sqlite3_errmsg(_database)]];
         }
+    } else {
+        [DTASDKQualityHelper reportQualityCode:CODE_UPDATE_DB_EXCEPTION
+                                      errorMsg:MSG_INSERT_DB_EXCEPTION
+                                           msg:[NSString stringWithUTF8String:sqlite3_errmsg(_database)]];
     }
     
     sqlite3_finalize(insertStatement);
@@ -94,7 +108,17 @@
     int rc = sqlite3_prepare_v2(_database, [query UTF8String], -1, &stmt, NULL);
     if (rc == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, [eventSyn UTF8String], -1, SQLITE_TRANSIENT);
-        success = (sqlite3_step(stmt) == SQLITE_DONE);
+        int code = sqlite3_step(stmt);
+        success = (code == SQLITE_DONE);
+        if(!success) {
+            [DTASDKQualityHelper reportQualityCode:CODE_UPDATE_DB_EXCEPTION
+                                          errorMsg:MSG_DELETE_DB_EXCEPTION
+                                               msg:[NSString stringWithUTF8String:sqlite3_errmsg(_database)]];
+        }
+    } else {
+        [DTASDKQualityHelper reportQualityCode:CODE_UPDATE_DB_EXCEPTION
+                                      errorMsg:MSG_DELETE_DB_EXCEPTION
+                                           msg:[NSString stringWithUTF8String:sqlite3_errmsg(_database)]];
     }
     sqlite3_finalize(stmt);
     _allEventCount = [self queryEventCount];
@@ -117,12 +141,20 @@
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(_database, query.UTF8String, -1, &stmt, NULL) != SQLITE_OK) {
-        DTLogError(@"Delete records Error: %s", sqlite3_errmsg(_database));
+        const char *error = sqlite3_errmsg(_database);
+        DTLogError(@"Delete records Error: %s", error);
+        [DTASDKQualityHelper reportQualityCode:CODE_UPDATE_DB_EXCEPTION
+                                      errorMsg:MSG_DELETE_DB_EXCEPTION
+                                           msg:[NSString stringWithUTF8String:error]];
         return NO;
     }
     BOOL success = YES;
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        DTLogError(@"Delete records Error: %s", sqlite3_errmsg(_database));
+        const char *error = sqlite3_errmsg(_database);
+        DTLogError(@"Delete records Error: %s", error);
+        [DTASDKQualityHelper reportQualityCode:CODE_UPDATE_DB_EXCEPTION
+                                      errorMsg:MSG_DELETE_DB_EXCEPTION
+                                           msg:[NSString stringWithUTF8String:error]];
         success = NO;
     }
     sqlite3_finalize(stmt);
@@ -186,6 +218,10 @@
             }
         }
         return records;
+    } else {
+        [DTASDKQualityHelper reportQualityCode:CODE_QUERY_DB_ERROR
+                                      errorMsg:MSG_DEFAULT
+                                           msg:[NSString stringWithUTF8String:sqlite3_errmsg(_database)]];
     }
     return nil;
 }
