@@ -52,7 +52,7 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 - (NSString *)networkState {
     if (self.isWifi) {
-        return @"WIFI";
+        return @"wifi";
     } else if (self.isWwan) {
         return [self currentRadio];
     } else {
@@ -137,7 +137,7 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
         }
         
         if ([currentRadio isEqualToString:CTRadioAccessTechnologyLTE]) {
-            networkType = @"4G";
+            networkType = @"4g";
         } else if ([currentRadio isEqualToString:CTRadioAccessTechnologyeHRPD] ||
                    [currentRadio isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB] ||
                    [currentRadio isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA] ||
@@ -146,17 +146,17 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
                    [currentRadio isEqualToString:CTRadioAccessTechnologyHSUPA] ||
                    [currentRadio isEqualToString:CTRadioAccessTechnologyHSDPA] ||
                    [currentRadio isEqualToString:CTRadioAccessTechnologyWCDMA]) {
-            networkType = @"3G";
+            networkType = @"3g";
         } else if ([currentRadio isEqualToString:CTRadioAccessTechnologyEdge] ||
                    [currentRadio isEqualToString:CTRadioAccessTechnologyGPRS]) {
-            networkType = @"2G";
+            networkType = @"2g";
         }
 #ifdef __IPHONE_14_1
         else if (@available(iOS 14.1, *)) {
             if ([currentRadio isKindOfClass:[NSString class]]) {
                 if([currentRadio isEqualToString:CTRadioAccessTechnologyNRNSA] ||
                    [currentRadio isEqualToString:CTRadioAccessTechnologyNR]) {
-                    networkType = @"5G";
+                    networkType = @"5g";
                 }
             }
         }

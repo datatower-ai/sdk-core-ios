@@ -29,15 +29,10 @@
 
 - (void)start {
     if (![DTPresetProperties disableAppVersion]) {
-        self.properties[@"#app_version"] = [DTDeviceInfo sharedManager].appVersion;
+        self.properties[COMMON_PROPERTY_APP_VERSION_NAME] = [DTDeviceInfo sharedManager].appVersion;
+        self.properties[COMMON_PROPERTY_APP_VERSION_CODE] = [DTDeviceInfo sharedManager].appVersionCode;
     }
-    if (![DTPresetProperties disableBundleId]) {
-        self.properties[@"#bundle_id"] = [DTDeviceInfo bundleId];
-    }
-        
-    if (![DTPresetProperties disableInstallTime]) {
-        self.properties[@"#install_time"] = [DTDeviceInfo dt_getInstallTime];
-    }
+   
 }
 
 - (void)asyncGetPropertyCompletion:(DTPropertyPluginCompletion)completion {
@@ -46,7 +41,7 @@
     [mutableDict addEntriesFromDictionary:[[DTDeviceInfo sharedManager] getAutomaticData]];
     
     if (![DTPresetProperties disableNetworkType]) {
-        mutableDict[@"#network_type"] = [[DTReachability shareInstance] networkState];
+        mutableDict[COMMON_PROPERTY_NETWORK_TYPE] = [[DTReachability shareInstance] networkState];
     }
     
     if (completion) {

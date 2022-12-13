@@ -17,7 +17,7 @@ static NSString *const kTANormalTrackProperNameValidateRegularExpression = @"^[a
 static NSRegularExpression *_regexForNormalTrackValidateKey;
 
 /// 自动采集，自定义属性名字格式验证。所有自动采集自定义属性，需要满足如下正则
-static NSString *const kTAAutoTrackProperNameValidateRegularExpression = @"^([a-zA-Z][a-zA-Z\\d_]{0,49}|\\#(resume_from_background|app_crashed_reason|screen_name|referrer|title|url|element_id|element_type|element_content|element_position|background_duration|start_reason))$";
+static NSString *const kTAAutoTrackProperNameValidateRegularExpression = @"^([a-zA-Z][a-zA-Z\\d_]{0,49}|\\#(resume_from_background|app_crashed_reason|session_id|is_foreground|title|url|element_id|element_type|element_content|element_position|background_duration|start_reason))$";
 /// 自动采集，自定义属性名字正则
 static NSRegularExpression *_regexForAutoTrackValidateKey;
 
@@ -40,7 +40,8 @@ static NSRegularExpression *_regexForAutoTrackValidateKey;
 
 + (void)validateBaseEventPropertyKey:(NSString *)key value:(NSString *)value error:(NSError **)error {
     // 验证 key
-    if (![key conformsToProtocol:@protocol(DTPropertyKeyValidating)]) {
+//    if (![key conformsToProtocol:@protocol(DTPropertyKeyValidating)]) {
+    if (![key isKindOfClass:NSString.class]) {
         NSString *errMsg = [NSString stringWithFormat:@"The property KEY must be NSString. got: %@ %@", [key class], key];
         DTLogError(errMsg);
         *error = DTPropertyError(10001, errMsg);
@@ -52,7 +53,12 @@ static NSRegularExpression *_regexForAutoTrackValidateKey;
     }
 
     // 验证 value
-    if (![value conformsToProtocol:@protocol(DTPropertyValueValidating)]) {
+//    if (![value conformsToProtocol:@protocol(DTPropertyValueValidating)]) {
+    if (![value isKindOfClass:NSString.class]
+        && ![value isKindOfClass:NSNumber.class]
+        && ![value isKindOfClass:NSDate.class]
+        && ![value isKindOfClass:NSDictionary.class]
+        && ![value isKindOfClass:NSArray.class]) {
         NSString *errMsg = [NSString stringWithFormat:@"Property value must be type NSString, NSNumber, NSDate, NSDictionary or NSArray. got: %@ %@. ", [value class], value];
         DTLogError(errMsg);
         *error = DTPropertyError(10002, errMsg);
@@ -125,14 +131,24 @@ static NSRegularExpression *_regexForAutoTrackValidateKey;
         return nil;
     }
     
-    for (id key in properties) {
+    NSMutableDictionary *propertiesCopy = [NSMutableDictionary dictionaryWithDictionary:properties];
+    NSMutableArray *invalidKeys = [NSMutableArray arrayWithCapacity:0];
+    
+    for (id key in propertiesCopy) {
         NSError *error = nil;
-        id value = properties[key];
+        id value = propertiesCopy[key];
         
-        // 验证key-value，只做报错提示
+        // 验证key-value
         [validator dt_validateKey:key value:value error:&error];
+        
+        if (error) {
+            [invalidKeys addObject:key];
+        }
     }
-    return [properties copy];
+    if(invalidKeys.count > 0){
+        [propertiesCopy removeObjectsForKeys:invalidKeys];
+    }
+    return propertiesCopy;
 }
 
 @end

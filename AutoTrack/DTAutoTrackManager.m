@@ -95,6 +95,9 @@
                     event.startReason = reason;
                 }
             }
+            DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
+            [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
+            
             [self.appColdStartTracker trackWithInstanceTag:appid event:event params:nil];
         };
         dispatch_async(dispatch_get_main_queue(), mainThreadBlock);
@@ -152,8 +155,10 @@
                         event.startReason = reason;
                     }
                 }
-                [self.
-                 appHotStartTracker trackWithInstanceTag:appid event:event params:@{}];
+                DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
+                [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
+                
+                [self.appHotStartTracker trackWithInstanceTag:appid event:event params:@{}];
             }
             
             if (type & DTAutoTrackEventTypeAppEnd) {
@@ -167,6 +172,8 @@
             DTAutoTrackEventType type = (DTAutoTrackEventType)[self.autoTrackOptions[appid] integerValue];
             if (type & DTAutoTrackEventTypeAppEnd) {
                 DTAppEndEvent *event = [[DTAppEndEvent alloc] initWithName:DT_APP_END_EVENT];
+                DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
+                [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@NO}];
                 [self.appEndTracker trackWithInstanceTag:appid event:event params:@{}];
             }
             

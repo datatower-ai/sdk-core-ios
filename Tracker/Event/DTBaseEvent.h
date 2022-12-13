@@ -13,14 +13,41 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NSString *kDTEventType;
 typedef NSString *kEDEventTypeName;
 
-static NSString * const DT_APP_START_EVENT                  = @"ta_app_start";
-static NSString * const DT_APP_START_BACKGROUND_EVENT       = @"ta_app_bg_start";
-static NSString * const DT_APP_END_EVENT                    = @"ta_app_end";
+static NSString * const DT_APP_START_EVENT                  = @"#session_start";
+static NSString * const DT_APP_START_BACKGROUND_EVENT       = @"#session_start";
+static NSString * const DT_APP_END_EVENT                    = @"#session_end";
 static NSString * const DT_APP_VIEW_EVENT                   = @"ta_app_view";
 static NSString * const DT_APP_CLICK_EVENT                  = @"ta_app_click";
 static NSString * const DT_APP_CRASH_EVENT                  = @"ta_app_crash";
-static NSString * const DT_APP_INSTALL_EVENT                = @"ta_app_install";
-static NSString * const DT_APP_INITIALIZE                   = @"app_initialize";
+static NSString * const DT_APP_INSTALL_EVENT                = @"#app_install";
+static NSString * const DT_APP_INITIALIZE                   = @"#app_initialize";
+
+
+static NSString * const COMMON_PROPERTY_EVENT_SESSION            = @"#session_id";
+static NSString * const COMMON_PROPERTY_MCC                      = @"#mcc";
+static NSString * const COMMON_PROPERTY_MNC                      = @"#mnc";
+static NSString * const COMMON_PROPERTY_OS_COUNTRY               = @"#os_country_code";
+static NSString * const COMMON_PROPERTY_OS_LANG                  = @"#os_lang_code";
+static NSString * const COMMON_PROPERTY_APP_VERSION_CODE         = @"#app_version_code";
+static NSString * const COMMON_PROPERTY_APP_VERSION_NAME         = @"#app_version_name";
+static NSString * const COMMON_PROPERTY_SDK_TYPE                 = @"#sdk_type";
+static NSString * const COMMON_PROPERTY_SDK_VERSION              = @"#sdk_version_name";
+static NSString * const COMMON_PROPERTY_OS                       = @"#os";
+static NSString * const COMMON_PROPERTY_OS_VERSION_NAME          = @"#os_version_name";
+static NSString * const COMMON_PROPERTY_DEVICE_MANUFACTURER      = @"#device_manufacturer";
+static NSString * const COMMON_PROPERTY_DEVICE_BRAND             = @"#device_brand";
+static NSString * const COMMON_PROPERTY_DIMS_DPI                 = @"#dims_dpi";
+static NSString * const COMMON_PROPERTY_NETWORK_TYPE             = @"#network_type";
+static NSString * const COMMON_PROPERTY_SIMULATOR                = @"#simulator";
+static NSString * const COMMON_PROPERTY_MEMORY_USED              = @"#memory_used";
+static NSString * const COMMON_PROPERTY_FPS                      = @"#fps";
+static NSString * const COMMON_PROPERTY_STORAGE_USED             = @"#storage_used";
+static NSString * const COMMON_PROPERTY_DEVICE_MODEL             = @"#device_model";
+static NSString * const COMMON_PROPERTY_SCREEN_HEIGHT            = @"#screen_height";
+static NSString * const COMMON_PROPERTY_SCREEN_WIDTH             = @"#screen_width";
+static NSString * const COMMON_PROPERTY_IS_FOREGROUND            = @"#is_foreground";
+static NSString * const COMMON_PROPERTY_EVENT_DURATION           = @"#event_duration";
+static NSString * const COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID    = @"#ias_ooid";
 
 static NSString * const DT_CRASH_REASON                     = @"#app_crashed_reason";
 static NSString * const DT_RESUME_FROM_BACKGROUND           = @"#resume_from_background";
@@ -34,13 +61,13 @@ static kEDEventTypeName const DT_EVENT_TYPE_TRACK_FIRST     = @"track_first";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_UPDATE    = @"track_update";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_OVERWRITE = @"track_overwrite";
 
-static kEDEventTypeName const DT_EVENT_TYPE_USER_DEL        = @"user_del";
-static kEDEventTypeName const DT_EVENT_TYPE_USER_ADD        = @"user_add";
-static kEDEventTypeName const DT_EVENT_TYPE_USER_SET        = @"user_set";
-static kEDEventTypeName const DT_EVENT_TYPE_USER_SETONCE    = @"user_setOnce";
-static kEDEventTypeName const DT_EVENT_TYPE_USER_UNSET      = @"user_unset";
-static kEDEventTypeName const DT_EVENT_TYPE_USER_APPEND     = @"user_append";
-static kEDEventTypeName const DT_EVENT_TYPE_USER_UNIQ_APPEND= @"user_uniq_append";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_DEL        = @"#user_del";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_ADD        = @"#user_add";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_SET        = @"#user_set";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_SETONCE    = @"#user_setOnce";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_UNSET      = @"#user_unset";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_APPEND     = @"#user_append";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_UNIQ_APPEND= @"#user_uniq_append";
 
 
 

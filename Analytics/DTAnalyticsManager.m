@@ -17,6 +17,8 @@
 #import "DTEventTracker.h"
 #import "DTFile.h"
 #import "DTDeviceInfo.h"
+#import "DTAppStartEvent.h"
+#import "DTAppEndEvent.h"
 
 @interface DTAnalyticsManager ()
 
@@ -90,6 +92,9 @@ static dispatch_queue_t dt_trackQueue;
 
 //
 - (void)initProperties {
+    // 初始化公共属性管理
+    self.superProperty = [[DTSuperProperty alloc] initWithToken:self.config.appid isLight:YES];
+    
     // 注册属性插件, 收集设备属性
     self.propertyPluginManager = [[DTPropertyPluginManager alloc] init];
     DTPresetPropertyPlugin *presetPlugin = [[DTPresetPropertyPlugin alloc] init];
@@ -122,12 +127,12 @@ static dispatch_queue_t dt_trackQueue;
 //        [self startFlushTimer];
 
         // 更新时长统计
-//        NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
-//        [self.trackTimer enterForegroundWithSystemUptime:systemUpTime];
+        NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
+        [self.trackTimer enterForegroundWithSystemUptime:systemUpTime];
     } else if (newState == DTAppLifeCycleStateEnd) {
         // 更新事件时长统计
-//        NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
-//        [self.trackTimer enterBackgroundWithSystemUptime:systemUpTime];
+        NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
+        [self.trackTimer enterBackgroundWithSystemUptime:systemUpTime];
         
 #if TARGET_OS_IOS
         // 开启后台任务发送事件
@@ -142,7 +147,7 @@ static dispatch_queue_t dt_trackQueue;
         // 进入后台时，事件发送完毕，需要关闭后台任务。
         [self.eventTracker _asyncWithCompletion:endBackgroundTask];
 #else
-//        [self.eventTracker flush];
+        [self.eventTracker flush];
 #endif
         
     } else if (newState == DTAppLifeCycleStateTerminate) {
@@ -167,6 +172,28 @@ static dispatch_queue_t dt_trackQueue;
     @synchronized (self.file) {
         [self.file archiveAccountID:accountId];
     }
+}
+
+- (void)setSuperProperties:(NSDictionary *)properties {
+    dispatch_async(dt_trackQueue, ^{
+        [self.superProperty registerSuperProperties:properties];
+    });
+}
+
+- (void)unsetSuperProperty:(NSString *)propertyKey {
+    dispatch_async(dt_trackQueue, ^{
+        [self.superProperty unregisterSuperProperty:propertyKey];
+    });
+}
+
+- (void)clearSuperProperties {
+    dispatch_async(dt_trackQueue, ^{
+        [self.superProperty clearSuperProperties];
+    });
+}
+
+- (NSDictionary *)currentSuperProperties {
+    return [self.superProperty currentSuperProperties];
 }
 
 //MARK: - Auto Track
@@ -250,12 +277,25 @@ static dispatch_queue_t dt_trackQueue;
     if ([DTAppState shareInstance].relaunchInBackground) {
         event.properties[@"#relaunched_in_background"] = @YES;
     }
+    
+    if ([event isKindOfClass:[DTAppStartEvent class]]) {
+        NSString *session = [[NSUUID UUID] UUIDString];
+        event.properties[COMMON_PROPERTY_EVENT_SESSION] = session;
+        [self setSuperProperties:@{COMMON_PROPERTY_EVENT_SESSION:session}];
+    }
+    // 静态公共属性
+    NSDictionary *superProperties = self.superProperty.currentSuperProperties;
     // 添加从属性插件获取的属性，属性插件只有系统使用，不支持用户自定义。所以属性名字是可信的，不用验证格式
     NSMutableDictionary *pluginProperties = [self.propertyPluginManager propertiesWithEventType:event.eventType];
   
     NSMutableDictionary *jsonObj = [NSMutableDictionary dictionary];
     
+    [event.properties addEntriesFromDictionary:superProperties];
     [event.properties addEntriesFromDictionary:pluginProperties];
+    
+    if ([event isKindOfClass:[DTAppEndEvent class]]) {
+        [self unsetSuperProperty:COMMON_PROPERTY_EVENT_SESSION];
+    }
     
     // 获取当前组装好的最新的属性值
     jsonObj = event.jsonObject;

@@ -13,13 +13,14 @@
 #include <mach-o/arch.h>
 #import <objc/message.h>
 #import "DTPresetProperties+DTDisProperties.h"
+#import "DTBaseEvent.h"
 
 typedef DTPresetProperties DTAPMPresetProperty;
 
-static const NSString *kDTPerformanceRAM  = @"#ram";
-static const NSString *kDTPerformanceDISK = @"#disk";
-static const NSString *kDTPerformanceSIM  = @"#simulator";
-static const NSString *kDTPerformanceFPS  = @"#fps";
+static const NSString *kDTPerformanceRAM  = COMMON_PROPERTY_MEMORY_USED;
+static const NSString *kDTPerformanceDISK = COMMON_PROPERTY_STORAGE_USED;
+static const NSString *kDTPerformanceSIM  = COMMON_PROPERTY_SIMULATOR;
+static const NSString *kDTPerformanceFPS  = COMMON_PROPERTY_FPS;
 
 #define TD_MAIM_INFO_PLIST_DISPRESTPRO_KEY @"DTDisPresetProperties"
 

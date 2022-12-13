@@ -14,7 +14,7 @@
 }
 
 + (void)trackEventName:(NSString *)eventName properties:(NSDictionary *)properties {
-//    [DTAnalyticsManager shareInstance]
+    [[DTAnalyticsManager shareInstance] track:eventName properties:properties];
 }
 
 @end

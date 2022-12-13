@@ -9,6 +9,7 @@
 #import "DTConfig.h"
 #import "DTAutoTrackEvent.h"
 #import "DTPropertyPluginManager.h"
+#import "DTSuperProperty.h"
 NS_ASSUME_NONNULL_BEGIN
 
 #ifndef dt_dispatch_main_sync_safe
@@ -27,6 +28,10 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 
 /// 属性插件，用于采集系统属性
 @property (nonatomic, strong) DTPropertyPluginManager *propertyPluginManager;
+
+/// 公共属性
+@property (nonatomic, strong) DTSuperProperty *superProperty;
+
 
 #pragma mark -  initiate
 
@@ -63,6 +68,14 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 - (void)enableAutoTrack:(DTAutoTrackEventType)eventType;
 
 - (void)autoTrackWithEvent:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties;
+
+- (void)setSuperProperties:(NSDictionary *)properties;
+
+- (void)unsetSuperProperty:(NSString *)propertyKey;
+
+- (void)clearSuperProperties;
+
+- (NSDictionary *)currentSuperProperties;
 @end
 
 NS_ASSUME_NONNULL_END

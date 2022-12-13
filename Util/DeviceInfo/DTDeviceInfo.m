@@ -11,6 +11,7 @@
 
 #import "DTKeychainHelper.h"
 #import "DTConfig.h"
+#import "DTBaseEvent.h"
 //#import "ThinkingAnalyticsSDKPrivate.h"
 //#import "TDFile.h"
 #import "DTPresetProperties+DTDisProperties.h"
@@ -54,6 +55,8 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
         self.libVersion = DTConfig.version;
         _deviceId = [self getDTID];
         _appVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
+        NSString *app_build = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
+        _appVersionCode = [NSNumber numberWithInt:[app_build intValue]];
         _automaticData = [self dt_collectProperties];
     }
     return self;
@@ -65,6 +68,14 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 
 + (NSString *)deviceId {
     return [self sharedManager].deviceId;
+}
+
++ (NSString *)userAgent {
+    UIDevice *currentDevice = [UIDevice currentDevice];
+    NSString *systemVersion = [currentDevice systemVersion];
+    NSString *model = [currentDevice model];
+    
+    return [NSString stringWithFormat:@"Mozilla/5.0 (%@; CPU %@ OS %@ like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile",model,model,systemVersion];
 }
 
 - (void)dt_updateData {
@@ -81,14 +92,13 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 - (NSDictionary *)dt_collectProperties {
     NSMutableDictionary *p = [NSMutableDictionary dictionary];
     
-    if (![DTPresetProperties disableDeviceId]) {
-        [p setValue:_deviceId forKey:@"#device_id"];
-    }
     
 #if TARGET_OS_IOS
     if (![DTPresetProperties disableCarrier]) {
         CTCarrier *carrier = nil;
         NSString *carrierName = @"";
+        NSString *mcc = @"";
+        NSString *mnc = @"";
     #ifdef __IPHONE_12_0
             if (@available(iOS 12.1, *)) {
                 // 双卡双待的情况
@@ -111,68 +121,77 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
             carrier.mobileNetworkCode &&
             carrier.mobileNetworkCode.length > 0) {
             carrierName = carrier.carrierName;
+            mcc = carrier.mobileCountryCode;
+            mnc = carrier.mobileNetworkCode;
         }
-        [p setValue:carrierName forKey:@"#carrier"];
+        [p setValue:mcc forKey:COMMON_PROPERTY_MCC];
+        [p setValue:mnc forKey:COMMON_PROPERTY_MNC];
     }
 #endif
     
     if (![DTPresetProperties disableLib]) {
-        [p setValue:self.libName forKey:@"#lib"];
+        [p setValue:self.libName forKey:COMMON_PROPERTY_SDK_TYPE];
     }
     if (![DTPresetProperties disableLibVersion]) {
-        [p setValue:self.libVersion forKey:@"#lib_version"];
+        [p setValue:self.libVersion forKey:COMMON_PROPERTY_SDK_VERSION];
     }
     if (![DTPresetProperties disableManufacturer]) {
-        [p setValue:@"Apple" forKey:@"#manufacturer"];
+        [p setValue:@"Apple" forKey:COMMON_PROPERTY_DEVICE_MANUFACTURER];
+        [p setValue:@"Apple" forKey:COMMON_PROPERTY_DEVICE_BRAND];
     }
     if (![DTPresetProperties disableDeviceModel]) {
-        [p setValue:[self td_iphoneType] forKey:@"#device_model"];
+        [p setValue:[self td_iphoneType] forKey:COMMON_PROPERTY_DEVICE_MODEL];
     }
     
 #if TARGET_OS_IOS
     if (![DTPresetProperties disableOs]) {
-        [p setValue:@"iOS" forKey:@"#os"];
+        [p setValue:@"iOS" forKey:COMMON_PROPERTY_OS];
     }
     if (![DTPresetProperties disableOsVersion]) {
         UIDevice *device = [UIDevice currentDevice];
-        [p setValue:[device systemVersion] forKey:@"#os_version"];
+        [p setValue:[device systemVersion] forKey:COMMON_PROPERTY_OS_VERSION_NAME];
     }
     if (![DTPresetProperties disableScreenWidth]) {
         CGSize size = [UIScreen mainScreen].bounds.size;
-        [p setValue:@((NSInteger)size.width) forKey:@"#screen_width"];
+        [p setValue:@((NSInteger)size.width) forKey:COMMON_PROPERTY_SCREEN_WIDTH];
     }
     if (![DTPresetProperties disableScreenHeight]) {
         CGSize size = [UIScreen mainScreen].bounds.size;
-        [p setValue:@((NSInteger)size.height) forKey:@"#screen_height"];
+        [p setValue:@((NSInteger)size.height) forKey:COMMON_PROPERTY_SCREEN_HEIGHT];
     }
     
 #if TARGET_OS_IOS
     if (![DTPresetProperties disableDeviceType]) {
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-            [p setValue:@"iPad" forKey:@"#device_type"];
-        } else {
-            [p setValue:@"iPhone" forKey:@"#device_type"];
-        }
+//        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+//            [p setValue:@"iPad" forKey:@"#device_type"];
+//        } else {
+//            [p setValue:@"iPhone" forKey:@"#device_type"];
+//        }
     }
 #endif
     
 #elif TARGET_OS_OSX
-    if (![TDPresetProperties disableOs]) {
-        [p setValue:@"OSX" forKey:@"#os"];
-    }
-    if (![TDPresetProperties disableOsVersion]) {
-        NSDictionary *sv = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
-        NSString *versionString = [sv objectForKey:@"ProductVersion"];
-        [p setValue:versionString forKey:@"#os_version"];
-    }
+//    if (![TDPresetProperties disableOs]) {
+//        [p setValue:@"OSX" forKey:COMMON_PROPERTY_OS];
+//    }
+//    if (![TDPresetProperties disableOsVersion]) {
+//        NSDictionary *sv = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+//        NSString *versionString = [sv objectForKey:@"ProductVersion"];
+//        [p setValue:versionString forKey:@"#os_version"];
+//    }
 #endif
     if (![DTPresetProperties disableSystemLanguage]) {
         NSString *preferredLanguages = [[NSLocale preferredLanguages] firstObject];
 //        NSString *preferredLanguages1 = [NSLocale currentLocale].languageCode;
         NSString * retValue = [[[[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"] firstObject] copy];
         if (preferredLanguages && preferredLanguages.length > 0) {
-            p[@"#system_language"] = [[preferredLanguages componentsSeparatedByString:@"-"] firstObject];;
+            p[COMMON_PROPERTY_OS_LANG] = [[preferredLanguages componentsSeparatedByString:@"-"] firstObject];;
         }
+        
+        NSLocale *locale = [NSLocale currentLocale];
+        NSString *country = [locale localeIdentifier];
+        p[COMMON_PROPERTY_OS_COUNTRY] = country;
+        
     }
     // 添加性能指标
     [p addEntriesFromDictionary:[DTDeviceInfo getAPMParams]];
@@ -209,12 +228,39 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     if ([platform isEqualToString:@"iPhone8,4"]) return @"iPhone SE";
     if ([platform isEqualToString:@"iPhone9,1"]) return @"iPhone 7";
     if ([platform isEqualToString:@"iPhone9,2"]) return @"iPhone 7 Plus";
+    
+    if ([platform isEqualToString:@"iPhone10,1"] || [platform isEqualToString:@"iPhone10,4"]) return @"iPhone 8";
+    if ([platform isEqualToString:@"iPhone10,2"] || [platform isEqualToString:@"iPhone10,5"]) return @"iPhone 8 Plus";
+    if ([platform isEqualToString:@"iPhone10,3"] || [platform isEqualToString:@"iPhone10,6"]) return @"iPhone X";
+    if ([platform isEqualToString:@"iPhone11,2"]) return @"iPhone XS";
+    if ([platform isEqualToString:@"iPhone11,4"] || [platform isEqualToString:@"iPhone11,6"]) return @"iPhone XS Max";
+    if ([platform isEqualToString:@"iPhone11,8"]) return @"iPhone XR";
+    if ([platform isEqualToString:@"iPhone12,1"]) return @"iPhone 11";
+    if ([platform isEqualToString:@"iPhone12,3"]) return @"iPhone 11 Pro";
+    if ([platform isEqualToString:@"iPhone12,5"]) return @"iPhone 11 Pro Max";
+    if ([platform isEqualToString:@"iPhone12,8"]) return @"iPhone SE2";
+    if ([platform isEqualToString:@"iPhone13,1"]) return @"iPhone 12 Mini";
+    if ([platform isEqualToString:@"iPhone13,2"]) return @"iPhone 12";
+    if ([platform isEqualToString:@"iPhone13,3"]) return @"iPhone 12 Pro";
+    if ([platform isEqualToString:@"iPhone13,4"]) return @"iPhone 12 Pro Max";
+    if ([platform isEqualToString:@"iPhone14,4"]) return @"iPhone 13 Mini";
+    if ([platform isEqualToString:@"iPhone14,5"]) return @"iPhone 13";
+    if ([platform isEqualToString:@"iPhone14,2"]) return @"iPhone 13 Pro";
+    if ([platform isEqualToString:@"iPhone14,3"]) return @"iPhone 13 Pro Max";
+    if ([platform isEqualToString:@"iPhone14,6"]) return @"iPhone SE3";
+    if ([platform isEqualToString:@"iPhone14,7"]) return @"iPhone 14";
+    if ([platform isEqualToString:@"iPhone14,8"]) return @"iPhone 14 Plus";
+    if ([platform isEqualToString:@"iPhone15,2"]) return @"iPhone 14 Pro";
+    if ([platform isEqualToString:@"iPhone15,3"]) return @"iPhone 14 Pro Max";
+    
     if ([platform isEqualToString:@"iPod1,1"])   return @"iPod Touch 1G";
     if ([platform isEqualToString:@"iPod2,1"])   return @"iPod Touch 2G";
     if ([platform isEqualToString:@"iPod3,1"])   return @"iPod Touch 3G";
     if ([platform isEqualToString:@"iPod4,1"])   return @"iPod Touch 4G";
     if ([platform isEqualToString:@"iPod5,1"])   return @"iPod Touch 5G";
-    if ([platform isEqualToString:@"iPad1,1"])   return @"iPad 1G";
+    
+    //ipad
+    if ([platform isEqualToString:@"iPad1,1"])   return @"iPad 1";
     if ([platform isEqualToString:@"iPad2,1"])   return @"iPad 2";
     if ([platform isEqualToString:@"iPad2,2"])   return @"iPad 2";
     if ([platform isEqualToString:@"iPad2,3"])   return @"iPad 2";
@@ -228,12 +274,48 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     if ([platform isEqualToString:@"iPad3,4"])   return @"iPad 4";
     if ([platform isEqualToString:@"iPad3,5"])   return @"iPad 4";
     if ([platform isEqualToString:@"iPad3,6"])   return @"iPad 4";
+    if ([platform isEqualToString:@"iPad6,11"] || [platform isEqualToString:@"iPad6,12"])   return @"iPad 5";
+    if ([platform isEqualToString:@"iPad7,5"] || [platform isEqualToString:@"iPad7,6"])   return @"iPad 6";
+    if ([platform isEqualToString:@"iPad7,11"] || [platform isEqualToString:@"iPad7,12"])   return @"iPad 7";
+    if ([platform isEqualToString:@"iPad11,6"] || [platform isEqualToString:@"iPad11,7"])   return @"iPad 8";
+    if ([platform isEqualToString:@"iPad12,1"] || [platform isEqualToString:@"iPad12,2"])   return @"iPad 9";
+
+    //ipad air
     if ([platform isEqualToString:@"iPad4,1"])   return @"iPad Air";
     if ([platform isEqualToString:@"iPad4,2"])   return @"iPad Air";
     if ([platform isEqualToString:@"iPad4,3"])   return @"iPad Air";
-    if ([platform isEqualToString:@"iPad4,4"])   return @"iPad Mini 2G";
-    if ([platform isEqualToString:@"iPad4,5"])   return @"iPad Mini 2G";
-    if ([platform isEqualToString:@"iPad4,6"])   return @"iPad Mini 2G";
+    if ([platform isEqualToString:@"iPad5,3"] || [platform isEqualToString:@"iPad5,4"])   return @"iPad Air2";
+    if ([platform isEqualToString:@"iPad11,3"] || [platform isEqualToString:@"iPad11,4"])   return @"iPad Air3";
+    if ([platform isEqualToString:@"iPad13,1"] || [platform isEqualToString:@"iPad13,2"])   return @"iPad Air4";
+    if ([platform isEqualToString:@"iPad13,16"] || [platform isEqualToString:@"iPad13,17"])   return @"iPad Air5";
+
+    //ipad mini
+    if ([platform isEqualToString:@"iPad4,4"])   return @"iPad Mini 2";
+    if ([platform isEqualToString:@"iPad4,5"])   return @"iPad Mini 2";
+    if ([platform isEqualToString:@"iPad4,6"])   return @"iPad Mini 2";
+    if ([platform isEqualToString:@"iPad4,7"] || [platform isEqualToString:@"iPad4,8"] || [platform isEqualToString:@"iPad4,9"])   return @"iPad Mini 3";
+    if ([platform isEqualToString:@"iPad5,1"] || [platform isEqualToString:@"iPad5,2"])   return @"iPad Mini 4";
+    if ([platform isEqualToString:@"iPad11,1"] || [platform isEqualToString:@"iPad11,2"])   return @"iPad Mini 5";
+    if ([platform isEqualToString:@"iPad14,1"] || [platform isEqualToString:@"iPad14,2"])   return @"iPad Mini 6";
+    
+    //ipad pro
+    if ([platform isEqualToString:@"iPad6,3"] || [platform isEqualToString:@"iPad6,4"])   return @"iPad Pro9 7Inch";
+    if ([platform isEqualToString:@"iPad6,7"] || [platform isEqualToString:@"iPad6,8"])   return @"iPad Pro12 9Inch";
+    if ([platform isEqualToString:@"iPad7,1"] || [platform isEqualToString:@"iPad7,2"])   return @"iPad Pro12 9Inch2";
+    if ([platform isEqualToString:@"iPad7,3"] || [platform isEqualToString:@"iPad7,4"])   return @"iPad Pro10 5Inch";
+    if ([platform isEqualToString:@"iPad8,1"] || [platform isEqualToString:@"iPad8,2"]
+        || [platform isEqualToString:@"iPad8,3"] || [platform isEqualToString:@"iPad8,4"])   return @"iPad Pro11 0Inch";
+    if ([platform isEqualToString:@"iPad8,5"] || [platform isEqualToString:@"iPad8,6"]
+        || [platform isEqualToString:@"iPad8,7"] || [platform isEqualToString:@"iPad8,8"])   return @"iPad Pro12 9Inch3";
+    if ([platform isEqualToString:@"iPad8,9"] || [platform isEqualToString:@"iPad8,10"])   return @"iPad Pro11 0Inch2";
+    if ([platform isEqualToString:@"iPad13,4"] || [platform isEqualToString:@"iPad13,5"]
+        || [platform isEqualToString:@"iPad13,6"] || [platform isEqualToString:@"iPad13,7"])   return @"iPad Pro11 0Inch3";
+    if ([platform isEqualToString:@"iPad8,11"] || [platform isEqualToString:@"iPad8,124"])   return @"iPad Pro12 9Inch4";
+    if ([platform isEqualToString:@"iPad13,8"] || [platform isEqualToString:@"iPad13,9"]
+        || [platform isEqualToString:@"iPad13,10"] || [platform isEqualToString:@"iPad13,11"])   return @"iPad Pro12 9Inch5";
+
+
+    //Simulator
     if ([platform isEqualToString:@"i386"])      return @"iPhone Simulator";
     if ([platform isEqualToString:@"x86_64"])    return @"iPhone Simulator";
     return platform;

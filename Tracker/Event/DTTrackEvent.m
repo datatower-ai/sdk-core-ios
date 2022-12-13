@@ -52,12 +52,6 @@
         }
     }
     
-    if (self.timeValueType != DTEventTimeValueTypeTimeOnly) {
-        if (![DTPresetProperties disableZoneOffset]) {
-            self.properties[@"#zone_offset"] = @([self timeZoneOffset]);
-        }
-    }
-    
     return dict;
 }
 

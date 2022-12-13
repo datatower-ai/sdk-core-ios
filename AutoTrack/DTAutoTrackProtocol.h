@@ -1,8 +1,8 @@
 //
-//  TAAutoTrackProtocol.h
-//  ThinkingSDK
+//  DTAutoTrackProtocol.h
 //
-//  Created by 杨雄 on 2022/7/1.
+//
+//
 //
 
 #ifndef TAAutoTrackProtocol_h
