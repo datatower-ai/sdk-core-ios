@@ -105,8 +105,15 @@
     if (syns.count == 0) {
         return NO;
     }
+
+    NSMutableArray *synsCopy = [syns mutableCopy];
+    for (int i = 0; i < synsCopy.count;i++) {
+        NSString *syn = synsCopy[i];
+        NSString *modifySyn = [NSString stringWithFormat:@"'%@'",syn];
+        synsCopy[i] = modifySyn;
+    }
     
-    NSString *query = [NSString stringWithFormat:@"DELETE FROM DTDataBase WHERE event_syn IN (%@)", [syns componentsJoinedByString:@","]];
+    NSString *query = [NSString stringWithFormat:@"DELETE FROM DTDataBase WHERE event_syn IN (%@);", [synsCopy componentsJoinedByString:@","]];
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(_database, query.UTF8String, -1, &stmt, NULL) != SQLITE_OK) {
