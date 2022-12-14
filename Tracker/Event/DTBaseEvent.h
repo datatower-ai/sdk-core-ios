@@ -24,6 +24,7 @@ static NSString * const DT_APP_INITIALIZE                   = @"#app_initialize"
 
 
 static NSString * const COMMON_PROPERTY_EVENT_SESSION            = @"#session_id";
+static NSString * const COMMON_PROPERTY_EVENT_SESSION_DURATION  = @"#session_duration";
 static NSString * const COMMON_PROPERTY_MCC                      = @"#mcc";
 static NSString * const COMMON_PROPERTY_MNC                      = @"#mnc";
 static NSString * const COMMON_PROPERTY_OS_COUNTRY               = @"#os_country_code";
@@ -113,7 +114,9 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 @property (nonatomic, copy) NSString *dtid;
 @property (nonatomic, copy) NSString *bundleId;
 @property (nonatomic, assign) BOOL isDebug;
-@property (nonatomic, strong) NSDate *time;
+@property (nonatomic, assign) NSTimeInterval time;
+/// 事件名字
+@property (nonatomic, copy) NSString *eventName;
 @property (nonatomic, strong) NSTimeZone *timeZone;
 @property (nonatomic, strong, readonly) NSDateFormatter *timeFormatter;
 /// 传入的时间类型

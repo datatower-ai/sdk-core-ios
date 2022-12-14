@@ -43,7 +43,7 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     self = [super init];
     if (self) {
         // 只能直接访问变量，不要触发 setter 方法。默认记录当前事件发生的时间
-        _time = [NSDate date];
+        _time = [[NSDate date] timeIntervalSince1970];
         self.timeValueType = DTEventTimeValueTypeNone;
         self.uuid = [NSUUID UUID].UUIDString;
     }
@@ -63,16 +63,7 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
 
 - (NSMutableDictionary *)jsonObject {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//
-//    static let EVENT_INFO_DTID          = "#dt_id"
-//    static let EVENT_INFO_ACID          = "#acid"
-//    static let EVENT_INFO_PKG           = "#pkg"
-//    static let EVENT_INFO_APP_ID        = "#app_id"
-//    static let EVENT_INFO_DEBUG         = "#debug"
-//    static let EVENT_INFO_TIME          = "#event_time"
-//    static let EVENT_INFO_NAME          = "#event_name"
-//    static let EVENT_INFO_SYN           = "#event_syn"
-//    static let EVENT_TYPE               = "#event_type"
+
     if (self.dtid) {
         dict[@"#dt_id"] = self.dtid;
     }
@@ -88,11 +79,13 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     if (self.isDebug){
         dict[@"#debug"] = @YES;
     }
-    dict[@"#event_time"] = self.time;
+    
+    dict[@"#event_time"] = [NSNumber numberWithDouble:self.time * 1000];
     dict[@"#event_syn"]  = self.uuid;
     dict[@"#event_type"] = [self eventTypeString];
     
-    
+    dict[@"#event_name"] = self.eventName;
+
     dict[@"properties"] = self.properties;
     return dict;
 }
@@ -228,7 +221,7 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     return _timeFormatter;
 }
 
-- (void)setTime:(NSDate *)time {
+- (void)setTime:(NSTimeInterval)time {
     // 过滤time为nil
     if (time) {
         [self willChangeValueForKey:@"time"];

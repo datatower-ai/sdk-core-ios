@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DTEventTracker : NSObject
 
-+ (dispatch_queue_t)td_networkQueue;
+- (dispatch_queue_t)dt_networkQueue;
 
 - (instancetype)initWithQueue:(dispatch_queue_t)queue;
 
@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)track:(NSDictionary *)event sync:(NSString *)sync immediately:(BOOL)immediately;
 
-- (NSInteger)saveEventsData:(NSDictionary *)data sync:(NSString *)sync;
+- (void)saveEventsData:(NSDictionary *)data sync:(NSString *)sync;
 
 - (void)_asyncWithCompletion:(void(^)(void))completion;
 

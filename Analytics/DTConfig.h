@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *appid;
 @property (nonatomic, copy) NSString *channel;
+@property (nonatomic, copy) NSString *serverUrl;
 @property (nonatomic, assign) BOOL enabledDebug;
 @property (nonatomic, assign) DTLogDegree logDegree;
 @property (nonatomic, strong) NSDictionary *commonProperties;
@@ -23,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (DTConfig *)shareInstance;
 
 + (NSString*)version;
+
+
+
 
 
 @end

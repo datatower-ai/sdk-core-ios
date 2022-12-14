@@ -38,17 +38,15 @@
 - (NSMutableDictionary *)jsonObject {
     NSMutableDictionary *dict = [super jsonObject];
     
-    dict[@"#event_name"] = self.eventName;
-    
-    if (![DTPresetProperties disableDuration]) {
+    if (![DTPresetProperties disableDuration] && ![self.eventName  isEqual: DT_APP_END_EVENT]) {
         if (self.foregroundDuration > 0) {
-            self.properties[@"#duration"] = [NSString stringWithFormat:@"%.3f", self.foregroundDuration];
+            self.properties[COMMON_PROPERTY_EVENT_DURATION] = [NSString stringWithFormat:@"%.3f", self.foregroundDuration];
         }
     }
     
     if (![DTPresetProperties disableBackgroundDuration]) {
         if (self.backgroundDuration > 0) {
-            self.properties[@"#background_duration"] = [NSString stringWithFormat:@"%.3f", self.backgroundDuration];
+//            self.properties[@"#background_duration"] = [NSString stringWithFormat:@"%.3f", self.backgroundDuration];
         }
     }
     

@@ -19,6 +19,8 @@
 #import "DTDeviceInfo.h"
 #import "DTAppStartEvent.h"
 #import "DTAppEndEvent.h"
+#import "DTUserPropertyHeader.h"
+#import "DTCalibratedTimeWithDTServer.h"
 
 @interface DTAnalyticsManager ()
 
@@ -29,7 +31,9 @@
 
 @property (atomic, copy, nullable) NSString *accountId;
 
-@property (strong,nonatomic) DTFile *file;
+@property (strong, nonatomic) DTFile *file;
+
+@property (strong, nonatomic) DTCalibratedTimeWithDTServer *calibratedTime;
 
 @end
 
@@ -67,6 +71,8 @@ static dispatch_queue_t dt_trackQueue;
     self.trackTimer = [[DTTrackTimer alloc] init];
     // 事件入库、上报
     self.eventTracker = [[DTEventTracker alloc] initWithQueue:dt_trackQueue];
+    //同步时间
+    [self calibratedTimeWithDTServer];
     //生命周期监听
     [self appLifeCycleObserver];
     //自动采集预置事件
@@ -75,7 +81,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)initLog {
     if ([[self config] enabledDebug]) {
-        [DTLogging sharedInstance].loggingLevel = DTLoggingLevelInfo;
+        [DTLogging sharedInstance].loggingLevel = DTLoggingLevelDebug;
     }
 }
 
@@ -90,17 +96,20 @@ static dispatch_queue_t dt_trackQueue;
     [self registerAppLifeCycleListener];
 }
 
+- (void)calibratedTimeWithDTServer {
+    self.calibratedTime = [[DTCalibratedTimeWithDTServer alloc]
+                           initWithNetworkQueue:[self.eventTracker dt_networkQueue] url:self.config.serverUrl];
+    [self.calibratedTime recalibrationWithDTServer];
+}
+
 //
 - (void)initProperties {
     // 初始化公共属性管理
-    self.superProperty = [[DTSuperProperty alloc] initWithToken:self.config.appid isLight:YES];
-    
+    self.superProperty = [[DTSuperProperty alloc] initWithToken:self.config.appid isLight:NO];
     // 注册属性插件, 收集设备属性
     self.propertyPluginManager = [[DTPropertyPluginManager alloc] init];
     DTPresetPropertyPlugin *presetPlugin = [[DTPresetPropertyPlugin alloc] init];
     [self.propertyPluginManager registerPropertyPlugin:presetPlugin];
-    
-//    DTLogInfo(pluginProperties);
 }
 
 //MARK: - AppLifeCycle
@@ -212,11 +221,6 @@ static dispatch_queue_t dt_trackQueue;
 /// @param event 事件
 /// @param properties 自定义属性
 - (void)asyncAutoTrackEventObject:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties {
-    // 获取当前的SDK上报状态，并记录
-//    event.isEnabled = self.isEnabled;
-//    event.trackPause = self.isTrackPause;
-//    event.isOptOut = self.isOptOut;
-    
     dispatch_async(dt_trackQueue, ^{
         [self trackEvent:event properties:properties isH5:NO];
     });
@@ -237,7 +241,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)track:(NSString *)event properties:(nullable NSDictionary *)properties time:(NSDate *)time timeZone:(NSTimeZone *)timeZone {
     DTTrackEvent *trackEvent = [[DTTrackEvent alloc] initWithName:event];
-    DTLogDebug(@"##### track.systemUpTime: %lf", trackEvent.systemUpTime);
+    DTLogDebug(@"##### track %@ systemUpTime: %lf",event, trackEvent.systemUpTime);
 //    [self configEventTimeValueWithEvent:trackEvent time:time timeZone:timeZone];
     [self handleTimeEvent:trackEvent];
     [self asyncTrackEventObject:trackEvent properties:properties isH5:NO];
@@ -257,6 +261,33 @@ static dispatch_queue_t dt_trackQueue;
     dispatch_async(dt_trackQueue, ^{
         [self trackEvent:event properties:properties isH5:isH5];
     });
+}
+
+
+/// 将事件加入到事件队列
+/// @param event 事件
+/// @param properties 自定义属性
+- (void)asyncUserEventObject:(DTUserEvent *)event properties:(NSDictionary *)properties {
+    // 获取当前的SDK上报状态，并记录
+//    event.isEnabled = self.isEnabled;
+//    event.trackPause = self.isTrackPause;
+//    event.isOptOut = self.isOptOut;
+    
+    dispatch_async(dt_trackQueue, ^{
+        [self trackUserEvent:event properties:properties];
+    });
+}
+
+- (void)trackUserEvent:(DTUserEvent *)event properties:(NSDictionary *)properties {
+    
+    // 组装通用属性
+    [self configBaseEvent:event];
+    // 校验并添加用户自定义属性
+    [event.properties addEntriesFromDictionary:[DTPropertyValidator validateProperties:properties validator:event]];
+    // 将属性中所有NSDate对象，用指定的 timezone 转换成时间字符串
+    NSDictionary *jsonObj = [event formatDateWithDict:event.jsonObject];
+    // 发送数据
+    [self.eventTracker track:jsonObj sync:event.uuid immediately:false ];
 }
 
 - (void)trackEvent:(DTTrackEvent *)event properties:(NSDictionary *)properties isH5:(BOOL)isH5 {
@@ -361,11 +392,11 @@ static dispatch_queue_t dt_trackQueue;
     event.bundleId = [DTDeviceInfo bundleId];
     
     // 事件如果没有指定时间，那么使用系统时间时需要校准
-//    if (event.timeValueType == DTEventTimeValueTypeNone && calibratedTime && calibratedTime.stopCalibrate == NO) {
-//        NSTimeInterval outTime = NSProcessInfo.processInfo.systemUptime - calibratedTime.systemUptime;
-//        NSDate *serverDate = [NSDate dateWithTimeIntervalSince1970:(calibratedTime.serverTime + outTime)];
-//        event.time = serverDate;
-//    }
+    if (event.timeValueType == DTEventTimeValueTypeNone && _calibratedTime && _calibratedTime.stopCalibrate == NO) {
+        NSTimeInterval outTime = NSProcessInfo.processInfo.systemUptime - _calibratedTime.systemUptime;
+        NSTimeInterval serverDate = _calibratedTime.serverTime + outTime;
+        event.time = serverDate;
+    }
 }
 
 - (void)timeEvent:(NSString *)event {
@@ -380,7 +411,84 @@ static dispatch_queue_t dt_trackQueue;
     [self.trackTimer trackEvent:event withSystemUptime:NSProcessInfo.processInfo.systemUptime];
 }
 
+#pragma mark - User
 
+- (void)user_add:(NSString *)propertyName andPropertyValue:(NSNumber *)propertyValue {
+    [self user_add:propertyName andPropertyValue:propertyValue withTime:nil];
+}
+
+- (void)user_add:(NSString *)propertyName andPropertyValue:(NSNumber *)propertyValue withTime:(NSDate *)time {
+    if (propertyName && propertyValue) {
+        [self user_add:@{propertyName: propertyValue} withTime:time];
+    }
+}
+
+- (void)user_add:(NSDictionary *)properties {
+    [self user_add:properties withTime:nil];
+}
+
+- (void)user_add:(NSDictionary *)properties withTime:(NSDate *)time {
+    DTUserEventAdd *event = [[DTUserEventAdd alloc] init];
+    
+    [self asyncUserEventObject:event properties:properties];
+}
+
+- (void)user_setOnce:(NSDictionary *)properties {
+    [self user_setOnce:properties withTime:nil];
+}
+
+- (void)user_setOnce:(NSDictionary *)properties withTime:(NSDate *)time {
+    DTUserEventSetOnce *event = [[DTUserEventSetOnce alloc] init];
+    [self asyncUserEventObject:event properties:properties];
+}
+
+- (void)user_set:(NSDictionary *)properties {
+    [self user_set:properties withTime:nil];
+}
+
+- (void)user_set:(NSDictionary *)properties withTime:(NSDate *)time {
+    DTUserEventSet *event = [[DTUserEventSet alloc] init];
+    [self asyncUserEventObject:event properties:properties];
+}
+
+- (void)user_unset:(NSString *)propertyName {
+    [self user_unset:propertyName withTime:nil];
+}
+
+- (void)user_unset:(NSString *)propertyName withTime:(NSDate *)time {
+    if ([propertyName isKindOfClass:[NSString class]] && propertyName.length > 0) {
+        NSDictionary *properties = @{propertyName: @0};
+        DTUserEventUnset *event = [[DTUserEventUnset alloc] init];
+        [self asyncUserEventObject:event properties:properties];
+    }
+}
+
+- (void)user_delete {
+    [self user_delete:nil];
+}
+
+- (void)user_delete:(NSDate *)time {
+    DTUserEventDelete *event = [[DTUserEventDelete alloc] init];
+    [self asyncUserEventObject:event properties:nil];
+}
+
+- (void)user_append:(NSDictionary<NSString *, NSArray *> *)properties {
+    [self user_append:properties withTime:nil];
+}
+
+- (void)user_append:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate *)time {
+    DTUserEventAppend *event = [[DTUserEventAppend alloc] init];
+    [self asyncUserEventObject:event properties:properties];
+}
+
+- (void)user_uniqAppend:(NSDictionary<NSString *, NSArray *> *)properties {
+    [self user_uniqAppend:properties withTime:nil];
+}
+
+- (void)user_uniqAppend:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate *)time {
+    DTUserEventUniqueAppend *event = [[DTUserEventUniqueAppend alloc] init];
+    [self asyncUserEventObject:event properties:properties];
+}
 
 
 @end

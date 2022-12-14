@@ -6,6 +6,8 @@
 //
 
 #import "DTNetWork.h"
+#import "DTLogging.h"
+
 
 @implementation DTNetWork
 
@@ -16,6 +18,7 @@
     NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:URL];
     req.HTTPMethod = @"POST";
     req.HTTPBody = requestBody;
+    [req setTimeoutInterval:60.0];
     for (NSString *key in [headers allKeys]) {
         NSString *value = [headers objectForKey:key];
         if (key && value) {
@@ -26,13 +29,42 @@
     BOOL __block postSuccess = NO;
     NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:req
                                                                      completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if ([response isKindOfClass:[NSHTTPURLResponse class]] && error == NULL) {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-            postSuccess = (httpResponse.statusCode == 200);
+            
+        if (error || ![response isKindOfClass:[NSHTTPURLResponse class]]) {
+            postSuccess = NO;
+            DTLogError(@"Networking error:%@", error);
             dispatch_semaphore_signal(sema);
-        } else {
-            dispatch_semaphore_signal(sema);
+            return;
         }
+
+        NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+        NSInteger statusCode = [urlResponse statusCode];
+        if (statusCode == 200) {
+            if (data) {
+                NSError *error = nil;
+                id jsonObject = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                if (jsonObject != nil && error == nil && [jsonObject isKindOfClass:[NSDictionary class]]){
+                    NSDictionary *jsonDictionary = (NSDictionary *)jsonObject;
+                    NSNumber *code  = (NSNumber *)[jsonDictionary objectForKey:@"code"];
+                    //code == 0 才算成功
+                    if([code longValue] == 0){
+                        postSuccess = YES;
+                        dispatch_semaphore_signal(sema);
+                        return;
+                    }
+                    
+                }
+            }
+            postSuccess = NO;
+            NSString *urlResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            DTLogDebug(@"%@", [NSString stringWithFormat:@"%@ network failed with statusCode 200, data '%@'.", self, urlResponse]);
+        } else {
+            postSuccess = NO;
+            NSString *urlResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            DTLogDebug(@"%@", [NSString stringWithFormat:@"%@ network failed with statusCode '%ld, data '%@'.", self, (long)statusCode,urlResponse]);
+        }
+        dispatch_semaphore_signal(sema);
+        
     }];
     [dataTask resume];
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
@@ -48,6 +80,7 @@
     NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:URL];
     req.HTTPMethod = @"POST";
     req.HTTPBody = requestBody;
+    [req setTimeoutInterval:60.0];
     for (NSString *key in [headers allKeys]) {
         NSString *value = [headers objectForKey:key];
         if (key && value) {
@@ -73,7 +106,7 @@
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         if (httpResponse.statusCode == 200) {
             if (success) {
-                success (data);
+                success(httpResponse, data);
             }
         } else {
             if (failed) {
@@ -84,5 +117,37 @@
     }];
     [dataTask resume];
 }
+
++ (NSString *)postRequestForResponse:(NSURL *)URL
+               requestBody:(NSData *)requestBody
+                   headers:(nullable NSDictionary<NSString *,NSString *> *)headers {
+    NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:URL];
+    req.HTTPMethod = @"POST";
+    req.HTTPBody = requestBody;
+    [req setTimeoutInterval:60.0];
+    for (NSString *key in [headers allKeys]) {
+        NSString *value = [headers objectForKey:key];
+        if (key && value) {
+            [req addValue:value forHTTPHeaderField:key];
+        }
+    }
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    NSString * __block dataString = @"";
+    NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:req
+                                                                     completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if ([response isKindOfClass:[NSHTTPURLResponse class]] && error == NULL) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            dataString = [NSString stringWithString:[httpResponse allHeaderFields][@"Date"]];
+            dispatch_semaphore_signal(sema);
+        } else {
+            dispatch_semaphore_signal(sema);
+        }
+    }];
+    [dataTask resume];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return dataString;
+}
+
+
 
 @end

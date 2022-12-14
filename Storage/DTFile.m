@@ -22,6 +22,18 @@
     return self;
 }
 
+
+- (void)archiveSuperProperties:(NSDictionary *)superProperties {
+    NSString *filePath = [self superPropertiesFilePath];
+    if (![self archiveObject:[superProperties copy] withFilePath:filePath]) {
+        DTLogError(@"%@ unable to archive superProperties", self);
+    }
+}
+
+- (NSDictionary*)unarchiveSuperProperties {
+    return [self unarchiveFromFile:[self superPropertiesFilePath] asClass:[NSDictionary class]];
+}
+
 - (NSString*)unarchiveAccountID {
     return [self unarchiveFromFile:[self accountIDFilePath] asClass:[NSString class]];
 }
@@ -91,6 +103,10 @@
     return unarchivedData;
 }
 
+- (NSString *)superPropertiesFilePath {
+    return [self persistenceFilePath:@"superProperties"];
+}
+
 - (NSString *)accountIDFilePath {
     return [self persistenceFilePath:@"accountID"];
 }
@@ -102,7 +118,7 @@
 
 // 持久化文件
 - (NSString *)persistenceFilePath:(NSString *)data{
-    NSString *filename = [NSString stringWithFormat:@"datatower-%@-%@.plist", self.appid, data];
+    NSString *filename = [NSString stringWithFormat:@"datatower-%@.plist", data];
     return [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject]
             stringByAppendingPathComponent:filename];
 }

@@ -92,16 +92,16 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 + (DTNetworkType)convertNetworkType:(NSString *)networkType {
     if ([@"NULL" isEqualToString:networkType]) {
-        return DTNetworkTypeALL;
-    } else if ([@"WIFI" isEqualToString:networkType]) {
+        return DTNetworkTypeNONE;
+    } else if ([@"wifi" isEqualToString:networkType]) {
         return DTNetworkTypeWIFI;
-    } else if ([@"2G" isEqualToString:networkType]) {
+    } else if ([@"2g" isEqualToString:networkType]) {
         return DTNetworkType2G;
-    } else if ([@"3G" isEqualToString:networkType]) {
+    } else if ([@"3g" isEqualToString:networkType]) {
         return DTNetworkType3G;
-    } else if ([@"4G" isEqualToString:networkType]) {
+    } else if ([@"4g" isEqualToString:networkType]) {
         return DTNetworkType4G;
-    }else if([@"5G"isEqualToString:networkType])
+    }else if([@"5g"isEqualToString:networkType])
     {
         return DTNetworkType5G;
     }
@@ -170,8 +170,8 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 #elif TARGET_OS_OSX
 
-+ (ThinkingNetworkType)convertNetworkType:(NSString *)networkType {
-    return ThinkingNetworkTypeWIFI;
++ (DTNetworkType)convertNetworkType:(NSString *)networkType {
+    return DTNetworkTypeWIFI;
 }
 
 - (void)startMonitoring {

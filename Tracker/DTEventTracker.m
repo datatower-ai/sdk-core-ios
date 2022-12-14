@@ -5,19 +5,21 @@
 //
 //
 #import "DTEventTracker.h"
-#import "DTNetwork.h"
 #import "DTReachability.h"
 #import "DTDBManager.h"
 #import "DTConfig.h"
 #import "DTAnalyticsManager.h"
 #import "DTDBEventModel.h"
+#import "DTJSONUtil.h"
+#import "DTNetWork.h"
+#import "DTReachability.h"
 
-static dispatch_queue_t td_networkQueue;// 网络请求在td_networkQueue中进行
+static dispatch_queue_t dt_networkQueue;// 网络请求在td_networkQueue中进行
 static NSUInteger const kBatchSize = 10;
 
 @interface DTEventTracker ()
-@property (atomic, strong) DTNetWork *network;
 @property (atomic, strong) DTConfig *config;
+@property (atomic, copy) NSURL *sendURL;
 @property (atomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) DTDBManager *dataQueue;
 
@@ -26,23 +28,23 @@ static NSUInteger const kBatchSize = 10;
 @implementation DTEventTracker
 
 + (void)initialize {
-    static dispatch_once_t ThinkingOnceToken;
-    dispatch_once(&ThinkingOnceToken, ^{
+    static dispatch_once_t DTOnceToken;
+    dispatch_once(&DTOnceToken, ^{
         NSString *queuelabel = [NSString stringWithFormat:@"com.datatower.%p", (void *)self];
         NSString *networkLabel = [queuelabel stringByAppendingString:@".network"];
-        td_networkQueue = dispatch_queue_create([networkLabel UTF8String], DISPATCH_QUEUE_SERIAL);
+        dt_networkQueue = dispatch_queue_create([networkLabel UTF8String], DISPATCH_QUEUE_SERIAL);
     });
 }
 
-+ (dispatch_queue_t)td_networkQueue {
-    return td_networkQueue;
+- (dispatch_queue_t)dt_networkQueue {
+    return dt_networkQueue;
 }
 
 - (instancetype)initWithQueue:(dispatch_queue_t)queue {
     if (self = [self init]) {
         self.queue = queue;
         self.config = [DTAnalyticsManager shareInstance].config;
-//        self.network = [self generateNetworkWithConfig:self.config];
+        self.sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", self.config.serverUrl]];
         self.dataQueue = [DTDBManager sharedInstance];
     }
     return self;
@@ -56,30 +58,30 @@ static NSUInteger const kBatchSize = 10;
     if (immediately) {
         DTLogDebug(@"queueing data flush immediately:%@", event);
         dispatch_async(self.queue, ^{
-            dispatch_async(td_networkQueue, ^{
+            dispatch_async(dt_networkQueue, ^{
                 [self flushImmediately:event];
             });
         });
     } else {
-        DTLogDebug(@"queueing data:%@", event);
         // 存入数据库
         [self saveEventsData:event sync:sync];
+        
+        [self flush];
     }
-   
-    [self flush];
 }
 
 - (void)flushImmediately:(NSDictionary *)event {
-//    [self.network flushEvents:@[event]];
+    [self sendEventsData:@[event]];
 }
 
-- (NSInteger)saveEventsData:(NSDictionary *)data sync:(NSString *)sync{
+- (void)saveEventsData:(NSDictionary *)data sync:(NSString *)sync{
     NSMutableDictionary *event = [[NSMutableDictionary alloc] initWithDictionary:data];
-    NSInteger count = 0;
     @synchronized (DTDBManager.class) {
-        [self.dataQueue addEvent:event eventSyn:sync];
+        BOOL result = [self.dataQueue addEvent:event eventSyn:sync];
+        if(result) {
+            DTLogDebug(@"save data success:%@", data[@"#event_name"]);
+        }
     }
-    return count;
 }
 
 - (void)flush {
@@ -92,7 +94,7 @@ static NSUInteger const kBatchSize = 10;
 - (void)_asyncWithCompletion:(void(^)(void))completion {
     // 在任务队列中异步执行，需要判断当前是否已经在任务队列中，避免重复包装
     void(^block)(void) = ^{
-        dispatch_async(td_networkQueue, ^{
+        dispatch_async(dt_networkQueue, ^{
             [self _syncWithSize:kBatchSize completion:completion];
         });
     };
@@ -108,7 +110,14 @@ static NSUInteger const kBatchSize = 10;
 /// @param completion 同步回调
 /// 该方法需要在networkQueue中进行，会持续的发送网络请求直到数据库的数据被发送完
 - (void)_syncWithSize:(NSUInteger)size completion:(void(^)(void))completion {
-    
+    //判断网络
+    NSString *networkType = [[DTReachability shareInstance] networkState];
+    if (![DTReachability convertNetworkType:networkType]) {
+        if (completion) {
+            completion();
+        }
+        return;
+    }
     // 获取数据库数据，取前十条数据
     NSArray<NSDictionary *> *recordArray;
     NSArray *recodSyns;
@@ -134,10 +143,10 @@ static NSUInteger const kBatchSize = 10;
     }
 
     // 网络情况较好，会在此处持续的将数据库中的数据发送完
-    // 1，保证end事件发送成功
+    // 保证end事件发送成功
     BOOL flushSucc = YES;
     while (recordArray.count > 0 && recodSyns.count > 0 && flushSucc) {
-//        flushSucc = [self.network flushEvents:recordArray];
+        flushSucc = [self sendEventsData:recordArray];
         if (flushSucc) {
             @synchronized (DTDBManager.class) {
                 BOOL ret = [self.dataQueue deleteEventsWithSyns:recodSyns];
@@ -166,7 +175,21 @@ static NSUInteger const kBatchSize = 10;
 
 
 - (void)syncSendAllData {
-    dispatch_sync(td_networkQueue, ^{});
+    dispatch_sync(dt_networkQueue, ^{});
+}
+- (BOOL)sendEventsData:(NSArray<NSDictionary *> *) eventArray{
+    NSMutableDictionary *header = [NSMutableDictionary dictionary];
+    header[@"Content-Type"] = @"text/plain";
+    
+    NSString *jsonString = [DTJSONUtil JSONStringForObject:eventArray];
+    NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    BOOL reslult = [DTNetWork postRequestWithURL:self.sendURL requestBody:postBody headers:header];
+    if (reslult) {
+        DTLogDebug(@"flush success sendContent---->:%@",jsonString);
+    }
+    return reslult;
+    
 }
 
 

@@ -20,6 +20,8 @@
     config.channel = [self channelTextWithChannel:channel];
     config.enabledDebug = debug;
     config.logDegree = log;
+    config.serverUrl = @"https://report-inner.roiquery.com";
+//    config.serverUrl = @"https://test.roiquery.com";
     config.commonProperties = [commonProperties copy];
     [DTAnalytics initializeWithConfig:config];
     

@@ -33,7 +33,7 @@ static NSString *dt_quality_error_message     = @"error_message";
     [DTNetWork postRequestWithURL:url
                       requestBody:[self mergeQualityDataWithLevel:DTQualityLevel_TYPE_ERROR code:code errorMsg:errorMsg msg:msg]
                           headers:header
-                          success:^(NSData * _Nullable data){
+                          success:^(NSHTTPURLResponse * _Nullable response,NSData * _Nullable data){
         DTLogInfo(@"reportQualityMessageLevelSuccess");
     } failed:^(NSError * _Nonnull error) {
         DTLogError(@"reportQualityMessageLevelFail %@", error);

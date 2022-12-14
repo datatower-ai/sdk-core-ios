@@ -11,8 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @interface DTTrackEvent : DTBaseEvent
-/// 事件名字
-@property (nonatomic, copy) NSString *eventName;
+
 /// 累计前台时长
 @property (nonatomic, assign) NSTimeInterval foregroundDuration;
 /// 累计后台时长

@@ -65,7 +65,7 @@
     if (type & DTAutoTrackEventTypeAppInstall) {
         DTAutoTrackEvent *event = [[DTAutoTrackEvent alloc] initWithName:DT_APP_INSTALL_EVENT];
         // 安装事件提前1s统计
-        event.time = [[NSDate date] dateByAddingTimeInterval: -1];
+//        event.time = [[NSDate date] dateByAddingTimeInterval: -1];
         [self.appInstallTracker trackWithInstanceTag:appid event:event params:nil];
     }
     

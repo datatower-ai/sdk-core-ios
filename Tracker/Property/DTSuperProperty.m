@@ -34,7 +34,7 @@
         if (!isLight) {
             // 非轻实例才需要用到持久化
             self.file = [[DTFile alloc] initWithAppid:token];
-//            self.superProperties = [self.file unarchiveSuperProperties];
+            self.superProperties = [self.file unarchiveSuperProperties];
         }
     }
     return self;
@@ -57,12 +57,12 @@
     self.superProperties = [NSDictionary dictionaryWithDictionary:tmp];
 
     // 持久化
-//    [self.file archiveSuperProperties:self.superProperties];
+    [self.file archiveSuperProperties:self.superProperties];
 }
 
 - (void)unregisterSuperProperty:(NSString *)property {
     NSError *error = nil;
-    [DTPropertyValidator validateEventOrPropertyName:property withError:&error];
+//    [DTPropertyValidator validateEventOrPropertyName:property withError:&error];
     if (error) {
         return;
     }
@@ -71,12 +71,12 @@
     tmp[property] = nil;
     self.superProperties = [NSDictionary dictionaryWithDictionary:tmp];
     
-//    [self.file archiveSuperProperties:self.superProperties];
+    [self.file archiveSuperProperties:self.superProperties];
 }
 
 - (void)clearSuperProperties {
     self.superProperties = @{};
-//    [self.file archiveSuperProperties:self.superProperties];
+    [self.file archiveSuperProperties:self.superProperties];
 }
 
 - (NSDictionary *)currentSuperProperties {
