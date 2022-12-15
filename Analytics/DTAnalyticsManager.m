@@ -117,6 +117,7 @@ static dispatch_queue_t dt_trackQueue;
 - (void)trackPresetEvents{
     // app_install 、app_initialize、session_start、session_end
     [self enableAutoTrack:DTAutoTrackEventTypeAll];
+    
     [self user_set: [self.presetProperty getLatestPresetProperties]];
     [self user_setOnce: [self.presetProperty getActivePresetProperties]];
 }
@@ -210,7 +211,6 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)autoTrackWithEvent:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties {
-    DTLogDebug(@"##### autoTrackWithEvent: %@", event.eventName);
     [self handleTimeEvent:event];
     [self asyncAutoTrackEventObject:event properties:properties];
 }
@@ -243,6 +243,11 @@ static dispatch_queue_t dt_trackQueue;
 //    [self configEventTimeValueWithEvent:trackEvent time:time timeZone:timeZone];
     [self handleTimeEvent:trackEvent];
     [self asyncTrackEventObject:trackEvent properties:properties isH5:NO];
+}
+
+// 发送将数据库数据
+- (void)flush {
+    [self.eventTracker flush];
 }
 
 #pragma mark - Private

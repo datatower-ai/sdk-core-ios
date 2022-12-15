@@ -147,6 +147,7 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 
 - (NSString *)eventTypeString;
 
+- (NSNumber *)formatTime:(NSTimeInterval)time;
 /// 获取事件类型
 + (DTEventType)typeWithTypeString:(NSString *)typeString;
 

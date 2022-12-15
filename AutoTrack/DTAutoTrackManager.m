@@ -63,7 +63,7 @@
     
     //安装事件
     if (type & DTAutoTrackEventTypeAppInstall) {
-        DTAutoTrackEvent *event = [[DTAutoTrackEvent alloc] initWithName:DT_APP_INSTALL_EVENT];
+        DTAppInstallEvent *event = [[DTAppInstallEvent alloc] initWithName:DT_APP_INSTALL_EVENT];
         // 安装事件提前1s统计
 //        event.time = [[NSDate date] dateByAddingTimeInterval: -1];
         [self.appInstallTracker trackWithInstanceTag:appid event:event params:nil];
@@ -71,7 +71,7 @@
     
     //初始化事件
     if (type & DTAutoTrackEventTypeInitialize) {
-        DTAutoTrackEvent *event = [[DTAutoTrackEvent alloc] initWithName:DT_APP_INITIALIZE];
+        DTAppInitializeEvent *event = [[DTAppInitializeEvent alloc] initWithName:DT_APP_INITIALIZE];
         [self.appInitializeTracker trackWithInstanceTag:appid event:event params:nil];
     }
     

@@ -52,7 +52,6 @@ dispatch_sync(dispatch_get_main_queue(), block);\
  */
 - (void)track:(NSString *)event;
 
-
 /**
  自定义事件埋点
 
@@ -60,6 +59,9 @@ dispatch_sync(dispatch_get_main_queue(), block);\
  @param propertieDict 事件属性
  */
 - (void)track:(NSString *)event properties:(nullable NSDictionary *)propertieDict;
+
+///发送数据到服务端
+- (void)flush;
 
 /**
  记录事件时长

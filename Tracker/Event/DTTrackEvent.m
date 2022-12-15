@@ -40,7 +40,7 @@
     CGFloat minDuration = 0.01;
     if (![DTPresetProperties disableDuration] && ![self.eventName  isEqual: DT_APP_END_EVENT]) {
         if (self.duration > minDuration) {
-            self.properties[COMMON_PROPERTY_EVENT_DURATION] = [NSNumber numberWithDouble:self.duration * 1000];
+            self.properties[COMMON_PROPERTY_EVENT_DURATION] = [self formatTime:self.duration * 1000];
         }
     }
     return dict;

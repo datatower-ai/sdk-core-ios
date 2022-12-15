@@ -13,6 +13,7 @@
 #import <ThinkingSDK/DTLogging.h>
 #else
 #import "DTLogging.h"
+#import "DTAnalyticsManager.h"
 #endif
 
 
@@ -72,6 +73,7 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
         if (didRetrieveFlags) {
             self.isWifi = (flags & kSCNetworkReachabilityFlagsReachable) && !(flags & kSCNetworkReachabilityFlagsIsWWAN);
             self.isWwan = (flags & kSCNetworkReachabilityFlagsIsWWAN);
+            [[DTAnalyticsManager shareInstance] flush];
         }
         
         SCNetworkReachabilityContext context = {0, (__bridge void *)self, NULL, NULL, NULL};
@@ -113,6 +115,7 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 - (void)reachabilityChanged:(SCNetworkReachabilityFlags)flags {
     self.isWifi = (flags & kSCNetworkReachabilityFlagsReachable) && !(flags & kSCNetworkReachabilityFlagsIsWWAN);
     self.isWwan = (flags & kSCNetworkReachabilityFlagsIsWWAN);
+    [[DTAnalyticsManager shareInstance] flush];
 }
 
 - (NSString *)currentRadio {
@@ -181,11 +184,11 @@ static void DTReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 }
 
 - (NSString *)currentRadio {
-    return @"WIFI";
+    return @"wifi";
 }
 
 - (NSString *)networkState {
-    return @"WIFI";
+    return @"wifi";
 }
 
 #endif

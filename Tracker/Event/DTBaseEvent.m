@@ -80,7 +80,8 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
         dict[@"#debug"] = @YES;
     }
     
-    dict[@"#event_time"] = [NSNumber numberWithDouble:self.time * 1000];
+    dict[@"#event_time"] = [self formatTime:self.time * 1000];
+//    dict[@"#event_time"] = [NSNumber numberWithLongLong:self.time * 1000];
     dict[@"#event_syn"]  = self.uuid;
     dict[@"#event_type"] = [self eventTypeString];
     
@@ -228,6 +229,13 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
         _time = time;
         [self didChangeValueForKey:@"time"];
     }
+}
+
+- (NSNumber *)formatTime:(NSTimeInterval)time {
+    NSString *timeDoubleStr = [NSString stringWithFormat:@"%.3f", time];
+    NSArray *arr = [timeDoubleStr componentsSeparatedByString:@"."];
+    NSString *timeLongStr = [arr objectAtIndex:0];
+    return @([timeLongStr longLongValue]);
 }
 
 @end

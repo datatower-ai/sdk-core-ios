@@ -2,6 +2,8 @@
 #import "DTColdStartTracker.h"
 #import "DTHotStartTracker.h"
 #import "DTInstallTracker.h"
+#import "DTAppInitializeEvent.h"
+#import "DTAppInstallEvent.h"
 
 @interface DTAutoTrackManager : NSObject
 
