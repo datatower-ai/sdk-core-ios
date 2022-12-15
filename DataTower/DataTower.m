@@ -11,6 +11,21 @@
 @implementation DataTower
 
 + (void)initSDKWithAppID:(NSString *)appid
+               serverUrl:(NSString *)url
+                 channel:(DTChannel)channel
+                 isDebug:(BOOL)debug
+             dtLogDegree:(DTLogDegree)log {
+     
+    [self initSDKWithAppID:appid
+                 serverUrl:url
+                   channel:channel
+                   isDebug:debug
+               dtLogDegree:log
+          commonProperties:nil];
+}
+
++ (void)initSDKWithAppID:(NSString *)appid
+               serverUrl:(NSString *)url
                  channel:(DTChannel)channel
                  isDebug:(BOOL)debug
              dtLogDegree:(DTLogDegree)log
@@ -20,8 +35,7 @@
     config.channel = [self channelTextWithChannel:channel];
     config.enabledDebug = debug;
     config.logDegree = log;
-    config.serverUrl = @"https://report-inner.roiquery.com";
-//    config.serverUrl = @"https://test.roiquery.com";
+    config.serverUrl = url;
     config.commonProperties = [commonProperties copy];
     [DTAnalytics initializeWithConfig:config];
     

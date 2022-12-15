@@ -12,6 +12,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DataTower : NSObject
 
 + (void)initSDKWithAppID:(NSString *)appid
+                 serverUrl:(NSString *)url
+                 channel:(DTChannel)channel
+                 isDebug:(BOOL)debug
+             dtLogDegree:(DTLogDegree)log;
+        
+
+
+///for unity
++ (void)initSDKWithAppID:(NSString *)appid
+               serverUrl:(NSString *)url
                  channel:(DTChannel)channel
                  isDebug:(BOOL)debug
              dtLogDegree:(DTLogDegree)log
