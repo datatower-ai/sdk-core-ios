@@ -12,6 +12,8 @@
 - (instancetype)init {
     if (self = [super init]) {
         self.eventType = DTEventTypeUserAdd;
+        self.eventName = DT_EVENT_TYPE_USER_ADD;
+
     }
     return self;
 }
