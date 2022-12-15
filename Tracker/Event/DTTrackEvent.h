@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSTimeInterval foregroundDuration;
 /// 累计后台时长
 @property (nonatomic, assign) NSTimeInterval backgroundDuration;
+/// 累计总共时长
+@property (nonatomic, assign) NSTimeInterval duration;
 
 /// 记录事件发生时的开机时间节点。用于统计事件累计时长
 @property (nonatomic, assign) NSTimeInterval systemUpTime;

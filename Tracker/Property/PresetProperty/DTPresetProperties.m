@@ -8,6 +8,8 @@
 
 #import "DTPresetProperties.h"
 #import "DTPresetProperties+DTDisProperties.h"
+#import "DTBaseEvent.h"
+#import "DTDeviceInfo.h"
 
 @interface DTPresetProperties ()
 
@@ -25,6 +27,8 @@
 @property (nonatomic, copy, readwrite) NSNumber *zone_offset;
 
 @property (nonatomic, copy) NSDictionary *presetProperties;
+@property (nonatomic, copy) NSDictionary *activeProperties;
+@property (nonatomic, copy) NSDictionary *latestProperties;
 
 @end
 
@@ -33,12 +37,64 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
     self = [super init];
     if (self) {
-        [self updateValuesWithDictionary:dict];
+        [self updateActivePresetProperties:dict];
+        [self updateLatestPresetProperties:dict];
     }
     return self;
 }
 
+- (NSDictionary *)getActivePresetProperties {
+    return [_activeProperties copy];
+}
 
+- (NSDictionary *)getLatestPresetProperties {
+    
+    return [_latestProperties copy];
+}
+
+- (void)updateActivePresetProperties:(NSDictionary *)dict {
+    if (!dict){
+        return;
+    }
+    NSMutableDictionary *copyDict = [dict mutableCopy];
+    NSMutableDictionary *activeProperties = [NSMutableDictionary dictionary];
+    
+    activeProperties[USER_PROPERTY_ACTIVE_MCC]              = copyDict[COMMON_PROPERTY_MCC];
+    activeProperties[USER_PROPERTY_ACTIVE_MNC]              = copyDict[COMMON_PROPERTY_MNC];
+    activeProperties[USER_PROPERTY_ACTIVE_OS_COUNTRY]       = copyDict[COMMON_PROPERTY_OS_COUNTRY];
+    activeProperties[USER_PROPERTY_ACTIVE_OS_LANG]          = copyDict[COMMON_PROPERTY_OS_LANG];
+    activeProperties[USER_PROPERTY_ACTIVE_PKG]              = [DTDeviceInfo bundleId];
+    activeProperties[USER_PROPERTY_ACTIVE_APP_VERSION_CODE] = copyDict[COMMON_PROPERTY_APP_VERSION_CODE];
+    activeProperties[USER_PROPERTY_ACTIVE_APP_VERSION_NAME] = copyDict[COMMON_PROPERTY_APP_VERSION_NAME];
+    activeProperties[USER_PROPERTY_ACTIVE_SDK_TYPE]         = copyDict[COMMON_PROPERTY_SDK_TYPE];
+    activeProperties[USER_PROPERTY_ACTIVE_SDK_VERSION]      = copyDict[COMMON_PROPERTY_SDK_VERSION];
+    activeProperties[USER_PROPERTY_ACTIVE_OS]               = copyDict[COMMON_PROPERTY_OS];
+    activeProperties[USER_PROPERTY_ACTIVE_OS_VERSION_NAME]  = copyDict[COMMON_PROPERTY_OS_VERSION_NAME];
+    activeProperties[USER_PROPERTY_ACTIVE_DEVICE_MANUFACTURER] = copyDict[COMMON_PROPERTY_DEVICE_MANUFACTURER];
+    activeProperties[USER_PROPERTY_ACTIVE_DEVICE_BRAND]     = copyDict[COMMON_PROPERTY_DEVICE_BRAND];
+    activeProperties[USER_PROPERTY_ACTIVE_DEVICE_MODEL]     = copyDict[COMMON_PROPERTY_DEVICE_MODEL];
+    activeProperties[USER_PROPERTY_ACTIVE_SCREEN_HEIGHT]    = copyDict[COMMON_PROPERTY_SCREEN_HEIGHT];
+    activeProperties[USER_PROPERTY_ACTIVE_SCREEN_WIDTH]     = copyDict[COMMON_PROPERTY_SCREEN_WIDTH];
+    activeProperties[USER_PROPERTY_ACTIVE_MEMORY_USED]      = copyDict[COMMON_PROPERTY_MEMORY_USED];
+    activeProperties[USER_PROPERTY_ACTIVE_STORAGE_USED]     = copyDict[COMMON_PROPERTY_STORAGE_USED];
+    activeProperties[USER_PROPERTY_ACTIVE_NETWORK_TYPE]     = copyDict[COMMON_PROPERTY_NETWORK_TYPE];
+    activeProperties[USER_PROPERTY_ACTIVE_SIMULATOR]        = copyDict[COMMON_PROPERTY_SIMULATOR];
+    activeProperties[USER_PROPERTY_ACTIVE_USER_AGENT]       = [DTDeviceInfo userAgent];
+    _activeProperties = activeProperties;
+    
+}
+
+- (void)updateLatestPresetProperties:(NSDictionary *)dict {
+    if (!dict){
+        return;
+    }
+    NSMutableDictionary *copyDict = [dict mutableCopy];
+    NSMutableDictionary *latestProperties = [NSMutableDictionary dictionary];
+    latestProperties[USER_PROPERTY_LATEST_DEBUG] = copyDict[@"#debug"];
+    latestProperties[USER_PROPERTY_LATEST_APP_VERSION_CODE] = copyDict[COMMON_PROPERTY_APP_VERSION_CODE];
+    latestProperties[USER_PROPERTY_LATEST_APP_VERSION_NAME] = copyDict[COMMON_PROPERTY_APP_VERSION_NAME];
+    _latestProperties = latestProperties;
+}
 
 - (void)updateValuesWithDictionary:(NSDictionary *)dict {
     _bundle_id = dict[@"#bundle_id"]?:@"";

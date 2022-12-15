@@ -57,8 +57,29 @@ NS_ASSUME_NONNULL_BEGIN
 */
 + (void)userAppend:(NSDictionary<NSString *, NSArray *> *)properties;
 
+/// 设置自有用户系统的id
+/// - Parameters:
+///   - accountId: 用户系统id
++ (void)setAccountId:(NSString *)accountId;
 
+/// 设置Firebase的app_instance_id
+/// - Parameters:
+///   - fiid: Firebase 的 app_instance_id
++ (void)setFirebaseAppInstanceId:(NSString *)fiid;
 
+/// 设置AppsFlyer的appsflyer_id
+/// - Parameters:
+///   - afuid: AppsFlyer的appsflyer_id
++ (void)setAppsFlyerId:(NSString *)afid;
+
+/// 设置kochava iid
+/// - Parameters:
+///   - afuid: AppsFlyer的appsflyer_id
++ (void)setKochavaId:(NSString *)koid;
+
+/// 设置AdjustId
+/// - Parameter adjustId: AdjustId
++ (void)setAdjustId:(NSString *)adjustId;
 
 
 @end

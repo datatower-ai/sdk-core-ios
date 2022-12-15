@@ -16,10 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithAppid:(NSString*)appid;
 
-- (void)archiveAccountID:(nullable NSString *)accountID;
-
-- (NSString*)unarchiveAccountID ;
-
 - (void)archiveDeviceId:(NSString *)deviceId;
 
 - (NSString *)unarchiveDeviceId;
@@ -31,6 +27,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)archiveSuperProperties:(NSDictionary *)superProperties;
 
 - (NSDictionary*)unarchiveSuperProperties;
+
+- (void)archiveAccountId:(nullable NSString *)accountId;
+
+- (NSString*)unarchiveAccountId;
+
+
 
 @end;
 

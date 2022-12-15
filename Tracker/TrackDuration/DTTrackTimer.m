@@ -35,6 +35,38 @@
     self.events[eventName] = item;
 }
 
+
+- (void) updateTimerState:(NSString *)eventName withSystemUptime:(NSTimeInterval)systemUptime withState:(BOOL)state {
+    if (!eventName.length) {
+        return;
+    }
+    DTTrackTimerItem *item = self.events[eventName];
+    if (!item) {
+        return;
+    }
+    if (item.isPaused != state) {
+        [item setTimerState:state upTime:systemUptime];
+    }
+}
+
+- (NSTimeInterval)durationOfEvent:(NSString *)eventName systemUptime:(NSTimeInterval)systemUptime  {
+    if (!eventName.length) {
+        return 0;
+    }
+    DTTrackTimerItem *item = self.events[eventName];
+    if (!item) {
+        return 0;
+    }
+    NSTimeInterval duration;
+    //如果是暂停状态，
+    if (item.isPaused) {
+        duration = item.duration;
+    }else {
+        duration = systemUptime - item.beginTime + item.duration;
+    }
+    return [self validateDuration:duration eventName:eventName];
+}
+
 - (void)enterForegroundWithSystemUptime:(NSTimeInterval)systemUptime {
     NSArray *keys = [self.events allKeys];
     for (NSString *key in keys) {

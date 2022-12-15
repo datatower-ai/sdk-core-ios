@@ -10,6 +10,7 @@
 #import "DTAutoTrackEvent.h"
 #import "DTPropertyPluginManager.h"
 #import "DTSuperProperty.h"
+#import "DTPresetProperties.h"
 NS_ASSUME_NONNULL_BEGIN
 
 #ifndef dt_dispatch_main_sync_safe
@@ -31,6 +32,9 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 
 /// 公共属性
 @property (nonatomic, strong) DTSuperProperty *superProperty;
+
+/// 预置属性
+@property (nonatomic, strong) DTPresetProperties *presetProperty;
 
 
 #pragma mark -  initiate
@@ -64,6 +68,7 @@ dispatch_sync(dispatch_get_main_queue(), block);\
  */
 - (void)timeEvent:(NSString *)event;
 
+- (void)timeEventUpdate:(NSString *)event withState:(BOOL)state;
 
 - (void)enableAutoTrack:(DTAutoTrackEventType)eventType;
 
@@ -177,7 +182,29 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 */
 - (void)user_append:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate * _Nullable)time;
 
+/// 设置自有用户系统的id
+/// - Parameters:
+///   - accountId: 用户系统id
+- (void)setAcid:(NSString *)accountId;
 
+/// 设置Firebase的app_instance_id
+/// - Parameters:
+///   - fiid: Firebase 的 app_instance_id
+- (void)setFirebaseAppInstanceId:(NSString *)fiid;
+
+/// 设置AppsFlyer的appsflyer_id
+/// - Parameters:
+///   - afuid: AppsFlyer的appsflyer_id
+- (void)setAppsFlyerId:(NSString *)afid;
+
+/// 设置kochava iid
+/// - Parameters:
+///   - afuid: AppsFlyer的appsflyer_id
+- (void)setKochavaId:(NSString *)koid;
+
+/// 设置AdjustId
+/// - Parameter adjustId: AdjustId
+- (void)setAdjustId:(NSString *)adjustId;
 @end
 
 NS_ASSUME_NONNULL_END

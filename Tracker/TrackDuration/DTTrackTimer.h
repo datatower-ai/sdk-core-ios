@@ -48,6 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// 清空所有事件的时间统计
 - (void)clear;
 
+- (void) updateTimerState:(NSString *)eventName withSystemUptime:(NSTimeInterval)systemUptime withState:(BOOL)state;
+
+- (NSTimeInterval)durationOfEvent:(NSString *)eventName systemUptime:(NSTimeInterval)systemUptime;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -34,13 +34,13 @@
     return [self unarchiveFromFile:[self superPropertiesFilePath] asClass:[NSDictionary class]];
 }
 
-- (NSString*)unarchiveAccountID {
-    return [self unarchiveFromFile:[self accountIDFilePath] asClass:[NSString class]];
+- (NSString*)unarchiveAccountId {
+    return [self unarchiveFromFile:[self accountIdFilePath] asClass:[NSString class]];
 }
 
-- (void)archiveAccountID:(NSString *)accountID {
-    NSString *filePath = [self accountIDFilePath];
-    if (![self archiveObject:[accountID copy] withFilePath:filePath]) {
+- (void)archiveAccountId:(NSString *)accountId {
+    NSString *filePath = [self accountIdFilePath];
+    if (![self archiveObject:[accountId copy] withFilePath:filePath]) {
         DTLogError(@"%@ unable to archive accountID", self);
     }
 }
@@ -107,10 +107,9 @@
     return [self persistenceFilePath:@"superProperties"];
 }
 
-- (NSString *)accountIDFilePath {
+- (NSString *)accountIdFilePath {
     return [self persistenceFilePath:@"accountID"];
 }
-
 
 - (NSString *)deviceIdFilePath {
     return [self persistenceFilePath:@"deviceId"];

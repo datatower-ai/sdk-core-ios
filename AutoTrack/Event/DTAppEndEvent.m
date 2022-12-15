@@ -18,7 +18,7 @@
     CGFloat minDuration = 0.01;
     if (![DTPresetProperties disableDuration]) {
         if (self.foregroundDuration > minDuration) {
-            self.properties[COMMON_PROPERTY_EVENT_SESSION_DURATION] = [NSString stringWithFormat:@"%.3f", self.foregroundDuration];
+            self.properties[COMMON_PROPERTY_EVENT_SESSION_DURATION] = [NSNumber numberWithDouble:self.foregroundDuration * 1000];
         }
     }
     return dict;

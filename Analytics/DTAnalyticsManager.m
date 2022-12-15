@@ -75,8 +75,8 @@ static dispatch_queue_t dt_trackQueue;
     [self calibratedTimeWithDTServer];
     //生命周期监听
     [self appLifeCycleObserver];
-    //自动采集预置事件
-    [self enableAutoTrack:DTAutoTrackEventTypeAll];
+    //采集预置事件
+    [self trackPresetEvents];
 }
 
 - (void)initLog {
@@ -102,7 +102,6 @@ static dispatch_queue_t dt_trackQueue;
     [self.calibratedTime recalibrationWithDTServer];
 }
 
-//
 - (void)initProperties {
     // 初始化公共属性管理
     self.superProperty = [[DTSuperProperty alloc] initWithToken:self.config.appid isLight:NO];
@@ -110,6 +109,16 @@ static dispatch_queue_t dt_trackQueue;
     self.propertyPluginManager = [[DTPropertyPluginManager alloc] init];
     DTPresetPropertyPlugin *presetPlugin = [[DTPresetPropertyPlugin alloc] init];
     [self.propertyPluginManager registerPropertyPlugin:presetPlugin];
+    
+    //预置属性，用于用户属性设置
+    self.presetProperty = [[DTPresetProperties alloc] initWithDictionary:[self.propertyPluginManager propertiesWithEventType:DTEventTypeTrack]];
+}
+
+- (void)trackPresetEvents{
+    // app_install 、app_initialize、session_start、session_end
+    [self enableAutoTrack:DTAutoTrackEventTypeAll];
+    [self user_set: [self.presetProperty getLatestPresetProperties]];
+    [self user_setOnce: [self.presetProperty getActivePresetProperties]];
 }
 
 //MARK: - AppLifeCycle
@@ -168,20 +177,9 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)retrievePersistedData {
     self.file = [[DTFile alloc] initWithAppid:[[self config] appid]];
-    self.accountId = [self.file unarchiveAccountID];
+    self.accountId = [self.file unarchiveAccountId];
 }
 
-- (void)setAcid:(NSString *)accountId {
-    if (![accountId isKindOfClass:[NSString class]] || accountId.length == 0) {
-        DTLogError(@"accountId invald", accountId);
-        return;
-    }
-
-    self.accountId = accountId;
-    @synchronized (self.file) {
-        [self.file archiveAccountID:accountId];
-    }
-}
 
 - (void)setSuperProperties:(NSDictionary *)properties {
     dispatch_async(dt_trackQueue, ^{
@@ -279,7 +277,6 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)trackUserEvent:(DTUserEvent *)event properties:(NSDictionary *)properties {
-    
     // 组装通用属性
     [self configBaseEvent:event];
     // 校验并添加用户自定义属性
@@ -291,11 +288,6 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)trackEvent:(DTTrackEvent *)event properties:(NSDictionary *)properties isH5:(BOOL)isH5 {
-    // 判断是否允许上报
-//    if (!event.isEnabled || event.isOptOut) {
-//        return;
-//    }
-
     // 组装通用属性
     [self configBaseEvent:event];
     // 验证事件本身的合法性，具体的验证策略由事件对象本身定义。
@@ -371,6 +363,8 @@ static dispatch_queue_t dt_trackQueue;
         // 计算累计后台时长
         trackEvent.backgroundDuration = [self.trackTimer backgroundDurationOfEvent:trackEvent.eventName isActive:isActive systemUptime:trackEvent.systemUpTime];
         
+        trackEvent.duration = [self.trackTimer durationOfEvent:trackEvent.eventName systemUptime:trackEvent.systemUpTime];
+        
         DTLogDebug(@"#####eventName: %@, foregroundDuration: %d", trackEvent.eventName, trackEvent.foregroundDuration);
         DTLogDebug(@"#####eventName: %@, backgroundDuration: %d", trackEvent.eventName, trackEvent.backgroundDuration);
         // 计算时长后，删除当前事件的记录
@@ -390,7 +384,6 @@ static dispatch_queue_t dt_trackQueue;
     event.appid = [self.config appid];
     event.isDebug = [self.config enabledDebug];
     event.bundleId = [DTDeviceInfo bundleId];
-    
     // 事件如果没有指定时间，那么使用系统时间时需要校准
     if (event.timeValueType == DTEventTimeValueTypeNone && _calibratedTime && _calibratedTime.stopCalibrate == NO) {
         NSTimeInterval outTime = NSProcessInfo.processInfo.systemUptime - _calibratedTime.systemUptime;
@@ -399,10 +392,10 @@ static dispatch_queue_t dt_trackQueue;
     }
 }
 
+
+#pragma mark - timeEvent
+
 - (void)timeEvent:(NSString *)event {
-//    if ([self hasDisabled]) {
-//        return;
-//    }
     NSError *error = nil;
     [DTPropertyValidator validateEventOrPropertyName:event withError:&error];
     if (error) {
@@ -410,6 +403,16 @@ static dispatch_queue_t dt_trackQueue;
     }
     [self.trackTimer trackEvent:event withSystemUptime:NSProcessInfo.processInfo.systemUptime];
 }
+
+- (void)timeEventUpdate:(NSString *)event withState:(BOOL)state{
+    NSError *error = nil;
+    [DTPropertyValidator validateEventOrPropertyName:event withError:&error];
+    if (error) {
+        return;
+    }
+    [self.trackTimer updateTimerState:event withSystemUptime:NSProcessInfo.processInfo.systemUptime withState:state];
+}
+
 
 #pragma mark - User
 
@@ -490,5 +493,62 @@ static dispatch_queue_t dt_trackQueue;
     [self asyncUserEventObject:event properties:properties];
 }
 
+/// 设置自有用户系统的id
+/// - Parameters:
+///   - accountId: 用户系统id
+- (void)setAcid:(NSString *)accountId {
+    if (![accountId isKindOfClass:[NSString class]] || accountId.length == 0) {
+        DTLogError(@"accountId invald", accountId);
+        return;
+    }
+
+    self.accountId = accountId;
+    @synchronized (self.file) {
+        [self.file archiveAccountId:accountId];
+    }
+}
+
+/// 设置Firebase的app_instance_id
+/// - Parameters:
+///   - fiid: Firebase 的 app_instance_id
+- (void)setFirebaseAppInstanceId:(NSString *)fiid {
+    if (![fiid isKindOfClass:[NSString class]] || fiid.length == 0) {
+        DTLogError(@"FirebaseAppInstanceId invald", fiid);
+        return;
+    }
+    [self user_set:@{USER_PROPERTY_LATEST_FIREBASE_IID:fiid}];
+}
+
+/// 设置AppsFlyer的appsflyer_id
+/// - Parameters:
+///   - afuid: AppsFlyer的appsflyer_id
+- (void)setAppsFlyerId:(NSString *)afid {
+    if (![afid isKindOfClass:[NSString class]] || afid.length == 0) {
+        DTLogError(@"AppsFlyerId invald", afid);
+        return;
+    }
+    [self user_set:@{USER_PROPERTY_LATEST_APPSFLYER_ID:afid}];
+}
+
+/// 设置kochava iid
+/// - Parameters:
+///   - afuid: AppsFlyer的appsflyer_id
+- (void)setKochavaId:(NSString *)koid {
+    if (![koid isKindOfClass:[NSString class]] || koid.length == 0) {
+        DTLogError(@"KochavaId invald", koid);
+        return;
+    }
+    [self user_set:@{USER_PROPERTY_LATEST_KOCHAVA_ID:koid}];
+}
+
+/// 设置AdjustId
+/// - Parameter adjustId: AdjustId
+- (void)setAdjustId:(NSString *)adjustId {
+    if (![adjustId isKindOfClass:[NSString class]] || adjustId.length == 0) {
+        DTLogError(@"adjustId invald", adjustId);
+        return;
+    }
+    [self user_set:@{USER_PROPERTY_LATEST_ADJUST_ID:adjustId}];
+}
 
 @end
