@@ -60,6 +60,9 @@ dispatch_sync(dispatch_get_main_queue(), block);\
  */
 - (void)track:(NSString *)event properties:(nullable NSDictionary *)propertieDict;
 
+
+- (void)asyncTrackEventObject:(DTTrackEvent *)event properties:(NSDictionary *)properties;
+
 ///发送数据到服务端
 - (void)flush;
 

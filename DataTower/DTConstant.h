@@ -24,6 +24,52 @@ typedef enum  : NSUInteger {
     DTLogDegreeError = 5//错误级别
 }DTLogDegree;
 
+typedef enum  : NSUInteger {
+    DTAdTypeIdle = -1,
+    DTAdTypeBanner = 0,
+    DTAdTypeInterstitial = 1,
+    DTAdTypeNative = 2,
+    DTAdTypeRewarded = 3,
+    DTAdTypeRewardedInterstitial = 4,
+    DTAdTypeAppOpen = 5,
+    DTAdTypeMREC = 6,
+  
+}DTAdType;
+
+typedef enum  : NSUInteger {
+    DTAdMediationIdle = -1,
+    DTAdMediationMopub = 0,
+    DTAdMediationMax = 1,
+    DTAdMediationHisavana = 2,
+    DTAdMediationCombo = 3,
+}DTAdMediation;
+
+typedef enum  : NSUInteger {
+    DTAdPlatformUndisclosed = -2,
+    DTAdPlatformIdle = -1,
+    DTAdPlatformAdmob = 0,
+    DTAdPlatformMopub = 1,
+    DTAdPlatformAdcolony = 2,
+    DTAdPlatformApplovin = 3,
+    DTAdPlatformChartboost = 4,
+    DTAdPlatformFaceBook = 5,
+    DTAdPlatformInmobi = 6,
+    DTAdPlatformIronsource = 7,
+    DTAdPlatformPangle = 8,
+    DTAdPlatformSnapAudienceNetwork= 9,
+    DTAdPlatformTapjoy = 10,
+    DTAdPlatformUnityAds = 11,
+    DTAdPlatformVerizonMedia = 12,
+    DTAdPlatformVungle = 13,
+    DTAdPlatformADX = 14,
+    DTAdPlatformCombo = 15,
+    DTAdPlatformBigo = 16,
+    DTAdPlatformHisavana = 17,
+    DTAdPlatformApplovinExchange = 18,
+    DTAdPlatformLovinJoyAds = 33,
+  
+}DTAdPlatform;
+
 /**
  Log 级别
 

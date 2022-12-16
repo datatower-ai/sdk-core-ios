@@ -17,7 +17,7 @@ static NSString *const kTANormalTrackProperNameValidateRegularExpression = @"^[a
 static NSRegularExpression *_regexForNormalTrackValidateKey;
 
 /// 自动采集，自定义属性名字格式验证。所有自动采集自定义属性，需要满足如下正则
-static NSString *const kTAAutoTrackProperNameValidateRegularExpression = @"^([a-zA-Z][a-zA-Z\\d_]{0,49}|\\#(resume_from_background|app_crashed_reason|session_id|is_foreground|title|url|element_id|element_type|element_content|element_position|background_duration|start_reason))$";
+static NSString *const kTAAutoTrackProperNameValidateRegularExpression = @"^([a-zA-Z][a-zA-Z\\d_]{0,49}|\\#(resume_from_background|app_crashed_reason|session_id|is_foreground|ad_id|url|element_id|element_type|element_content|element_position|background_duration|start_reason))$";
 /// 自动采集，自定义属性名字正则
 static NSRegularExpression *_regexForAutoTrackValidateKey;
 

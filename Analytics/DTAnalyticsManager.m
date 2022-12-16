@@ -225,6 +225,14 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 //MARK: - Track 事件
+/// 将事件加入到事件队列
+/// @param event 事件
+/// @param properties 自定义属性
+- (void)asyncTrackEventObject:(DTTrackEvent *)event properties:(NSDictionary *)properties {
+    dispatch_async(dt_trackQueue, ^{
+        [self trackEvent:event properties:properties isH5:NO];
+    });
+}
 
 - (void)track:(NSString *)event {
     [self track:event properties:nil];

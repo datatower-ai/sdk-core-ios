@@ -52,19 +52,13 @@
                         dispatch_semaphore_signal(sema);
                         return;
                     }
-                    
                 }
             }
-            postSuccess = NO;
-            NSString *urlResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            DTLogDebug(@"%@", [NSString stringWithFormat:@"%@ network failed with statusCode 200, data '%@'.", self, urlResponse]);
-        } else {
-            postSuccess = NO;
-            NSString *urlResponse = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            DTLogDebug(@"%@", [NSString stringWithFormat:@"%@ network failed with statusCode '%ld, data '%@'.", self, (long)statusCode,urlResponse]);
         }
+        postSuccess = NO;
+        NSString *urlResponseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        DTLogDebug(@"%@", [NSString stringWithFormat:@"%@ network failed with statusCode '%ld, data '%@'.", self, (long)statusCode, urlResponseString]);
         dispatch_semaphore_signal(sema);
-        
     }];
     [dataTask resume];
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
@@ -124,7 +118,7 @@
     NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:URL];
     req.HTTPMethod = @"POST";
     req.HTTPBody = requestBody;
-    [req setTimeoutInterval:60.0];
+    [req setTimeoutInterval:3.0];
     for (NSString *key in [headers allKeys]) {
         NSString *value = [headers objectForKey:key];
         if (key && value) {
