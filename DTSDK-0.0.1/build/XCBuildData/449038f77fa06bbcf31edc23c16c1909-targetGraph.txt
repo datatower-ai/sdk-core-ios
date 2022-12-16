@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+DTSDK in Pods
+Pods-packager in Pods, depends on:
+DTSDK in Pods (explicit)
