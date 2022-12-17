@@ -38,7 +38,7 @@
     }
     
     dispatch_async(self.operaQueue, ^{
-        BOOL success = [self.eventDBManager addEvent:data eventSyn:eventSyn createdAt:createdAt];
+        BOOL success = [self.eventDBManager addEvent:data eventSyn:eventSyn];
         if (completion) {
             completion(success);
         }

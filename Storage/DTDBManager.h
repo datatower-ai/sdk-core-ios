@@ -7,9 +7,13 @@
 
 #import <Foundation/Foundation.h>
 #import "DTDBEventModel.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DTDBManager : NSObject
+
++ (DTDBManager *)sharedInstance;
+
 
 /*
   初始化数据库，建议在主线程完成。
@@ -20,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 /*
   增加一条数据，返回值是否操作成功
  */
-- (BOOL)addEvent:(NSString *)data
-         eventSyn:(NSString *)eventSyn
-        createdAt:(double)createdAt;
+- (BOOL)addEvent:(NSDictionary *)data
+        eventSyn:(NSString *)eventSyn;
+        
 
 /*
   根据eventSyn删除数据
@@ -30,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)deleteEventsBySyn:(NSString *)eventSyn;
 
+
+- (BOOL)deleteEventsWithSyns:(NSArray *)syns;
 /*
   从数据库读取数据
  */
