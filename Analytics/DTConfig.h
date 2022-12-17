@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *channel;
 @property (nonatomic, copy) NSString *serverUrl;
 @property (nonatomic, assign) BOOL enabledDebug;
-@property (nonatomic, assign) DTLogDegree logDegree;
+@property (nonatomic, assign) DTLoggingLevel logLevel;
 @property (nonatomic, strong) NSDictionary *commonProperties;
 @property (nonatomic, assign) NSInteger maxNumEvents;
 @property(copy,nonatomic) NSString* version;

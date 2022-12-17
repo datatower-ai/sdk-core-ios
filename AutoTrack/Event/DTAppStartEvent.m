@@ -16,10 +16,10 @@
     NSMutableDictionary *dict = [super jsonObject];
     
     if (![DTPresetProperties disableResumeFromBackground]) {
-        self.properties[@"#resume_from_background"] = @(self.resumeFromBackground);
+        self.properties[DT_RESUME_FROM_BACKGROUND] = @(self.resumeFromBackground);
     }
     if (![DTPresetProperties disableStartReason]) {
-        self.properties[@"#start_reason"] = self.startReason;
+        self.properties[DT_START_REASON] = self.startReason;
     }
     self.properties[@"#is_first_time"] = @([[DTDeviceInfo sharedManager] isFirstOpen]);
     return dict;

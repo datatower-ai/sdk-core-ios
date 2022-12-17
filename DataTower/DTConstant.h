@@ -16,15 +16,6 @@ typedef enum : NSUInteger {
 
 
 typedef enum  : NSUInteger {
-    DTLogDegreeVerbose = 0,//最低级log
-    DTLogDegreeDebug = 1,//debug级别
-    DTLogDegreeNet = 2,//用于打印网络报文，可单独关闭
-    DTLogDegreeInfo = 3,//重要信息级别,比如网络层输出
-    DTLogDegreeWarn = 4,//警告级别
-    DTLogDegreeError = 5//错误级别
-}DTLogDegree;
-
-typedef enum  : NSUInteger {
     DTAdTypeIdle = -1,
     DTAdTypeBanner = 0,
     DTAdTypeInterstitial = 1,
@@ -75,7 +66,7 @@ typedef enum  : NSUInteger {
 
  - DTLoggingLevelNone : 默认不开启
  */
-typedef NS_OPTIONS(NSInteger, DTLoggingLevel) {
+typedef enum : NSInteger {
     /**
      默认不开启
      */
@@ -95,7 +86,7 @@ typedef NS_OPTIONS(NSInteger, DTLoggingLevel) {
      Debug Log
      */
     DTLoggingLevelDebug = 1 << 2,
-};
+}DTLoggingLevel;
 
 
 /**

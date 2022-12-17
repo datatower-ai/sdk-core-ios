@@ -108,4 +108,11 @@
     [[DTAnalyticsManager shareInstance] setAdjustId:adjustId];
 }
 
++ (void)setIasOriginalOrderId:(NSString *)oorderId {
+    [[DTAnalyticsManager shareInstance] setIasOriginalOrderId:oorderId];
+}
+
++ (NSString *)getDataTowerId {
+    return [[DTAnalyticsManager shareInstance] getDTid];
+}
 @end

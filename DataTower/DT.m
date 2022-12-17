@@ -10,35 +10,33 @@
 #import "DTAnalytics.h"
 @implementation DT
 
-+ (void)initSDKWithAppID:(NSString *)appid
++ (void)initSDK:(NSString *)appid
                serverUrl:(NSString *)url
                  channel:(DTChannel)channel
                  isDebug:(BOOL)debug
-             dtLogDegree:(DTLogDegree)log {
+             logLevel:(DTLoggingLevel)logLevel {
      
-    [self initSDKWithAppID:appid
-                 serverUrl:url
-                   channel:channel
-                   isDebug:debug
-               dtLogDegree:log
-          commonProperties:nil];
+    [self initSDK:appid
+        serverUrl:url
+          channel:channel
+          isDebug:debug
+         logLevel:logLevel
+        commonProperties:nil];
 }
 
-+ (void)initSDKWithAppID:(NSString *)appid
++ (void)initSDK:(NSString *)appid
                serverUrl:(NSString *)url
                  channel:(DTChannel)channel
                  isDebug:(BOOL)debug
-             dtLogDegree:(DTLogDegree)log
+       logLevel:(DTLoggingLevel)logLevel
         commonProperties:(NSDictionary *)commonProperties {
     DTConfig *config = [DTConfig shareInstance];
     config.appid = appid;
-    config.channel = [self channelTextWithChannel:channel];
     config.enabledDebug = debug;
-    config.logDegree = log;
+    config.logLevel = logLevel;
     config.serverUrl = url;
     config.commonProperties = [commonProperties copy];
     [DTAnalytics initializeWithConfig:config];
-    
 }
 
 + (NSString *)channelTextWithChannel:(DTChannel)channel {

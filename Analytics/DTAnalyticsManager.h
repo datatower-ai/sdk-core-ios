@@ -210,6 +210,13 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 /// 设置AdjustId
 /// - Parameter adjustId: AdjustId
 - (void)setAdjustId:(NSString *)adjustId;
+
+/// 设置订阅原始订单id
+/// - Parameters:
+///   - oorderId : 订阅原始订单id
+- (void)setIasOriginalOrderId:(NSString *)oorderId;
+
+- (NSString *)getDTid;
 @end
 
 NS_ASSUME_NONNULL_END

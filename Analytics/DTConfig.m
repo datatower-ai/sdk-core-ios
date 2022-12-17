@@ -25,6 +25,7 @@ static DTConfig * _defaultTDConfig;
     self = [super init];
     if (self) {
         _maxNumEvents = 10000;
+        _logLevel = DTLoggingLevelNone;
     }
     return self;
 }

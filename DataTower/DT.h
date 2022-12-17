@@ -11,20 +11,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DT : NSObject
 
-+ (void)initSDKWithAppID:(NSString *)appid
-                 serverUrl:(NSString *)url
-                 channel:(DTChannel)channel
-                 isDebug:(BOOL)debug
-             dtLogDegree:(DTLogDegree)log;
++ (void)initSDK:(NSString *)appid
+      serverUrl:(NSString *)url
+        channel:(DTChannel)channel
+        isDebug:(BOOL)debug
+       logLevel:(DTLoggingLevel)logLevel;
         
 
 
 ///for unity
-+ (void)initSDKWithAppID:(NSString *)appid
-               serverUrl:(NSString *)url
-                 channel:(DTChannel)channel
-                 isDebug:(BOOL)debug
-             dtLogDegree:(DTLogDegree)log
++ (void)initSDK:(NSString *)appid
+      serverUrl:(NSString *)url
+        channel:(DTChannel)channel
+        isDebug:(BOOL)debug
+       logLevel:(DTLoggingLevel)logLevel
         commonProperties:(nullable NSDictionary *)commonProperties;
 
 @end

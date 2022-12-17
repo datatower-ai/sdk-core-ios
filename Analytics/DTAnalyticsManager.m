@@ -81,7 +81,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)initLog {
     if ([[self config] enabledDebug]) {
-        [DTLogging sharedInstance].loggingLevel = DTLoggingLevelDebug;
+        [DTLogging sharedInstance].loggingLevel = [self config].logLevel;
     }
 }
 
@@ -562,6 +562,18 @@ static dispatch_queue_t dt_trackQueue;
         return;
     }
     [self user_set:@{USER_PROPERTY_LATEST_ADJUST_ID:adjustId}];
+}
+
+- (void)setIasOriginalOrderId:(NSString *)oorderId {
+    if (![oorderId isKindOfClass:[NSString class]] || oorderId.length == 0) {
+        DTLogError(@"oorderId invald", oorderId);
+        return;
+    }
+    [self setSuperProperties:@{COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID:oorderId}];
+}
+
+- (NSString *)getDTid {
+    return [[DTDeviceInfo sharedManager] deviceId];
 }
 
 @end

@@ -81,6 +81,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameter adjustId: AdjustId
 + (void)setAdjustId:(NSString *)adjustId;
 
+/// 设置订阅原始订单id
+/// - Parameters:
+///   - orderId : 订阅原始订单id
++ (void)setIasOriginalOrderId:(NSString *)oorderId;
+
+
++ (NSString *)getDataTowerId;
 
 @end
 
