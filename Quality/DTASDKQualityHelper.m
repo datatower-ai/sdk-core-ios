@@ -8,6 +8,8 @@
 #import "DTASDKQualityHelper.h"
 #import "DTNetwork.h"
 #import "DTLogging.h"
+#import "DTAnalyticsManager.h"
+#import "DTDeviceInfo.h"
 static NSString *dt_quality_app_id            = @"app_id";
 static NSString *dt_quality_instance_id       = @"instance_id";
 static NSString *dt_quality_sdk_type          = @"sdk_type";
@@ -57,14 +59,16 @@ static NSString *dt_quality_error_message     = @"error_message";
 
 + (NSDictionary *)errorCommomData {
     NSMutableDictionary *commonData = [NSMutableDictionary dictionary];
+    DTAnalyticsManager *manager = [DTAnalyticsManager shareInstance];
+    NSDictionary *presetProperties = [[manager presetProperty] getActivePresetProperties];
     //TODO: 这里需要填充属性
-    commonData[dt_quality_app_id] = [@"aaaa"] ?: @"";
-    commonData[dt_quality_instance_id] = @"aaaa" ?: @"";
-    commonData[dt_quality_sdk_type] = @"aaaa" ?: @"";
-    commonData[dt_quality_sdk_version_name] = @"aaaa" ?: @"";
-    commonData[dt_quality_app_version_name] = @"aaaa" ?: @"";
-    commonData[dt_quality_os_version_name] = @"aaaa" ?: @"";
-    commonData[dt_quality_device_model] = @"aaaa" ?: @"";
+    commonData[dt_quality_app_id] = [[manager config] appid] ?: @"";
+    commonData[dt_quality_instance_id] = [manager getDTid] ?: @"";
+    commonData[dt_quality_sdk_type] = @"Android";
+    commonData[dt_quality_sdk_version_name] = presetProperties[USER_PROPERTY_ACTIVE_SDK_VERSION] ?: @"";
+    commonData[dt_quality_app_version_name] = presetProperties[USER_PROPERTY_ACTIVE_APP_VERSION_NAME]  ?: @"";
+    commonData[dt_quality_os_version_name] = presetProperties[USER_PROPERTY_ACTIVE_OS_VERSION_NAME]  ?: @"";
+    commonData[dt_quality_device_model] = presetProperties[USER_PROPERTY_ACTIVE_DEVICE_MODEL]  ?: @"";
     return commonData;
 }
 

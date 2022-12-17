@@ -3,6 +3,7 @@
 #import "DTJSONUtil.h"
 #import "DTNetWork.h"
 #import "DTReachability.h"
+#import "DTAnalyticsManager.h"
 
 @interface DTCalibratedTimeWithDTServer()
 
@@ -57,6 +58,7 @@
             self.serverTime = [[formatter dateFromString:dateString] timeIntervalSince1970];
             self.stopCalibrate = NO;
             DTLogDebug(@"calibration time succeed");
+            [[DTAnalyticsManager shareInstance] flush];
         } else {
             self.stopCalibrate = YES;
             DTLogDebug(@"calibration time failed");
