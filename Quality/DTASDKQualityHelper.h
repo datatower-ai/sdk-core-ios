@@ -1,9 +1,3 @@
-//
-//  DTASDKQualityHelper.h
-//  DTSDK
-//
-//  Created by neo on 2022/12/13.
-//
 
 #import <Foundation/Foundation.h>
 #import "DTQualityConstant.h"

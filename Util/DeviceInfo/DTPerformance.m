@@ -1,9 +1,3 @@
-//
-//  TDPerformance.m
-//  ThinkingSDK
-//
-//  Created by wwango on 2021/12/23.
-//
 
 #import "DTPerformance.h"
 #import "DTFPSMonitor.h"

@@ -1,10 +1,3 @@
-//
-//  DTAnalyticsManager.h
-//  report
-//
-//  Created by neo on 2022/12/5.
-//
-
 #import <Foundation/Foundation.h>
 #import "DTConfig.h"
 #import "DTAutoTrackEvent.h"

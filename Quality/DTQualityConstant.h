@@ -1,9 +1,3 @@
-//
-//  DTQualityConstant.h
-//  DTSDK
-//
-//  Created by neo on 2022/12/13.
-//
 
 typedef enum : NSUInteger {
     DTQualityLevel_TYPE_ERROR     = 1,

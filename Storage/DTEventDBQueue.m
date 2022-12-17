@@ -1,9 +1,3 @@
-//
-//  DTEventDBQueue.m
-//  DTSDK
-//
-//  Created by neo on 2022/12/8.
-//
 
 #import "DTEventDBQueue.h"
 #import "DTDBManager.h"

@@ -1,9 +1,3 @@
-//
-//  DataTower.h
-//  Pods-demo
-//
-//  Created by NEO on 2022/12/5.
-//
 
 #import <Foundation/Foundation.h>
 #import "DTConstant.h"

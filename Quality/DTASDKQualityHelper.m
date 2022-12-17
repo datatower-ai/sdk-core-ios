@@ -1,9 +1,3 @@
-//
-//  DTASDKQualityHelper.m
-//  DTSDK
-//
-//  Created by neo on 2022/12/13.
-//
 
 #import "DTASDKQualityHelper.h"
 #import "DTNetwork.h"

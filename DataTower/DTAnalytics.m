@@ -1,10 +1,3 @@
-//
-//  DTAnalytics.m
-//  report
-//
-//  Created by neo on 2022/12/5.
-//
-
 #import "DTAnalytics.h"
 #import "DTAnalyticsManager.h"
 @implementation DTAnalytics

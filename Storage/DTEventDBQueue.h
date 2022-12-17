@@ -1,9 +1,3 @@
-//
-//  DTEventDBQueue.h
-//  DTSDK
-//
-//  Created by neo on 2022/12/8.
-//
 
 #import <Foundation/Foundation.h>
 

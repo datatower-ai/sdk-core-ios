@@ -1,10 +1,3 @@
-//
-//  DTAnalyticsManager.m
-//  report
-//
-//  Created by neo on 2022/12/5.
-//
-
 #import "DTAnalyticsManager.h"
 #import "DTPresetPropertyPlugin.h"
 #import "DTReachability.h"
