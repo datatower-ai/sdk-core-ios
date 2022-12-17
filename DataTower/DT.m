@@ -32,9 +32,10 @@
         commonProperties:(NSDictionary *)commonProperties {
     DTConfig *config = [DTConfig shareInstance];
     config.appid = appid;
+    config.serverUrl = url;
+    config.channel = [self channelTextWithChannel:channel];
     config.enabledDebug = debug;
     config.logLevel = logLevel;
-    config.serverUrl = url;
     config.commonProperties = [commonProperties copy];
     [DTAnalytics initializeWithConfig:config];
 }

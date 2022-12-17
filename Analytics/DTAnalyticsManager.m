@@ -55,28 +55,49 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)initializeWithConfig:(DTConfig *)config {
+    NSTimeInterval beginTime = NSProcessInfo.processInfo.systemUptime;
     //App 状态
     [DTAppState shareInstance];
+    DTLogDebug(@"DTAppState takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     //sdk 配置
     self.config = config;
     // 日志模块
     [self initLog];
+    DTLogDebug(@"initLog takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     // 网络变化监听
     [self networkStateObserver];
+    DTLogDebug(@"networkStateObserver takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     //恢复持久化数据
     [self retrievePersistedData];
+    DTLogDebug(@"retrievePersistedData takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     // 用户属性管理器
     [self initProperties];
+    DTLogDebug(@"initProperties takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     //事件计时
     self.trackTimer = [[DTTrackTimer alloc] init];
+    DTLogDebug(@"trackTimer takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     // 事件入库、上报
     self.eventTracker = [[DTEventTracker alloc] initWithQueue:dt_trackQueue];
+    DTLogDebug(@"eventTracker takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     //同步时间
     [self calibratedTimeWithDTServer];
+    DTLogDebug(@"calibratedTimeWithDTServer takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     //生命周期监听
     [self appLifeCycleObserver];
+    DTLogDebug(@"appLifeCycleObserver takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    beginTime = NSProcessInfo.processInfo.systemUptime;
     //采集预置事件
     [self trackPresetEvents];
+    DTLogDebug(@"trackPresetEvents takes:@%.4f", NSProcessInfo.processInfo.systemUptime - beginTime )
+    
 }
 
 - (void)initLog {
@@ -143,7 +164,6 @@ static dispatch_queue_t dt_trackQueue;
     DTAppLifeCycleState newState = [[notification.userInfo objectForKey:kTAAppLifeCycleNewStateKey] integerValue];
 
     if (newState == DTAppLifeCycleStateStart) {
-//        [self startFlushTimer];
 
         // 更新时长统计
         NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
@@ -248,7 +268,6 @@ static dispatch_queue_t dt_trackQueue;
 - (void)track:(NSString *)event properties:(nullable NSDictionary *)properties time:(NSDate *)time timeZone:(NSTimeZone *)timeZone {
     DTTrackEvent *trackEvent = [[DTTrackEvent alloc] initWithName:event];
     DTLogDebug(@"##### track %@ systemUpTime: %lf",event, trackEvent.systemUpTime);
-//    [self configEventTimeValueWithEvent:trackEvent time:time timeZone:timeZone];
     [self handleTimeEvent:trackEvent];
     [self asyncTrackEventObject:trackEvent properties:properties isH5:NO];
 }

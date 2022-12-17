@@ -40,20 +40,32 @@
     
     NSString *jsonString = @"[{}]";
     NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *dateString = [DTNetWork postRequestForResponse:self.sendURL requestBody:postBody headers:header];
+//    NSString *dateString = [DTNetWork postRequestForResponse:self.sendURL requestBody:postBody headers:header];
     
-    if (dateString && [dateString length] > 0){
-        NSDateFormatter *formatter = [NSDateFormatter new];
-        formatter.dateFormat = @"EEE, dd MM yyyy HH:mm:ss ZZZ";
-        formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
-        self.serverTime = [[formatter dateFromString:dateString] timeIntervalSince1970];
-        self.stopCalibrate = NO;
-        DTLogDebug(@"calibration time succeed");
-    } else {
+    [DTNetWork postRequestWithURL:self.sendURL
+                      requestBody:postBody
+                          headers:header
+                          success:^(NSHTTPURLResponse * _Nullable response,NSData * _Nullable data){
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSString *dateString = [NSString stringWithString:[httpResponse allHeaderFields][@"Date"]];
+        
+        if (dateString && [dateString length] > 0){
+            NSDateFormatter *formatter = [NSDateFormatter new];
+            formatter.dateFormat = @"EEE, dd MM yyyy HH:mm:ss ZZZ";
+            formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
+            self.serverTime = [[formatter dateFromString:dateString] timeIntervalSince1970];
+            self.stopCalibrate = NO;
+            DTLogDebug(@"calibration time succeed");
+        } else {
+            self.stopCalibrate = YES;
+            DTLogDebug(@"calibration time failed");
+        }
+        
+    } failed:^(NSError * _Nonnull error) {
+        DTLogError(@"calibration time failed %@", error);
         self.stopCalibrate = YES;
-    }
-
+    }];
 }
 
 - (NSTimeInterval)serverTime {
@@ -76,34 +88,6 @@
     
 }
 
-//- (void)startNtp:(NSArray *)ntpServerHost {
-//    NSMutableArray *serverHostArr = [NSMutableArray array];
-//    for (NSString *host in ntpServerHost) {
-//        if ([host isKindOfClass:[NSString class]] && host.length > 0) {
-//            [serverHostArr addObject:host];
-//        }
-//    }
-//    NSError *err;
-//    for (NSString *host in serverHostArr) {
-//        TDLogDebug(@"ntp host :%@", host);
-//        err = nil;
-//        TDNTPServer *server = [[TDNTPServer alloc] initWithHostname:host port:123];
-//        NSTimeInterval offset = [server dateWithError:&err];
-//        [server disconnect];
-//
-//        if (err) {
-//            TDLogDebug(@"ntp failed :%@", err);
-//        } else {
-//            self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
-//            self.serverTime = [[NSDate dateWithTimeIntervalSinceNow:offset] timeIntervalSince1970];
-//            break;
-//        }
-//    }
-//
-//    if (err) {
-//        TDLogDebug(@"get ntp time failed");
-//        self.stopCalibrate = YES;
-//    }
-//}
+
 
 @end
