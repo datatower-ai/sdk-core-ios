@@ -14,5 +14,6 @@ Pod::Spec.new do |spec|
   spec.libraries        = 'sqlite3', 'z'
   spec.source_files = "**/*.{h,m,mm,c,cc,cpp,metal}", "**/**/*.{h,m,mm,c,cc,cpp,metal}", 
   spec.public_header_files = "**/*.{h}"  
+  spec.pod_target_xcconfig = {'EXCLUDED_ARCHS [sdk = iphonesimulator *]'=>'arm64'}
 end
 
