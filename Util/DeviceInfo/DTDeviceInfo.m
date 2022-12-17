@@ -26,6 +26,7 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 @interface DTDeviceInfo ()
 
 @property (nonatomic, readwrite) BOOL isFirstOpen;
+@property (nonatomic, readwrite) BOOL isAppInstalled;
 @property (nonatomic, strong) NSDictionary *automaticData;
 
 @end
@@ -69,6 +70,41 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 + (NSString *)deviceId {
     return [self sharedManager].deviceId;
 }
+
+//- (void)setIsAppInsatlled:(BOOL)isAppInsatlled {
+//    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"datatower_appInsatll"];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
+//}
+//
+//- (void)setIsFirstOpen:(BOOL)isFirstOpen {
+//    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"datatower_isfirst"];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
+//}
+
+- (BOOL)isAppInsatlled{
+    BOOL isExistRecord = [[[NSUserDefaults standardUserDefaults] objectForKey:@"datatower_appInsatll"] boolValue];
+    if (!isExistRecord) {
+        _isAppInstalled = NO;
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"datatower_appInsatll"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    } else {
+        _isAppInstalled = YES;
+    }
+    return _isAppInstalled;
+}
+
+- (BOOL)isFirstOpen{
+    BOOL isExistRecord = [[[NSUserDefaults standardUserDefaults] objectForKey:@"datatower_isfirst"] boolValue];
+    if (!isExistRecord) {
+        _isFirstOpen = YES;
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"datatower_isfirst"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    } else {
+        _isFirstOpen = NO;
+    }
+    return _isFirstOpen;
+}
+
 
 + (NSString *)userAgent {
     UIDevice *currentDevice = [UIDevice currentDevice];

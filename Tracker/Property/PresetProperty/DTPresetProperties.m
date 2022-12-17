@@ -10,6 +10,7 @@
 #import "DTPresetProperties+DTDisProperties.h"
 #import "DTBaseEvent.h"
 #import "DTDeviceInfo.h"
+#import "DTConfig.h"
 
 @interface DTPresetProperties ()
 
@@ -90,7 +91,9 @@
     }
     NSMutableDictionary *copyDict = [dict mutableCopy];
     NSMutableDictionary *latestProperties = [NSMutableDictionary dictionary];
-    latestProperties[USER_PROPERTY_LATEST_DEBUG] = copyDict[@"#debug"];
+    if([DTConfig shareInstance].enabledDebug){
+        latestProperties[USER_PROPERTY_LATEST_DEBUG] = @(YES);
+    }
     latestProperties[USER_PROPERTY_LATEST_APP_VERSION_CODE] = copyDict[COMMON_PROPERTY_APP_VERSION_CODE];
     latestProperties[USER_PROPERTY_LATEST_APP_VERSION_NAME] = copyDict[COMMON_PROPERTY_APP_VERSION_NAME];
     _latestProperties = latestProperties;

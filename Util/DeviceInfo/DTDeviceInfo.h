@@ -15,6 +15,7 @@ FOUNDATION_EXTERN NSString *const VERSION;
 @property (nonatomic, copy) NSString *appVersion;// app版本名
 @property (nonatomic, copy) NSNumber *appVersionCode;// app版本号
 @property (nonatomic, readonly) BOOL isFirstOpen;// 是否是第一次启动
+@property (nonatomic, readonly) BOOL isAppInsatlled;//已安装
 @property (nonatomic, copy) NSString *libName; // 库名称，外层库可以修改该字段
 @property (nonatomic, copy) NSString *libVersion;// 库版本号，外层库可以修改该字段
 

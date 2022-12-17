@@ -5,6 +5,7 @@
 //
 //
 
+#import "DTDeviceInfo.h"
 #import "DTAppStartEvent.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import "DTPresetProperties+DTDisProperties.h"
@@ -20,7 +21,7 @@
     if (![DTPresetProperties disableStartReason]) {
         self.properties[@"#start_reason"] = self.startReason;
     }
-    
+    self.properties[@"#is_first_time"] = @([[DTDeviceInfo sharedManager] isFirstOpen]);
     return dict;
 }
 

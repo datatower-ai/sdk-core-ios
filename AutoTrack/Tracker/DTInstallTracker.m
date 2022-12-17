@@ -15,7 +15,7 @@
 }
 
 - (BOOL)additionalCondition {
-    return [DTDeviceInfo sharedManager].isFirstOpen;
+    return ![DTDeviceInfo sharedManager].isAppInsatlled;
 }
 
 @end

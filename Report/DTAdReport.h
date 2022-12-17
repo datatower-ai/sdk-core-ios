@@ -238,6 +238,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @param type 广告类型
  * @param platform 广告平台
  * @param location 广告位
+ * @param clickGap 广告点击间隔
+ * @param returnGap 广告离开间隔
  * @param seq 系列行为标识
  * @param properties 自定义属性
  * @param entrance 广告入口
@@ -246,6 +248,8 @@ NS_ASSUME_NONNULL_BEGIN
                     type:(DTAdType)type
                 platform:(DTAdPlatform)platform
                 location:(NSString *)location
+                clickGap:(NSNumber *)clickGap
+                returnGap:(NSNumber *)returnGap
                      seq:(NSString *)seq
               properties:(NSDictionary *)properties
                 entrance:(NSString *)entrance;
@@ -274,6 +278,36 @@ NS_ASSUME_NONNULL_BEGIN
                 precision:(NSString *)precision
               properties:(NSDictionary *)properties
                 entrance:(NSString *)entrance;
+
+
+/**
+ * 上报广告展示价值（聚合广告）
+ *
+ * @param adid 广告最小单元id
+ * @param type 广告类型
+ * @param platform 广告平台
+ * @param location 广告位
+ * @param seq 系列行为标识
+ * @param mediation 聚合平台
+ * @param mediationId 聚合平台广告id
+ * @param value 价值
+ * @param precision 精确度
+ * @param country 国家
+ * @param properties 自定义属性
+ * @param entrance 广告入口
+ */
++ (void) reportPaid:(NSString *)adid
+               type:(DTAdType)type
+           platform:(DTAdPlatform)platform
+           location:(NSString *)location
+                seq:(NSString *)seq
+          mediation:(DTAdMediation)mediation
+        mediationId:(NSString *)mediationId
+              value:(NSString *)value
+          precision:(NSString *)precision
+            country:(NSString *)country
+         properties:(NSDictionary *)properties
+           entrance:(NSString *)entrance;
 
 
 /**

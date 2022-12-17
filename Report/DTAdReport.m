@@ -365,6 +365,8 @@
                     type:(DTAdType)type
                 platform:(DTAdPlatform)platform
                 location:(NSString *)location
+                clickGap:(NSNumber *)clickGap
+                returnGap:(NSNumber *)returnGap
                      seq:(NSString *)seq
               properties:(NSDictionary *)properties
                 entrance:(NSString *)entrance {
@@ -373,6 +375,8 @@
     propertiesCopy[PROPERTY_AD_TYPE] = [NSNumber numberWithInteger:type];
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
+    propertiesCopy[PROPERTY_AD_CLICK_GAP] = clickGap;
+    propertiesCopy[PROPERTY_AD_RETURN_GAP] = returnGap;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_RETURN_APP];
@@ -418,6 +422,48 @@
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
 }
 
+/**
+ * 上报广告展示价值（聚合广告）
+ *
+ * @param adid 广告最小单元id
+ * @param type 广告类型
+ * @param platform 广告平台
+ * @param location 广告位
+ * @param seq 系列行为标识
+ * @param value 价值
+ * @param precision 精确度
+ * @param country 国家
+ * @param properties 自定义属性
+ * @param entrance 广告入口
+ */
++ (void) reportPaid:(NSString *)adid
+               type:(DTAdType)type
+           platform:(DTAdPlatform)platform
+           location:(NSString *)location
+                seq:(NSString *)seq
+          mediation:(DTAdMediation)mediation
+        mediationId:(NSString *)mediationId
+              value:(NSString *)value
+          precision:(NSString *)precision
+            country:(NSString *)country
+         properties:(NSDictionary *)properties
+           entrance:(NSString *)entrance {
+    NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
+    propertiesCopy[PROPERTY_AD_ID] = adid;
+    propertiesCopy[PROPERTY_AD_TYPE] = [NSNumber numberWithInteger:type];
+    propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
+    propertiesCopy[PROPERTY_AD_LOCATION] = location;
+    propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
+    propertiesCopy[PROPERTY_AD_VALUE_MICROS] = value;
+    propertiesCopy[PROPERTY_AD_COUNTRY] = country;
+    propertiesCopy[PROPERTY_AD_PRECISION_TYPE] = precision;
+    propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
+    DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_PAID];
+    [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
+}
 
 /**
  * 上报 广告关闭
