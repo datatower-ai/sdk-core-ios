@@ -157,9 +157,29 @@ static NSUInteger const kBatchSize = 10;
                 NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
                 NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
                 NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+                //时间同步器
+                DTCalibratedTime *timeCalibrater = [[DTAnalyticsManager shareInstance] calibratedTime];
                 for (DTDBEventModel *eventMode in eventModes) {
-                    [syns addObject:eventMode.eventSyn];
-                    [contents addObject:eventMode.data];
+                    NSNumber *eventTime = eventMode.data[@"#event_time"];
+                    //事件时间已校准
+                    if (eventTime && [eventTime longValue] > 0){
+                        [eventMode.data removeObjectForKey:@"#event_su_time"];
+                        [syns addObject:eventMode.eventSyn];
+                        [contents addObject:eventMode.data];
+                    }else {
+                        //时间同步器可用
+                        if (timeCalibrater && timeCalibrater.stopCalibrate == NO) {
+                            NSNumber *eventSystemUpTime = eventMode.data[@"#event_su_time"];
+                            NSTimeInterval outTime = [eventSystemUpTime longValue] - timeCalibrater.systemUptime * 1000;
+                            NSTimeInterval realTime = timeCalibrater.serverTime * 1000 + outTime;
+                            [eventMode.data setValue:[self formatTime:realTime] forKey:@"#event_time"];
+                            
+                            [eventMode.data removeObjectForKey:@"#event_su_time"];
+                            [syns addObject:eventMode.eventSyn];
+                            [contents addObject:eventMode.data];
+                        }
+                    }
+                    
                 }
                 recodSyns = syns;
                 recordArray = contents;
@@ -192,6 +212,12 @@ static NSUInteger const kBatchSize = 10;
     
 }
 
+- (NSNumber *)formatTime:(NSTimeInterval)time {
+    NSString *timeDoubleStr = [NSString stringWithFormat:@"%.3f", time];
+    NSArray *arr = [timeDoubleStr componentsSeparatedByString:@"."];
+    NSString *timeLongStr = [arr objectAtIndex:0];
+    return @([timeLongStr longLongValue]);
+}
 
 //MARK: - Setter & Getter
 

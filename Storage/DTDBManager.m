@@ -210,7 +210,7 @@
                 if (!err && [eventDict isKindOfClass:[NSDictionary class]]) {
                     
                     DTDBEventModel *model = [[DTDBEventModel alloc] init];
-                    model.data = eventDict;
+                    model.data = [NSMutableDictionary dictionaryWithDictionary:eventDict];
                     model.createAt = createAt;
                     model.eventSyn = eventSyn;
                     [records addObject:model];

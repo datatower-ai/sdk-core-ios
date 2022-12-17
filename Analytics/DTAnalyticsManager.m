@@ -20,7 +20,6 @@
 #import "DTAppStartEvent.h"
 #import "DTAppEndEvent.h"
 #import "DTUserPropertyHeader.h"
-#import "DTCalibratedTimeWithDTServer.h"
 
 @interface DTAnalyticsManager ()
 
@@ -33,7 +32,6 @@
 
 @property (strong, nonatomic) DTFile *file;
 
-@property (strong, nonatomic) DTCalibratedTimeWithDTServer *calibratedTime;
 
 @end
 
@@ -419,8 +417,8 @@ static dispatch_queue_t dt_trackQueue;
     // 事件如果没有指定时间，那么使用系统时间时需要校准
     if (event.timeValueType == DTEventTimeValueTypeNone && _calibratedTime && _calibratedTime.stopCalibrate == NO) {
         NSTimeInterval outTime = NSProcessInfo.processInfo.systemUptime - _calibratedTime.systemUptime;
-        NSTimeInterval serverDate = _calibratedTime.serverTime + outTime;
-        event.time = serverDate;
+        NSTimeInterval realTime = _calibratedTime.serverTime + outTime;
+        event.time = realTime;
     }
 }
 

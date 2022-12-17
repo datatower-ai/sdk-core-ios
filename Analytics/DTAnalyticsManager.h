@@ -11,6 +11,8 @@
 #import "DTPropertyPluginManager.h"
 #import "DTSuperProperty.h"
 #import "DTPresetProperties.h"
+#import "DTCalibratedTimeWithDTServer.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 #ifndef dt_dispatch_main_sync_safe
@@ -35,6 +37,9 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 
 /// 预置属性
 @property (nonatomic, strong) DTPresetProperties *presetProperty;
+
+/// 时间同步
+@property (strong, nonatomic) DTCalibratedTimeWithDTServer *calibratedTime;
 
 
 #pragma mark -  initiate

@@ -43,9 +43,11 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     self = [super init];
     if (self) {
         // 只能直接访问变量，不要触发 setter 方法。默认记录当前事件发生的时间
-        _time = [[NSDate date] timeIntervalSince1970];
-        self.timeValueType = DTEventTimeValueTypeNone;
-        self.uuid = [NSUUID UUID].UUIDString;
+        _time = 0;
+        // 获取当前开机时长
+        _systemUpTime = NSProcessInfo.processInfo.systemUptime;
+        _timeValueType = DTEventTimeValueTypeNone;
+        _uuid = [NSUUID UUID].UUIDString;
     }
     return self;
 }
@@ -81,7 +83,7 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     }
     
     dict[@"#event_time"] = [self formatTime:self.time * 1000];
-//    dict[@"#event_time"] = [NSNumber numberWithLongLong:self.time * 1000];
+    dict[@"#event_su_time"] = [self formatTime:self.systemUpTime * 1000];
     dict[@"#event_syn"]  = self.uuid;
     dict[@"#event_type"] = [self eventTypeString];
     

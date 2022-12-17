@@ -24,8 +24,6 @@
     self = [super init];
     if (self) {
         self.eventType = DTEventTypeTrack;
-        // 获取当前开机时长
-        self.systemUpTime = NSProcessInfo.processInfo.systemUptime;
     }
     return self;
 }

@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DTDBEventModel : NSObject
 
-@property (nonatomic,copy)NSDictionary *data;
+@property (nonatomic,copy)NSMutableDictionary *data;
 @property (nonatomic,copy)NSString *eventSyn;
 @property (nonatomic,assign)double createAt;
 

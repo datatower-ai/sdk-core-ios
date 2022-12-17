@@ -114,7 +114,12 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 @property (nonatomic, copy) NSString *dtid;
 @property (nonatomic, copy) NSString *bundleId;
 @property (nonatomic, assign) BOOL isDebug;
+
+/// 事件真正的时间戳
 @property (nonatomic, assign) NSTimeInterval time;
+
+/// 记录事件发生时的开机时间节点。用于统计事件累计时长
+@property (nonatomic, assign) NSTimeInterval systemUpTime;
 /// 事件名字
 @property (nonatomic, copy) NSString *eventName;
 @property (nonatomic, strong) NSTimeZone *timeZone;
@@ -150,6 +155,8 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 - (NSNumber *)formatTime:(NSTimeInterval)time;
 /// 获取事件类型
 + (DTEventType)typeWithTypeString:(NSString *)typeString;
+
+
 
 @end
 
