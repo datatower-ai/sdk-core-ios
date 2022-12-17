@@ -5,7 +5,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
-    //预置事件名称
+//广告预置事件名称
 static NSString * const EVENT_AD_LOAD_BEGIN       =  @"#ad_load_begin";
 static NSString * const EVENT_AD_LOAD_END         =  @"#ad_load_end";
 static NSString * const EVENT_AD_TO_SHOW          =  @"#ad_to_show";
@@ -45,6 +45,60 @@ static NSString * const PROPERTY_LOAD_RESULT              = @"#load_result";
 static NSString * const PROPERTY_LOAD_DURATION            = @"#load_duration";
 static NSString * const PROPERTY_ERROR_CODE               = @"#error_code";
 static NSString * const PROPERTY_ERROR_MESSAGE            = @"#error_message";
+
+
+//展示订阅
+static NSString * const IAS_TO_SHOW_EVENT              = @"#ias_to_show";
+// 展示订阅内容成功
+static NSString * const IAS_SHOW_SUCCESS_EVENT         =  @"#ias_show_success";
+// 展示订阅内容失败
+static NSString * const IAS_SHOW_FAIL_EVENT            =  @"#ias_show_fail";
+// 点击内购
+static NSString * const IAS_TO_SUBSCRIBE_EVENT         =  @"#ias_to_subscribe";
+// 订阅成功
+static NSString * const IAS_SUBSCRIBE_SUCCESS_EVENT =  @"#ias_subscribe_success";
+// 订阅失败
+static NSString * const IAS_SUBSCRIBE_FAIL_EVENT    =  @"#ias_subscribe_fail";
+
+// 系列行为唯一标识
+static NSString * const IAS_SEQ            = @"#ias_seq";
+// 入口
+static NSString * const IAS_ENTRANCE       = @"#ias_entrance";
+// 页面区分
+static NSString * const IAS_PLACEMENT      = @"#ias_placement";
+// 错误码
+static NSString * const IAS_CODE           = @"#error_code";
+// 额外信息
+static NSString * const IAS_MSG            = @"#error_message";
+//订阅的产品ID
+static NSString * const IAS_SKU            = @"#ias_sku";
+// 订单ID
+static NSString * const IAS_ORDER_ID       = @"#ias_order";
+// 价格
+static NSString * const IAS_PRICE          = @"#ias_price";
+// 货币
+static NSString * const IAS_CURRENCY       = @"#ias_currency";
+// 原始订单ID
+static NSString * const IAS_ORIGINAL_ORDER_ID = @"#ias_original_order";
+
+
+
+//内购事件名称
+static NSString * const EVENT_IAP_ENTRANCE        = @"#iap_entrance";
+static NSString * const EVENT_IAP_TO_PURCHASE     = @"#iap_to_purchase";
+static NSString * const EVENT_IAP_PURCHASED       = @"#iap_purchased";
+static NSString * const EVENT_IAP_NOT_PURCHASED   = @"#iap_not_purchased";
+//事件属性
+static NSString * const PROPERTY_IAP_SEQ          = @"#iap_seq";
+static NSString * const PROPERTY_IAP_ENTRANCE     = @"#iap_entrance";
+static NSString * const PROPERTY_IAP_PLACEMENT    = @"#iap_placement";
+static NSString * const PROPERTY_IAP_ORDER        = @"#iap_order";
+static NSString * const PROPERTY_IAP_SKU          = @"#iap_sku";
+static NSString * const PROPERTY_IAP_USD_PRICE    = @"#iap_usd_price";
+static NSString * const PROPERTY_IAP_PRICE        = @"#iap_price";
+static NSString * const PROPERTY_IAP_CURRENCY     = @"#iap_currency";
+static NSString * const PROPERTY_IAP_CODE         = @"#iap_code";
+static NSString * const PROPERTY_IAP_MSG          = @"#iap_msg";
 
 @interface DTReportEvent : DTTrackEvent
 

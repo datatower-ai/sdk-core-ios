@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DTConstant.h"
+#import "DTReportEvent.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DTIASReport : NSObject
