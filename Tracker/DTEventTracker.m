@@ -102,7 +102,7 @@ static NSUInteger const kBatchSize = 10;
         block();
     } else {
         dispatch_async(self.queue, block);
-    }    
+    }
 }
 
 /// 同步数据（将本地数据库中的数据同步到后台）
@@ -127,13 +127,12 @@ static NSUInteger const kBatchSize = 10;
         NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
         NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
         for (DTDBEventModel *eventMode in eventModes) {
-            [syns addObject:eventMode.eventSyn];
-            [contents addObject:eventMode.data];
+            [self handleEventTime:eventMode syns:syns contents:contents];
         }
         recodSyns = syns;
         recordArray = contents;
     }
-
+    
     // 数据库没有数据了
     if (recordArray.count == 0 || recodSyns.count == 0) {
         if (completion) {
@@ -141,7 +140,7 @@ static NSUInteger const kBatchSize = 10;
         }
         return;
     }
-
+    
     // 网络情况较好，会在此处持续的将数据库中的数据发送完
     // 保证end事件发送成功
     BOOL flushSucc = YES;
@@ -157,29 +156,8 @@ static NSUInteger const kBatchSize = 10;
                 NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
                 NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
                 NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
-                //时间同步器
-                DTCalibratedTime *timeCalibrater = [[DTAnalyticsManager shareInstance] calibratedTime];
                 for (DTDBEventModel *eventMode in eventModes) {
-                    NSNumber *eventTime = eventMode.data[@"#event_time"];
-                    //事件时间已校准
-                    if (eventTime && [eventTime longValue] > 0){
-                        [eventMode.data removeObjectForKey:@"#event_su_time"];
-                        [syns addObject:eventMode.eventSyn];
-                        [contents addObject:eventMode.data];
-                    }else {
-                        //时间同步器可用
-                        if (timeCalibrater && timeCalibrater.stopCalibrate == NO) {
-                            NSNumber *eventSystemUpTime = eventMode.data[@"#event_su_time"];
-                            NSTimeInterval outTime = [eventSystemUpTime longValue] - timeCalibrater.systemUptime * 1000;
-                            NSTimeInterval realTime = timeCalibrater.serverTime * 1000 + outTime;
-                            [eventMode.data setValue:[self formatTime:realTime] forKey:@"#event_time"];
-                            
-                            [eventMode.data removeObjectForKey:@"#event_su_time"];
-                            [syns addObject:eventMode.eventSyn];
-                            [contents addObject:eventMode.data];
-                        }
-                    }
-                    
+                    [self handleEventTime:eventMode syns:syns contents:contents];
                 }
                 recodSyns = syns;
                 recordArray = contents;
@@ -193,6 +171,28 @@ static NSUInteger const kBatchSize = 10;
     }
 }
 
+- (void)handleEventTime:(DTDBEventModel *) eventMode syns:(NSMutableArray *)syns contents:(NSMutableArray *)contents {
+    DTCalibratedTime *timeCalibrater = [[DTAnalyticsManager shareInstance] calibratedTime];
+    NSNumber *eventTime = eventMode.data[@"#event_time"];
+    //事件时间已校准
+    if (eventTime && [eventTime longValue] > 0){
+        [eventMode.data removeObjectForKey:@"#event_su_time"];
+        [syns addObject:eventMode.eventSyn];
+        [contents addObject:eventMode.data];
+    } else {
+    //时间同步器可用
+        if (timeCalibrater && timeCalibrater.stopCalibrate == NO) {
+            NSNumber *eventSystemUpTime = eventMode.data[@"#event_su_time"];
+            NSTimeInterval outTime = [eventSystemUpTime longValue] - timeCalibrater.systemUptime * 1000;
+            NSTimeInterval realTime = timeCalibrater.serverTime * 1000 + outTime;
+            [eventMode.data setValue:[self formatTime:realTime] forKey:@"#event_time"];
+                                
+            [eventMode.data removeObjectForKey:@"#event_su_time"];
+            [syns addObject:eventMode.eventSyn];
+            [contents addObject:eventMode.data];
+        }
+    }
+}
 
 - (void)syncSendAllData {
     dispatch_sync(dt_networkQueue, ^{});

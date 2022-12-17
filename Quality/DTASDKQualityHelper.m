@@ -58,7 +58,7 @@ static NSString *dt_quality_error_message     = @"error_message";
 + (NSDictionary *)errorCommomData {
     NSMutableDictionary *commonData = [NSMutableDictionary dictionary];
     //TODO: 这里需要填充属性
-    commonData[dt_quality_app_id] = @"aaaa" ?: @"";
+    commonData[dt_quality_app_id] = [@"aaaa"] ?: @"";
     commonData[dt_quality_instance_id] = @"aaaa" ?: @"";
     commonData[dt_quality_sdk_type] = @"aaaa" ?: @"";
     commonData[dt_quality_sdk_version_name] = @"aaaa" ?: @"";
