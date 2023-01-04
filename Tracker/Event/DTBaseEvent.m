@@ -83,7 +83,7 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     }
     
     dict[@"#event_time"] = [self formatTime:self.time * 1000];
-    dict[@"#event_su_time"] = [self formatTime:self.systemUpTime * 1000];
+    dict[@"#event_su_time"] = [NSNumber numberWithDouble:self.systemUpTime];
     dict[@"#event_syn"]  = self.uuid;
     dict[@"#event_type"] = [self eventTypeString];
     

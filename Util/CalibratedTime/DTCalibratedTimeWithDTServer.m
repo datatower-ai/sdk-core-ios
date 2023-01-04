@@ -13,7 +13,7 @@
 @end
 
 @implementation DTCalibratedTimeWithDTServer
-@synthesize serverTime = _serverTime;
+//@synthesize serverTime = _serverTime;
 
 + (void)initialize {
     static dispatch_once_t once;
@@ -32,6 +32,10 @@
 }
 
 - (void)recalibrationWithDTServer{
+    if (!self.stopCalibrate) {
+        return;
+    }
+    self.stopCalibrate = NO;
     NSString *networkType = [[DTReachability shareInstance] networkState];
     if (![DTReachability convertNetworkType:networkType]) {
         return;
@@ -41,12 +45,14 @@
     
     NSString *jsonString = @"[{}]";
     NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-//    NSString *dateString = [DTNetWork postRequestForResponse:self.sendURL requestBody:postBody headers:header];
     
     [DTNetWork postRequestWithURL:self.sendURL
                       requestBody:postBody
                           headers:header
                           success:^(NSHTTPURLResponse * _Nullable response,NSData * _Nullable data){
+        if ([self enable]){
+            return;
+        }
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         NSString *dateString = [NSString stringWithString:[httpResponse allHeaderFields][@"Date"]];
         
@@ -56,40 +62,24 @@
             formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
             self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
             self.serverTime = [[formatter dateFromString:dateString] timeIntervalSince1970];
-            self.stopCalibrate = NO;
             DTLogDebug(@"calibration time succeed");
             [[DTAnalyticsManager shareInstance] flush];
         } else {
-            self.stopCalibrate = YES;
             DTLogDebug(@"calibration time failed");
         }
-        
+        self.stopCalibrate = YES;
     } failed:^(NSError * _Nonnull error) {
         DTLogError(@"calibration time failed %@", error);
         self.stopCalibrate = YES;
     }];
 }
 
-- (NSTimeInterval)serverTime {
-//
-//    if (_ta_ntpGroup) {
-//        TDLogDebug(@"ntp _ntpGroup serverTime wait start");
-//        long ret = dispatch_group_wait(_ta_ntpGroup, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)));
-//        TDLogDebug(@"ntp _ntpGroup serverTime wait end");
-//        if (ret != 0) {
-//            self.stopCalibrate = YES;
-//            TDLogDebug(@"wait ntp time timeout");
-//        }
-//        return _serverTime;
-//    } else {
-//        self.stopCalibrate = YES;
-//        TDLogDebug(@"ntp _ntpGroup is nil !!!");
-//    }
-//
-    return _serverTime;
-    
+//- (NSTimeInterval)serverTime {
+//    return self.serverTime;
+//}
+
+- (BOOL)enable{
+    return (self.stopCalibrate == YES) && (self.serverTime != 0) && (self.systemUptime != 0);
 }
-
-
 
 @end

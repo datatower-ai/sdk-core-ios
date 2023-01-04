@@ -389,8 +389,9 @@ static dispatch_queue_t dt_trackQueue;
     event.isDebug = [self.config enabledDebug];
     event.bundleId = [DTDeviceInfo bundleId];
     // 事件如果没有指定时间，那么使用系统时间时需要校准
-    if (event.timeValueType == DTEventTimeValueTypeNone && _calibratedTime && _calibratedTime.stopCalibrate == NO) {
-        NSTimeInterval outTime = NSProcessInfo.processInfo.systemUptime - _calibratedTime.systemUptime;
+    if (_calibratedTime && [_calibratedTime enable]) {
+        NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
+        NSTimeInterval outTime = systemUpTime - _calibratedTime.systemUptime;
         NSTimeInterval realTime = _calibratedTime.serverTime + outTime;
         event.time = realTime;
     }
