@@ -24,7 +24,7 @@ static DTConfig * _defaultTDConfig;
 }
 
 + (NSString*)version{
-    return @"1.3.2";
+    return @"1.3.3-beta2";
 }
 
 

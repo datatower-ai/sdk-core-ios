@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)recalibrationWithDTServer;
 
+- (BOOL)enable;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -118,6 +118,15 @@ static NSUInteger const kBatchSize = 10;
         }
         return;
     }
+    //判断时间是否校准
+    DTCalibratedTimeWithDTServer *timeCalibrater = [[DTAnalyticsManager shareInstance] calibratedTime];
+    if(![timeCalibrater enable]){
+        [timeCalibrater recalibrationWithDTServer];
+        if (completion) {
+            completion();
+        }
+        return;
+    }
     // 获取数据库数据，取前十条数据
     NSArray<NSDictionary *> *recordArray;
     NSArray *recodSyns;
@@ -172,7 +181,7 @@ static NSUInteger const kBatchSize = 10;
 }
 
 - (void)handleEventTime:(DTDBEventModel *) eventMode syns:(NSMutableArray *)syns contents:(NSMutableArray *)contents {
-    DTCalibratedTime *timeCalibrater = [[DTAnalyticsManager shareInstance] calibratedTime];
+    DTCalibratedTimeWithDTServer *timeCalibrater = [[DTAnalyticsManager shareInstance] calibratedTime];
     NSNumber *eventTime = eventMode.data[@"#event_time"];
     //事件时间已校准
     if (eventTime && [eventTime longValue] > 0){
@@ -181,11 +190,11 @@ static NSUInteger const kBatchSize = 10;
         [contents addObject:eventMode.data];
     } else {
     //时间同步器可用
-        if (timeCalibrater && timeCalibrater.stopCalibrate == NO) {
+        if (timeCalibrater && [timeCalibrater enable]) {
             NSNumber *eventSystemUpTime = eventMode.data[@"#event_su_time"];
-            NSTimeInterval outTime = [eventSystemUpTime longValue] - timeCalibrater.systemUptime * 1000;
-            NSTimeInterval realTime = timeCalibrater.serverTime * 1000 + outTime;
-            [eventMode.data setValue:[self formatTime:realTime] forKey:@"#event_time"];
+            NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
+            NSTimeInterval realTime = timeCalibrater.serverTime + outTime;
+            [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
                                 
             [eventMode.data removeObjectForKey:@"#event_su_time"];
             [syns addObject:eventMode.eventSyn];

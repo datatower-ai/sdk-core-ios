@@ -13,8 +13,8 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.serverTime = [[NSDate date] timeIntervalSince1970];
-        self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
+        self.serverTime = 0;
+        self.systemUptime = 0;
     }
 
     return self;
