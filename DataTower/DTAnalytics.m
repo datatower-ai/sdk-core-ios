@@ -2,9 +2,6 @@
 #import "DTAnalyticsManager.h"
 @implementation DTAnalytics
 
-+ (void)initializeWithConfig:(DTConfig *)config {
-    [[DTAnalyticsManager shareInstance] initializeWithConfig:config];
-}
 
 + (void)trackEventName:(NSString *)eventName properties:(NSDictionary *)properties {
     [[DTAnalyticsManager shareInstance] track:eventName properties:properties];

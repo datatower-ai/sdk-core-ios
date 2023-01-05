@@ -1,6 +1,7 @@
 #import "DT.h"
 #import "DTConfig.h"
 #import "DTAnalytics.h"
+#import "DTAnalyticsManager.h"
 @implementation DT
 
 + (void)initSDK:(NSString *)appid
@@ -30,7 +31,7 @@
     config.enabledDebug = debug;
     config.logLevel = logLevel;
     config.commonProperties = [commonProperties copy];
-    [DTAnalytics initializeWithConfig:config];
+    [[DTAnalyticsManager shareInstance] initializeWithConfig:config];
 }
 
 + (NSString *)channelTextWithChannel:(DTChannel)channel {
