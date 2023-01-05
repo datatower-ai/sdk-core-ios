@@ -1,6 +1,7 @@
 
 
 #import "DTAdReport.h"
+#import "DTReportEvent.h"
 #import "DTConfig.h"
 @implementation DTAdReport
 
