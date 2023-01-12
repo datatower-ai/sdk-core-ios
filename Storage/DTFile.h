@@ -32,7 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString*)unarchiveAccountId;
 
+- (void)archiveSdkDisable:(BOOL)disable;
 
+- (BOOL)unarchiveSdkDisable;
+
+- (void)archiveReportUrl:(NSString *)url;
+
+- (NSString *)unarchiveReportUrl;
 
 @end;
 

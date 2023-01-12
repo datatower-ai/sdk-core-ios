@@ -20,8 +20,7 @@
     id appLaunch = [cls performSelector:@selector(sharedInstance)];
     
     if (appLaunch &&
-        [appLaunch respondsToSelector:@selector(appLaunchParams)] &&
-        !DTPresetProperties.disableStartReason)
+        [appLaunch respondsToSelector:@selector(appLaunchParams)] )
     {
         NSDictionary *startReason = [appLaunch performSelector:@selector(appLaunchParams)];
         NSString *url = startReason[@"url"];

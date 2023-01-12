@@ -4,7 +4,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DTNetWork : NSObject
-
+typedef void (^DTFlushConfigBlock)(NSDictionary *result, NSError * _Nullable error);
 typedef void (^DTNetWorkSuccess)(NSHTTPURLResponse *response, NSData *data);
 typedef void (^DTNetWorkFail)(NSError *error);
 
@@ -26,6 +26,7 @@ typedef void (^DTNetWorkFail)(NSError *error);
                    success:(DTNetWorkSuccess)success
                     failed:(DTNetWorkFail)failed;
 
++ (void)fetchRemoteConfig:(NSString *)serverURL handler:(DTFlushConfigBlock)handler;
 @end
 
 NS_ASSUME_NONNULL_END
