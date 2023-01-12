@@ -11,16 +11,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) DTLoggingLevel logLevel;
 @property (nonatomic, strong) NSDictionary *commonProperties;
 @property (nonatomic, assign) NSInteger maxNumEvents;
-@property(copy,nonatomic) NSString* version;
+@property(copy,nonatomic) NSString* sdkVersion;
+@property(copy,nonatomic) NSString* sdkType;
+@property (nonatomic, assign) BOOL hasUpdateConfig;
+@property (nonatomic, assign) BOOL sdkDisable;
+@property (nonatomic, copy) NSString *reportUrl;
 
 
 + (DTConfig *)shareInstance;
 
-+ (NSString*)version;
-
-
-
-
+- (void)getRemoteConfig;
 
 @end
 

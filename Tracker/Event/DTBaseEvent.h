@@ -23,8 +23,9 @@ static NSString * const DT_APP_INSTALL_EVENT                = @"#app_install";
 static NSString * const DT_APP_INITIALIZE                   = @"#app_initialize";
 
 
+static NSString * const COMMON_PROPERTY_BUNDLE_ID                = @"#bundle_id";
 static NSString * const COMMON_PROPERTY_EVENT_SESSION            = @"#session_id";
-static NSString * const COMMON_PROPERTY_EVENT_SESSION_DURATION  = @"#session_duration";
+static NSString * const COMMON_PROPERTY_EVENT_SESSION_DURATION   = @"#session_duration";
 static NSString * const COMMON_PROPERTY_MCC                      = @"#mcc";
 static NSString * const COMMON_PROPERTY_MNC                      = @"#mnc";
 static NSString * const COMMON_PROPERTY_OS_COUNTRY               = @"#os_country_code";
@@ -49,6 +50,7 @@ static NSString * const COMMON_PROPERTY_SCREEN_WIDTH             = @"#screen_wid
 static NSString * const COMMON_PROPERTY_IS_FOREGROUND            = @"#is_foreground";
 static NSString * const COMMON_PROPERTY_EVENT_DURATION           = @"#event_duration";
 static NSString * const COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID    = @"#ias_ooid";
+static NSString * const COMMON_PROPERTY_ZONE_OFFSET              = @"#zone_offset";
 
 static NSString * const DT_CRASH_REASON                     = @"#app_crashed_reason";
 static NSString * const DT_RESUME_FROM_BACKGROUND           = @"#resume_from_background";

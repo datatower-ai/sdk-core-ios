@@ -89,12 +89,11 @@
             DTAppStartEvent *event = [[DTAppStartEvent alloc] initWithName:eventName];
             event.resumeFromBackground = NO;
             // 启动原因
-            if (![DTPresetProperties disableStartReason]) {
-                NSString *reason = [DTRunTime getAppLaunchReason];
-                if (reason && reason.length) {
-                    event.startReason = reason;
-                }
+            NSString *reason = [DTRunTime getAppLaunchReason];
+            if (reason && reason.length) {
+                event.startReason = reason;
             }
+            
             DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
             [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
             
@@ -149,11 +148,9 @@
                 DTAppStartEvent *event = [[DTAppStartEvent alloc] initWithName:eventName];
                 event.resumeFromBackground = YES;
                 // 启动原因
-                if (![DTPresetProperties disableStartReason]) {
-                    NSString *reason = [DTRunTime getAppLaunchReason];
-                    if (reason && reason.length) {
-                        event.startReason = reason;
-                    }
+                NSString *reason = [DTRunTime getAppLaunchReason];
+                if (reason && reason.length) {
+                    event.startReason = reason;
                 }
                 DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
                 [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];

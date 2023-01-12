@@ -7,82 +7,58 @@
 
 #import "DTPresetProperties+DTDisProperties.h"
 
-static BOOL _td_disableStartReason;
-static BOOL _td_disableDisk;
-static BOOL _td_disableRAM;
-static BOOL _td_disableFPS;
-static BOOL _td_disableSimulator;
-static BOOL _td_disableAppVersion;
-static BOOL _td_disableOsVersion;
-static BOOL _td_disableManufacturer;
-static BOOL _td_disableDeviceModel;
-static BOOL _td_disableScreenHeight;
-static BOOL _td_disableScreenWidth;
-static BOOL _td_disableCarrier;
-static BOOL _td_disableDeviceId;
-static BOOL _td_disableSystemLanguage;
-static BOOL _td_disableLib;
-static BOOL _td_disableLibVersion;
-static BOOL _td_disableBundleId;
-static BOOL _td_disableOs;
-static BOOL _td_disableInstallTime;
-static BOOL _td_disableDeviceType;
-
-static BOOL _td_disableNetworkType;
-static BOOL _td_disableZoneOffset;
-static BOOL _td_disableDuration;
-static BOOL _td_disableBackgroundDuration;
-static BOOL _td_disableAppCrashedReason;
-static BOOL _td_disableResumeFromBackground;
-static BOOL _td_disableElementId;
-static BOOL _td_disableElementType;
-static BOOL _td_disableElementContent;
-static BOOL _td_disableElementPosition;
-static BOOL _td_disableElementSelector;
-static BOOL _td_disableScreenName;
-static BOOL _td_disableTitle;
-static BOOL _td_disableUrl;
-static BOOL _td_disableReferrer;
 
 
-// - 禁用功能并过滤字段拼接
-static const NSString *kTDStartReason  = @"#start_reason";
-static const NSString *kTDPerformanceRAM  = @"#ram";
-static const NSString *kTDPerformanceDISK = @"#disk";
-static const NSString *kTDPerformanceSIM  = @"#simulator";
-static const NSString *kTDPerformanceFPS  = @"#fps";
-static const NSString *kTDPresentAppVersion  = @"#app_version";
-static const NSString *kTDPresentOsVersion = @"#os_version";
-static const NSString *kTDPresentManufacturer  = @"#manufacturer";
-static const NSString *kTDPresentDeviceModel  = @"#device_model";
-static const NSString *kTDPresentScreenHeight  = @"#screen_height";
-static const NSString *kTDPresentScreenWidth  = @"#screen_width";
-static const NSString *kTDPresentCarrier  = @"#carrier";
-static const NSString *kTDPresentDeviceId  = @"#device_id";
-static const NSString *kTDPresentSystemLanguage  = @"#system_language";
-static const NSString *kTDPresentLib  = @"#lib";
-static const NSString *kTDPresentLibVersion  = @"#lib_version";
-static const NSString *kTDPresentOs  = @"#os";
-static const NSString *kTDPresentBundleId  = @"#bundle_id";
-static const NSString *kTDPresentInstallTime  = @"#install_time";
-static const NSString *kTDPresentDeviceType = @"#device_type";
+static BOOL _disableIsForeground;//
+static BOOL _disableBundleId;
+static BOOL _disableAppVersionCode;//
+static BOOL _disableAppVersion;
+static BOOL _disableLib;
+static BOOL _disableLibVersion;
+static BOOL _disableOs;
+static BOOL _disableOsVersion;
+static BOOL _disableSystemCountry;//
+static BOOL _disableSystemLanguage;
+static BOOL _disableScreenHeight;
+static BOOL _disableScreenWidth;
+static BOOL _disableDeviceBrand;//
+static BOOL _disableManufacturer;
+static BOOL _disableDeviceModel;
+static BOOL _disableRAM;
+static BOOL _disableDisk;
+static BOOL _disableSimulator;
+static BOOL _disableNetworkType;
+static BOOL _disableMcc;//
+static BOOL _disableMnc;//
+static BOOL _disableFPS;
+static BOOL _disableZoneOffset;
 
-// - 只过滤字段
-static const NSString *kTDPresentNETWORKTYPE = @"#network_type";
-static const NSString *kTDPresentZONEOFFSET = @"#zone_offset";
-static const NSString *kTDPresentDURATION = @"#duration";
-static const NSString *kTDPresentBACKGROUNDDURATION = @"#background_duration";
-static const NSString *kTDPresentCRASHREASON = @"#app_crashed_reason";
-static const NSString *kTDPresentRESUMEFROMBACKGROUND = @"#resume_from_background";
-static const NSString *kTDPresentELEMENTID = @"#element_id";
-static const NSString *kTDPresentELEMENTTYPE = @"#element_type";
-static const NSString *kTDPresentELEMENTCONTENT = @"#element_content";
-static const NSString *kTDPresentELEMENTPOSITION = @"#element_position";
-static const NSString *kTDPresentELEMENTSELECTOR = @"#element_selector";
-static const NSString *kTDPresentSCREENNAME = @"#screen_name";
-static const NSString *kTDPresentTITLE = @"#title";
-static const NSString *kTDPresentURL = @"#url";
-static const NSString *kTDPresentREFERRER = @"#referrer";
+//用户属性Active
+static BOOL _disableActiveMcc;//
+static BOOL _disableActiveMnc;//
+static BOOL _disableActiveSystemCountry;//
+static BOOL _disableActiveSystemLanguage;
+static BOOL _disableActiveBundleId;
+static BOOL _disableActiveAppVersionCode;//
+static BOOL _disableActiveAppVersion;
+static BOOL _disableActiveLib;
+static BOOL _disableActiveLibVersion;
+static BOOL _disableActiveOs;
+static BOOL _disableActiveOsVersion;
+static BOOL _disableActiveManufacturer;
+static BOOL _disableActiveDeviceBrand;
+static BOOL _disableActiveDeviceModel;
+static BOOL _disableActiveScreenHeight;
+static BOOL _disableActiveScreenWidth;
+static BOOL _disableActiveRAM;
+static BOOL _disableActiveDisk;
+static BOOL _disableActiveNetworkType;
+static BOOL _disableActiveSimulator;
+
+//用户属性Latest
+static BOOL _disableLatestAppVersionCode;//
+static BOOL _disableLatestAppVersion;
+
 
 
 
@@ -97,44 +73,55 @@ static NSArray *__td_disPresetProperties;
     dispatch_once(&onceToken, ^{
         __td_disPresetProperties = (NSArray *)[[[NSBundle mainBundle] infoDictionary] objectForKey:TD_MAIM_INFO_PLIST_DISPRESTPRO_KEY];
         if (__td_disPresetProperties && __td_disPresetProperties.count) {
-            _td_disableStartReason = [__td_disPresetProperties containsObject:kTDStartReason];
-            _td_disableDisk        = [__td_disPresetProperties containsObject:kTDPerformanceDISK];
-            _td_disableRAM         = [__td_disPresetProperties containsObject:kTDPerformanceRAM];
-            _td_disableFPS         = [__td_disPresetProperties containsObject:kTDPerformanceFPS];
-            _td_disableSimulator   = [__td_disPresetProperties containsObject:kTDPerformanceSIM];
-            
-            _td_disableAppVersion  = [__td_disPresetProperties containsObject:kTDPresentAppVersion];
-            _td_disableOsVersion   = [__td_disPresetProperties containsObject:kTDPresentOsVersion];
-            _td_disableManufacturer = [__td_disPresetProperties containsObject:kTDPresentManufacturer];
-            _td_disableDeviceModel = [__td_disPresetProperties containsObject:kTDPresentDeviceModel];
-            _td_disableScreenHeight = [__td_disPresetProperties containsObject:kTDPresentScreenHeight];
-            _td_disableScreenWidth = [__td_disPresetProperties containsObject:kTDPresentScreenWidth];
-            _td_disableCarrier = [__td_disPresetProperties containsObject:kTDPresentCarrier];
-            _td_disableDeviceId = [__td_disPresetProperties containsObject:kTDPresentDeviceId];
-            _td_disableSystemLanguage = [__td_disPresetProperties containsObject:kTDPresentSystemLanguage];
-            _td_disableLib = [__td_disPresetProperties containsObject:kTDPresentLib];
-            _td_disableLibVersion = [__td_disPresetProperties containsObject:kTDPresentLibVersion];
-            _td_disableBundleId = [__td_disPresetProperties containsObject:kTDPresentBundleId];
-            _td_disableOs = [__td_disPresetProperties containsObject:kTDPresentOs];
-            _td_disableInstallTime = [__td_disPresetProperties containsObject:kTDPresentInstallTime];
-            _td_disableDeviceType = [__td_disPresetProperties containsObject:kTDPresentDeviceType];
-            
-            _td_disableNetworkType = [__td_disPresetProperties containsObject:kTDPresentNETWORKTYPE];
-            _td_disableZoneOffset = [__td_disPresetProperties containsObject:kTDPresentZONEOFFSET];
-            _td_disableDuration = [__td_disPresetProperties containsObject:kTDPresentDURATION];
-            _td_disableBackgroundDuration = [__td_disPresetProperties containsObject:kTDPresentBACKGROUNDDURATION];
-            _td_disableAppCrashedReason = [__td_disPresetProperties containsObject:kTDPresentCRASHREASON];
-            _td_disableResumeFromBackground = [__td_disPresetProperties containsObject:kTDPresentRESUMEFROMBACKGROUND];
-            _td_disableElementId = [__td_disPresetProperties containsObject:kTDPresentELEMENTID];
-            _td_disableElementType = [__td_disPresetProperties containsObject:kTDPresentELEMENTTYPE];
-            _td_disableElementContent = [__td_disPresetProperties containsObject:kTDPresentELEMENTCONTENT];
-            _td_disableElementPosition = [__td_disPresetProperties containsObject:kTDPresentELEMENTPOSITION];
-            _td_disableElementSelector = [__td_disPresetProperties containsObject:kTDPresentELEMENTSELECTOR];
-            _td_disableScreenName = [__td_disPresetProperties containsObject:kTDPresentSCREENNAME];
-            _td_disableTitle = [__td_disPresetProperties containsObject:kTDPresentTITLE];
-            _td_disableUrl = [__td_disPresetProperties containsObject:kTDPresentURL];
-            _td_disableReferrer = [__td_disPresetProperties containsObject:kTDPresentREFERRER];
-            
+
+            _disableIsForeground    = [__td_disPresetProperties containsObject:COMMON_PROPERTY_IS_FOREGROUND];
+            _disableBundleId        = [__td_disPresetProperties containsObject:COMMON_PROPERTY_BUNDLE_ID];
+            _disableAppVersionCode  = [__td_disPresetProperties containsObject:COMMON_PROPERTY_APP_VERSION_CODE];
+            _disableAppVersion      = [__td_disPresetProperties containsObject:COMMON_PROPERTY_APP_VERSION_NAME];
+            _disableLib             = [__td_disPresetProperties containsObject:COMMON_PROPERTY_SDK_TYPE];
+            _disableLibVersion      = [__td_disPresetProperties containsObject:COMMON_PROPERTY_SDK_VERSION];
+            _disableOs              = [__td_disPresetProperties containsObject:COMMON_PROPERTY_OS];
+            _disableOsVersion       = [__td_disPresetProperties containsObject:COMMON_PROPERTY_OS_VERSION_NAME];
+            _disableSystemCountry   = [__td_disPresetProperties containsObject:COMMON_PROPERTY_OS_COUNTRY];
+            _disableSystemLanguage  = [__td_disPresetProperties containsObject:COMMON_PROPERTY_OS_LANG];
+            _disableScreenHeight    = [__td_disPresetProperties containsObject:COMMON_PROPERTY_SCREEN_HEIGHT];
+            _disableScreenWidth     = [__td_disPresetProperties containsObject:COMMON_PROPERTY_SCREEN_WIDTH];
+            _disableDeviceBrand     = [__td_disPresetProperties containsObject:COMMON_PROPERTY_DEVICE_BRAND];
+            _disableManufacturer    = [__td_disPresetProperties containsObject:COMMON_PROPERTY_DEVICE_MANUFACTURER];
+            _disableDeviceModel     = [__td_disPresetProperties containsObject:COMMON_PROPERTY_DEVICE_MODEL];
+            _disableRAM             = [__td_disPresetProperties containsObject:COMMON_PROPERTY_MEMORY_USED];
+            _disableDisk            = [__td_disPresetProperties containsObject:COMMON_PROPERTY_STORAGE_USED];
+            _disableSimulator       = [__td_disPresetProperties containsObject:COMMON_PROPERTY_SIMULATOR];
+            _disableNetworkType     = [__td_disPresetProperties containsObject:COMMON_PROPERTY_NETWORK_TYPE];
+            _disableMcc             = [__td_disPresetProperties containsObject:COMMON_PROPERTY_MCC];
+            _disableMnc             = [__td_disPresetProperties containsObject:COMMON_PROPERTY_MNC];
+            _disableFPS             = [__td_disPresetProperties containsObject:COMMON_PROPERTY_FPS];
+            _disableZoneOffset      = [__td_disPresetProperties containsObject:COMMON_PROPERTY_ZONE_OFFSET];
+
+            //用户属性Active
+            _disableActiveMcc           = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_MCC];
+            _disableActiveMnc           = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_MNC];
+            _disableActiveSystemCountry = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_OS_COUNTRY];
+            _disableActiveSystemLanguage= [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_OS_LANG];
+            _disableActiveAppVersionCode= [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_APP_VERSION_CODE];
+            _disableActiveAppVersion    = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_APP_VERSION_NAME];
+            _disableActiveLib           = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_SDK_TYPE];
+            _disableActiveLibVersion    = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_SDK_VERSION];
+            _disableActiveOs            = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_OS];
+            _disableActiveOsVersion     = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_OS_VERSION_NAME];
+            _disableActiveManufacturer  = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_DEVICE_MANUFACTURER];
+            _disableActiveDeviceBrand   = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_DEVICE_BRAND];
+            _disableActiveDeviceModel   = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_DEVICE_MODEL];
+            _disableActiveScreenHeight  = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_SCREEN_HEIGHT];
+            _disableActiveScreenWidth   = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_SCREEN_WIDTH];
+            _disableActiveRAM           = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_MEMORY_USED];
+            _disableActiveDisk          = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_STORAGE_USED];
+            _disableActiveNetworkType   = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_NETWORK_TYPE];
+            _disableActiveSimulator     = [__td_disPresetProperties containsObject:USER_PROPERTY_ACTIVE_SIMULATOR];
+
+            //用户属性Latest
+            _disableLatestAppVersionCode = [__td_disPresetProperties containsObject:USER_PROPERTY_LATEST_APP_VERSION_CODE];
+            _disableLatestAppVersion     = [__td_disPresetProperties containsObject:USER_PROPERTY_LATEST_APP_VERSION_NAME];
         }
     });
     return __td_disPresetProperties;
@@ -159,147 +146,185 @@ static NSArray *__td_disPresetProperties;
 }
 
 
-+ (BOOL)disableStartReason {
-    return _td_disableStartReason;
-}
-
-+ (BOOL)disableDisk {
-    return _td_disableDisk;
-}
-
-+ (BOOL)disableRAM {
-    return _td_disableRAM;
-}
-
-+ (BOOL)disableFPS {
-    return _td_disableFPS;
-}
-
-+ (BOOL)disableSimulator {
-    return _td_disableSimulator;
-}
-
-
-
-
-+ (BOOL)disableAppVersion {
-    return _td_disableAppVersion;
-}
-
-+ (BOOL)disableOsVersion {
-    return _td_disableOsVersion;
-}
-
-+ (BOOL)disableManufacturer {
-    return _td_disableManufacturer;
-}
-
-+ (BOOL)disableDeviceId {
-    return _td_disableDeviceId;
-}
-
-+ (BOOL)disableDeviceModel {
-    return _td_disableDeviceModel;
-}
-
-+ (BOOL)disableScreenHeight {
-    return _td_disableScreenHeight;
-}
-
-+ (BOOL)disableScreenWidth {
-    return _td_disableScreenWidth;
-}
-
-+ (BOOL)disableCarrier {
-    return _td_disableCarrier;
-}
-
-+ (BOOL)disableSystemLanguage {
-    return _td_disableSystemLanguage;
-}
-
-+ (BOOL)disableLib {
-    return _td_disableLib;
-}
-
-+ (BOOL)disableLibVersion {
-    return _td_disableLibVersion;
-}
-
-+ (BOOL)disableOs {
-    return _td_disableOs;
++ (BOOL)disableIsForeground {
+    return _disableIsForeground;
 }
 
 + (BOOL)disableBundleId {
-    return _td_disableBundleId;
+    return _disableBundleId;
 }
 
-+ (BOOL)disableInstallTime {
-    return _td_disableInstallTime;
++ (BOOL)disableAppVersion {
+    return _disableAppVersion;
 }
 
-+ (BOOL)disableDeviceType {
-    return _td_disableDeviceType;
++ (BOOL)disableAppVersionCode {
+    return _disableAppVersionCode;
+}
+
++ (BOOL)disableLib {
+    return _disableLib;
+}
+
++ (BOOL)disableLibVersion {
+    return _disableLibVersion;
+}
+
++ (BOOL)disableOs {
+    return _disableOs;
+}
+
++ (BOOL)disableOsVersion {
+    return _disableOsVersion;
+}
+
++ (BOOL)disableSystemCountry {
+    return _disableSystemCountry;
+}
+
++ (BOOL)disableSystemLanguage {
+    return _disableSystemLanguage;
+}
+
++ (BOOL)disableScreenHeight {
+    return _disableScreenHeight;
+}
+
++ (BOOL)disableScreenWidth {
+    return _disableScreenWidth;
+}
+
++ (BOOL)disableDeviceBrand {
+    return _disableDeviceBrand;
+}
+
++ (BOOL)disableManufacturer {
+    return _disableManufacturer;
+}
+
++ (BOOL)disableDeviceModel {
+    return _disableDeviceModel;
+}
+
++ (BOOL)disableRAM {
+    return _disableRAM;
+}
+
++ (BOOL)disableDisk {
+    return _disableDisk;
+}
+
++ (BOOL)disableSimulator {
+    return _disableSimulator;
 }
 
 + (BOOL)disableNetworkType {
-    return _td_disableNetworkType;
+    return _disableNetworkType;
+}
+
++ (BOOL)disableMcc {
+    return _disableMcc;
+}
+
++ (BOOL)disableMnc {
+    return _disableMnc;
+}
+
++ (BOOL)disableFPS {
+    return _disableFPS;
 }
 
 + (BOOL)disableZoneOffset {
-    return _td_disableZoneOffset;
+    return _disableZoneOffset;
 }
 
-+ (BOOL)disableDuration {
-    return _td_disableDuration;
+//active
+
++ (BOOL)disableActiveMcc {
+    return _disableActiveMcc;
 }
 
-+ (BOOL)disableBackgroundDuration {
-    return _td_disableBackgroundDuration;
++ (BOOL)disableActiveMnc {
+    return _disableActiveMnc;
 }
 
-+ (BOOL)disableAppCrashedReason {
-    return _td_disableAppCrashedReason;
++ (BOOL)disableActiveSystemCountry {
+    return _disableActiveSystemCountry;
 }
 
-+ (BOOL)disableResumeFromBackground {
-    return _td_disableResumeFromBackground;
++ (BOOL)disableActiveSystemLanguage {
+    return _disableActiveSystemLanguage;
 }
 
-+ (BOOL)disableElementId {
-    return _td_disableElementId;
++ (BOOL)disableActiveAppVersion {
+    return _disableActiveAppVersion;
 }
 
-+ (BOOL)disableElementType {
-    return _td_disableElementType;
++ (BOOL)disableActiveAppVersionCode {
+    return _disableActiveAppVersionCode;
 }
 
-+ (BOOL)disableElementContent {
-    return _td_disableElementContent;
++ (BOOL)disableActiveLib {
+    return _disableActiveLib;
 }
 
-+ (BOOL)disableElementPosition {
-    return _td_disableElementPosition;
++ (BOOL)disableActiveLibVersion {
+    return _disableActiveLibVersion;
 }
 
-+ (BOOL)disableElementSelector {
-    return _td_disableElementSelector;
++ (BOOL)disableActiveOs {
+    return _disableActiveOs;
 }
 
-+ (BOOL)disableScreenName {
-    return _td_disableScreenName;
++ (BOOL)disableActiveOsVersion {
+    return _disableActiveOsVersion;
 }
 
-+ (BOOL)disableTitle {
-    return _td_disableTitle;
++ (BOOL)disableActiveManufacturer {
+    return _disableActiveManufacturer;
 }
 
-+ (BOOL)disableUrl {
-    return _td_disableUrl;
++ (BOOL)disableActiveDeviceBrand {
+    return _disableActiveDeviceBrand;
 }
 
-+ (BOOL)disableReferrer {
-    return _td_disableReferrer;
++ (BOOL)disableActiveDeviceModel {
+    return _disableActiveDeviceModel;
 }
+
++ (BOOL)disableActiveScreenHeight {
+    return _disableActiveScreenHeight;
+}
+
++ (BOOL)disableActiveScreenWidth {
+    return _disableActiveScreenWidth;
+}
+
++ (BOOL)disableActiveRAM {
+    return _disableActiveRAM;
+}
+
++ (BOOL)disableActiveDisk {
+    return _disableActiveDisk;
+}
+
++ (BOOL)disableActiveNetworkType {
+    return _disableActiveNetworkType;
+}
+
++ (BOOL)disableActiveSimulator {
+    return _disableActiveSimulator;
+}
+
++ (BOOL)disableLatestAppVersion {
+    return _disableLatestAppVersion;
+}
+
++ (BOOL)disableLatestAppVersionCode {
+    return _disableLatestAppVersionCode;
+}
+
+
+
 
 @end

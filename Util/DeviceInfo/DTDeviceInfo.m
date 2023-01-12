@@ -12,9 +12,6 @@
 #import "DTKeychainHelper.h"
 #import "DTConfig.h"
 #import "DTBaseEvent.h"
-//#import "ThinkingAnalyticsSDKPrivate.h"
-//#import "TDFile.h"
-#import "DTPresetProperties+DTDisProperties.h"
 
 #define kTDDyldPropertyNames @[@"DTPerformance"]
 #define kTDGetPropertySelName @"getPresetProperties"
@@ -52,8 +49,8 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.libName = @"iOS";
-        self.libVersion = DTConfig.version;
+        self.libName = DTConfig.shareInstance.sdkType;
+        self.libVersion = DTConfig.shareInstance.sdkVersion;
         _deviceId = [self getDTID];
         _appVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
         NSString *app_build = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
@@ -130,105 +127,92 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     
     
 #if TARGET_OS_IOS
-    if (![DTPresetProperties disableCarrier]) {
-        CTCarrier *carrier = nil;
-        NSString *carrierName = @"";
-        NSString *mcc = @"";
-        NSString *mnc = @"";
-    #ifdef __IPHONE_12_0
-            if (@available(iOS 12.1, *)) {
-                // 双卡双待的情况
-                NSArray *carrierKeysArray = [__td_TelephonyNetworkInfo.serviceSubscriberCellularProviders.allKeys sortedArrayUsingSelector:@selector(compare:)];
-                carrier = __td_TelephonyNetworkInfo.serviceSubscriberCellularProviders[carrierKeysArray.firstObject];
-                if (!carrier.mobileNetworkCode) {
-                    carrier = __td_TelephonyNetworkInfo.serviceSubscriberCellularProviders[carrierKeysArray.lastObject];
-                }
-            }
-    #endif
-        
-        if (!carrier) {
-            carrier = [__td_TelephonyNetworkInfo subscriberCellularProvider];
+    
+    CTCarrier *carrier = nil;
+    NSString *carrierName = @"";
+    NSString *mcc = @"";
+    NSString *mnc = @"";
+#ifdef __IPHONE_12_0
+    if (@available(iOS 12.1, *)) {
+        // 双卡双待的情况
+        NSArray *carrierKeysArray = [__td_TelephonyNetworkInfo.serviceSubscriberCellularProviders.allKeys sortedArrayUsingSelector:@selector(compare:)];
+        carrier = __td_TelephonyNetworkInfo.serviceSubscriberCellularProviders[carrierKeysArray.firstObject];
+        if (!carrier.mobileNetworkCode) {
+            carrier = __td_TelephonyNetworkInfo.serviceSubscriberCellularProviders[carrierKeysArray.lastObject];
         }
-        
-        // 系统特性，在SIM没有安装的情况下，carrierName也存在有值的情况，这里额外添加MCC和MNC是否有值的判断
-        // MCC、MNC、isoCountryCode在没有安装SIM卡、没在蜂窝服务范围内时候为nil
-        if (carrier.carrierName &&
-            carrier.carrierName.length > 0 &&
-            carrier.mobileNetworkCode &&
-            carrier.mobileNetworkCode.length > 0) {
-            carrierName = carrier.carrierName;
-            mcc = carrier.mobileCountryCode;
-            mnc = carrier.mobileNetworkCode;
-        }
-        [p setValue:mcc forKey:COMMON_PROPERTY_MCC];
-        [p setValue:mnc forKey:COMMON_PROPERTY_MNC];
     }
 #endif
     
-    if (![DTPresetProperties disableLib]) {
-        [p setValue:self.libName forKey:COMMON_PROPERTY_SDK_TYPE];
-    }
-    if (![DTPresetProperties disableLibVersion]) {
-        [p setValue:self.libVersion forKey:COMMON_PROPERTY_SDK_VERSION];
-    }
-    if (![DTPresetProperties disableManufacturer]) {
-        [p setValue:@"Apple" forKey:COMMON_PROPERTY_DEVICE_MANUFACTURER];
-        [p setValue:@"Apple" forKey:COMMON_PROPERTY_DEVICE_BRAND];
-    }
-    if (![DTPresetProperties disableDeviceModel]) {
-        [p setValue:[self td_iphoneType] forKey:COMMON_PROPERTY_DEVICE_MODEL];
+    if (!carrier) {
+        carrier = [__td_TelephonyNetworkInfo subscriberCellularProvider];
     }
     
-#if TARGET_OS_IOS
-    if (![DTPresetProperties disableOs]) {
-        [p setValue:@"iOS" forKey:COMMON_PROPERTY_OS];
+    // 系统特性，在SIM没有安装的情况下，carrierName也存在有值的情况，这里额外添加MCC和MNC是否有值的判断
+    // MCC、MNC、isoCountryCode在没有安装SIM卡、没在蜂窝服务范围内时候为nil
+    if (carrier.carrierName &&
+        carrier.carrierName.length > 0 &&
+        carrier.mobileNetworkCode &&
+        carrier.mobileNetworkCode.length > 0) {
+        carrierName = carrier.carrierName;
+        mcc = carrier.mobileCountryCode;
+        mnc = carrier.mobileNetworkCode;
     }
-    if (![DTPresetProperties disableOsVersion]) {
-        UIDevice *device = [UIDevice currentDevice];
-        [p setValue:[device systemVersion] forKey:COMMON_PROPERTY_OS_VERSION_NAME];
-    }
-    if (![DTPresetProperties disableScreenWidth]) {
-        CGSize size = [UIScreen mainScreen].bounds.size;
-        [p setValue:@((NSInteger)size.width) forKey:COMMON_PROPERTY_SCREEN_WIDTH];
-    }
-    if (![DTPresetProperties disableScreenHeight]) {
-        CGSize size = [UIScreen mainScreen].bounds.size;
-        [p setValue:@((NSInteger)size.height) forKey:COMMON_PROPERTY_SCREEN_HEIGHT];
-    }
+    [p setValue:mcc forKey:COMMON_PROPERTY_MCC];
+    [p setValue:mnc forKey:COMMON_PROPERTY_MNC];
+    
+#endif
+    [p setValue:self.libName forKey:COMMON_PROPERTY_SDK_TYPE];
+    [p setValue:self.libVersion forKey:COMMON_PROPERTY_SDK_VERSION];
+    [p setValue:@"Apple" forKey:COMMON_PROPERTY_DEVICE_MANUFACTURER];
+    [p setValue:@"Apple" forKey:COMMON_PROPERTY_DEVICE_BRAND];
+    [p setValue:[self td_iphoneType] forKey:COMMON_PROPERTY_DEVICE_MODEL];
+    
     
 #if TARGET_OS_IOS
-    if (![DTPresetProperties disableDeviceType]) {
-//        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-//            [p setValue:@"iPad" forKey:@"#device_type"];
-//        } else {
-//            [p setValue:@"iPhone" forKey:@"#device_type"];
-//        }
-    }
+    //os 类型
+    [p setValue:@"iOS" forKey:COMMON_PROPERTY_OS];
+    //os 版本号
+    UIDevice *device = [UIDevice currentDevice];
+    [p setValue:[device systemVersion] forKey:COMMON_PROPERTY_OS_VERSION_NAME];
+    //屏幕参数
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    [p setValue:@((NSInteger)size.width) forKey:COMMON_PROPERTY_SCREEN_WIDTH];
+    [p setValue:@((NSInteger)size.height) forKey:COMMON_PROPERTY_SCREEN_HEIGHT];
+    
+    
+#if TARGET_OS_IOS
+    //    if (![DTPresetProperties disableDeviceType]) {
+    //        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    //            [p setValue:@"iPad" forKey:@"#device_type"];
+    //        } else {
+    //            [p setValue:@"iPhone" forKey:@"#device_type"];
+    //        }
+    //    }
 #endif
     
 #elif TARGET_OS_OSX
-//    if (![TDPresetProperties disableOs]) {
-//        [p setValue:@"OSX" forKey:COMMON_PROPERTY_OS];
-//    }
-//    if (![TDPresetProperties disableOsVersion]) {
-//        NSDictionary *sv = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
-//        NSString *versionString = [sv objectForKey:@"ProductVersion"];
-//        [p setValue:versionString forKey:@"#os_version"];
-//    }
+    //    if (![TDPresetProperties disableOs]) {
+    //        [p setValue:@"OSX" forKey:COMMON_PROPERTY_OS];
+    //    }
+    //    if (![TDPresetProperties disableOsVersion]) {
+    //        NSDictionary *sv = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+    //        NSString *versionString = [sv objectForKey:@"ProductVersion"];
+    //        [p setValue:versionString forKey:@"#os_version"];
+    //    }
 #endif
-    if (![DTPresetProperties disableSystemLanguage]) {
-        NSString *preferredLanguages = [[NSLocale preferredLanguages] firstObject];
-//        NSString *preferredLanguages1 = [NSLocale currentLocale].languageCode;
-        NSString * retValue = [[[[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"] firstObject] copy];
-        if (preferredLanguages && preferredLanguages.length > 0) {
-            p[COMMON_PROPERTY_OS_LANG] = [[preferredLanguages componentsSeparatedByString:@"-"] firstObject];;
-        }
-        
-        NSLocale *locale = [NSLocale currentLocale];
-        NSString *country = [locale localeIdentifier];
-        p[COMMON_PROPERTY_OS_COUNTRY] = country;
-        
+    
+    NSString *preferredLanguages = [[NSLocale preferredLanguages] firstObject];
+    //        NSString *preferredLanguages1 = [NSLocale currentLocale].languageCode;
+//    NSString * retValue = [[[[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"] firstObject] copy];
+    if (preferredLanguages && preferredLanguages.length > 0) {
+        p[COMMON_PROPERTY_OS_LANG] = [[preferredLanguages componentsSeparatedByString:@"-"] firstObject];;
     }
+    
+    NSLocale *locale = [NSLocale currentLocale];
+    NSString *country = [locale localeIdentifier];
+    p[COMMON_PROPERTY_OS_COUNTRY] = country;
+    
+
     // 添加性能指标
     [p addEntriesFromDictionary:[DTDeviceInfo getAPMParams]];
     
@@ -237,7 +221,7 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 
 + (NSString*)bundleId
 {
-     return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
 }
 
 - (NSString *)td_iphoneType {
@@ -315,7 +299,7 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     if ([platform isEqualToString:@"iPad7,11"] || [platform isEqualToString:@"iPad7,12"])   return @"iPad 7";
     if ([platform isEqualToString:@"iPad11,6"] || [platform isEqualToString:@"iPad11,7"])   return @"iPad 8";
     if ([platform isEqualToString:@"iPad12,1"] || [platform isEqualToString:@"iPad12,2"])   return @"iPad 9";
-
+    
     //ipad air
     if ([platform isEqualToString:@"iPad4,1"])   return @"iPad Air";
     if ([platform isEqualToString:@"iPad4,2"])   return @"iPad Air";
@@ -324,7 +308,7 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     if ([platform isEqualToString:@"iPad11,3"] || [platform isEqualToString:@"iPad11,4"])   return @"iPad Air3";
     if ([platform isEqualToString:@"iPad13,1"] || [platform isEqualToString:@"iPad13,2"])   return @"iPad Air4";
     if ([platform isEqualToString:@"iPad13,16"] || [platform isEqualToString:@"iPad13,17"])   return @"iPad Air5";
-
+    
     //ipad mini
     if ([platform isEqualToString:@"iPad4,4"])   return @"iPad Mini 2";
     if ([platform isEqualToString:@"iPad4,5"])   return @"iPad Mini 2";
@@ -349,8 +333,8 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     if ([platform isEqualToString:@"iPad8,11"] || [platform isEqualToString:@"iPad8,124"])   return @"iPad Pro12 9Inch4";
     if ([platform isEqualToString:@"iPad13,8"] || [platform isEqualToString:@"iPad13,9"]
         || [platform isEqualToString:@"iPad13,10"] || [platform isEqualToString:@"iPad13,11"])   return @"iPad Pro12 9Inch5";
-
-
+    
+    
     //Simulator
     if ([platform isEqualToString:@"i386"])      return @"iPhone Simulator";
     if ([platform isEqualToString:@"x86_64"])    return @"iPhone Simulator";
@@ -361,7 +345,7 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     // DT ID
     NSString *dtId;
     DTKeychainHelper *wrapper = [[DTKeychainHelper alloc] init];
-
+    
     NSString *dtIdKeychain = [wrapper readDTID];
     
     if (dtIdKeychain.length == 0) {
@@ -381,9 +365,9 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
                                                                       options:NSRegularExpressionCaseInsensitive
                                                                         error:nil];
     return [regExp stringByReplacingMatchesInString:string
-                                                     options:NSMatchingReportProgress
-                                                       range:NSMakeRange(0, string.length)
-                                                withTemplate:@""];
+                                            options:NSMatchingReportProgress
+                                              range:NSMakeRange(0, string.length)
+                                       withTemplate:@""];
 }
 
 #if TARGET_OS_IOS
@@ -436,7 +420,7 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
         }
 #endif
     } @catch (NSException *exception) {
-//        DTLogError(@"%@: %@", self, exception);
+        //        DTLogError(@"%@: %@", self, exception);
     }
     
     return networkType;
@@ -469,11 +453,11 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
         SEL sel = NSSelectorFromString(kTDGetPropertySelName);
         if (cls && sel && [cls respondsToSelector:sel]) {
             NSDictionary *result = [cls performSelector:sel];
-//            NSDictionary *result = [NSObject performSelector:sel onTarget:cls withArguments:@[]];
+            //            NSDictionary *result = [NSObject performSelector:sel onTarget:cls withArguments:@[]];
             if ([result isKindOfClass:[NSDictionary class]] && result.allKeys.count > 0) {
                 [p addEntriesFromDictionary:result];
             }
-      
+            
         }
     }
     return p;

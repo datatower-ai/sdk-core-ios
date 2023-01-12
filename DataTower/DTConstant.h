@@ -115,7 +115,7 @@ typedef NS_OPTIONS(NSInteger, DTAutoTrackEventType) {
      
      以上全部 APP 事件
      */
-    DTAutoTrackEventTypeAll    = DTAutoTrackEventTypeInitialize |DTAutoTrackEventTypeAppInstall | DTAutoTrackEventTypeAppStart | DTAutoTrackEventTypeAppEnd
+    DTAutoTrackEventTypeAll  = DTAutoTrackEventTypeAppInstall | DTAutoTrackEventTypeAppStart | DTAutoTrackEventTypeAppEnd
 
 };
 
