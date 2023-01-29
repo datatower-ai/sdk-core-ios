@@ -328,15 +328,14 @@ static dispatch_queue_t dt_trackQueue;
     NSDictionary *superProperties = self.superProperty.currentSuperProperties;
     // 添加从属性插件获取的属性，属性插件只有系统使用，不支持用户自定义。所以属性名字是可信的，不用验证格式
     NSMutableDictionary *pluginProperties = [self.propertyPluginManager propertiesWithEventType:event.eventType];
-    // 过滤禁用属性
-    [DTPresetProperties handleFilterDisPresetProperties:pluginProperties];
-
-  
+    
     NSMutableDictionary *jsonObj = [NSMutableDictionary dictionary];
     
     [event.properties addEntriesFromDictionary:superProperties];
     [event.properties addEntriesFromDictionary:pluginProperties];
-    
+    // 过滤禁用属性
+    [DTPresetProperties handleFilterDisPresetProperties:event.properties];
+
     if ([event isKindOfClass:[DTAppEndEvent class]]) {
         [self unsetSuperProperty:COMMON_PROPERTY_EVENT_SESSION];
     }
