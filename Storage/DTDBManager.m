@@ -23,7 +23,7 @@
     dispatch_once(&onceToken, ^{
         NSString *filepath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"DT-data.plist"];
         sharedInstance = [[self alloc] initWithDBPath:filepath];
-//        DTLogDebug(@"数据库路径：%@", filepath);
+        DTLogDebug(@"数据库路径：%@", filepath);
     });
     return sharedInstance;
 }

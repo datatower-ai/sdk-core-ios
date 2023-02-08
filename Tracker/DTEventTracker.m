@@ -19,7 +19,7 @@ static NSUInteger const kBatchSize = 10;
 
 @interface DTEventTracker ()
 @property (atomic, strong) DTConfig *config;
-
+@property (atomic, copy) NSURL *sendURL;
 @property (atomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) DTDBManager *dataQueue;
 
@@ -44,6 +44,7 @@ static NSUInteger const kBatchSize = 10;
     if (self = [self init]) {
         self.queue = queue;
         self.config = [DTAnalyticsManager shareInstance].config;
+        self.sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", self.config.serverUrl]];
         self.dataQueue = [DTDBManager sharedInstance];
     }
     return self;
@@ -84,8 +85,6 @@ static NSUInteger const kBatchSize = 10;
 }
 
 - (void)flush {
-    if ([self.config sdkDisable])
-        return;
     [self _asyncWithCompletion:^{}];
 }
 
@@ -210,15 +209,12 @@ static NSUInteger const kBatchSize = 10;
 - (BOOL)sendEventsData:(NSArray<NSDictionary *> *) eventArray{
     NSMutableDictionary *header = [NSMutableDictionary dictionary];
     header[@"Content-Type"] = @"text/plain";
-    NSURL *sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", self.config.reportUrl]];
+    
     NSString *jsonString = [DTJSONUtil JSONStringForObject:eventArray];
     NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     
-    BOOL reslult = [DTNetWork postRequestWithURL:sendURL requestBody:postBody headers:header];
+    BOOL reslult = [DTNetWork postRequestWithURL:self.sendURL requestBody:postBody headers:header];
     if (reslult) {
-        if (![self.config hasUpdateConfig]) {
-            [self.config getRemoteConfig];
-        }
         DTLogDebug(@"flush success sendContent---->:%@",jsonString);
     }
     return reslult;

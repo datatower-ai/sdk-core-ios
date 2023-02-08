@@ -14,15 +14,14 @@
 
 - (NSMutableDictionary *)jsonObject {
     NSMutableDictionary *dict = [super jsonObject];
-
     
-    if (self.startReason && self.startReason.length > 0 && ![self.startReason isEqual: @"{}"]) {
+    if (![DTPresetProperties disableResumeFromBackground]) {
+        self.properties[DT_RESUME_FROM_BACKGROUND] = @(self.resumeFromBackground);
+    }
+    if (![DTPresetProperties disableStartReason]) {
         self.properties[DT_START_REASON] = self.startReason;
     }
-    self.properties[DT_RESUME_FROM_BACKGROUND] = @(self.resumeFromBackground);
-    
     self.properties[@"#is_first_time"] = @([[DTDeviceInfo sharedManager] isFirstOpen]);
-    
     return dict;
 }
 
