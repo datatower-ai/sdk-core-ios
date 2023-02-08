@@ -50,7 +50,6 @@ static dispatch_queue_t dt_trackQueue;
     [DTAppState shareInstance];
     //sdk 配置
     self.config = config;
-    [self.config getRemoteConfig];
     // 日志模块
     [self initLog];
     // 网络变化监听
@@ -104,7 +103,7 @@ static dispatch_queue_t dt_trackQueue;
     DTPresetPropertyPlugin *presetPlugin = [[DTPresetPropertyPlugin alloc] init];
     [self.propertyPluginManager registerPropertyPlugin:presetPlugin];
     
-    // 预置属性，用于用户属性设置
+    //预置属性，用于用户属性设置
     self.presetProperty = [[DTPresetProperties alloc] initWithDictionary:[self.propertyPluginManager propertiesWithEventType:DTEventTypeTrack]];
 }
 
@@ -200,14 +199,10 @@ static dispatch_queue_t dt_trackQueue;
 //MARK: - Auto Track
 
 - (void)enableAutoTrack:(DTAutoTrackEventType)eventType {
-    if ([self hasDisabled])
-        return;
     [[DTAutoTrackManager sharedManager] trackWithAppid:[self.config appid] withOption:eventType];
 }
 
 - (void)autoTrackWithEvent:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties {
-    if ([self hasDisabled])
-        return;
     [self handleTimeEvent:event];
     [self asyncAutoTrackEventObject:event properties:properties];
 }
@@ -216,8 +211,6 @@ static dispatch_queue_t dt_trackQueue;
 /// @param event 事件
 /// @param properties 自定义属性
 - (void)asyncAutoTrackEventObject:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties {
-    if ([self hasDisabled])
-        return;
     dispatch_async(dt_trackQueue, ^{
         [self trackEvent:event properties:properties isH5:NO];
     });
@@ -228,16 +221,12 @@ static dispatch_queue_t dt_trackQueue;
 /// @param event 事件
 /// @param properties 自定义属性
 - (void)asyncTrackEventObject:(DTTrackEvent *)event properties:(NSDictionary *)properties {
-    if ([self hasDisabled])
-        return;
     dispatch_async(dt_trackQueue, ^{
         [self trackEvent:event properties:properties isH5:NO];
     });
 }
 
 - (void)track:(NSString *)event {
-    if ([self hasDisabled])
-        return;
     [self track:event properties:nil];
 }
 
@@ -250,6 +239,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)track:(NSString *)event properties:(nullable NSDictionary *)properties time:(NSDate *)time timeZone:(NSTimeZone *)timeZone {
     DTTrackEvent *trackEvent = [[DTTrackEvent alloc] initWithName:event];
+    DTLogDebug(@"##### track %@ systemUpTime: %lf",event, trackEvent.systemUpTime);
     [self handleTimeEvent:trackEvent];
     [self asyncTrackEventObject:trackEvent properties:properties isH5:NO];
 }
@@ -291,8 +281,6 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)trackUserEvent:(DTUserEvent *)event properties:(NSDictionary *)properties {
-    if ([self hasDisabled])
-        return;
     // 组装通用属性
     [self configBaseEvent:event];
     // 校验并添加用户自定义属性
@@ -304,8 +292,6 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)trackEvent:(DTTrackEvent *)event properties:(NSDictionary *)properties isH5:(BOOL)isH5 {
-    if ([self hasDisabled])
-        return;
     // 组装通用属性
     [self configBaseEvent:event];
     // 验证事件本身的合法性，具体的验证策略由事件对象本身定义。
@@ -328,9 +314,6 @@ static dispatch_queue_t dt_trackQueue;
     NSDictionary *superProperties = self.superProperty.currentSuperProperties;
     // 添加从属性插件获取的属性，属性插件只有系统使用，不支持用户自定义。所以属性名字是可信的，不用验证格式
     NSMutableDictionary *pluginProperties = [self.propertyPluginManager propertiesWithEventType:event.eventType];
-    // 过滤禁用属性
-    [DTPresetProperties handleFilterDisPresetProperties:pluginProperties];
-
   
     NSMutableDictionary *jsonObj = [NSMutableDictionary dictionary];
     
@@ -404,10 +387,7 @@ static dispatch_queue_t dt_trackQueue;
     event.dtid = [[DTDeviceInfo sharedManager] deviceId];
     event.appid = [self.config appid];
     event.isDebug = [self.config enabledDebug];
-    if(![DTPresetProperties disableBundleId]){
-        event.bundleId = [DTDeviceInfo bundleId];
-    }
-    
+    event.bundleId = [DTDeviceInfo bundleId];
     // 事件如果没有指定时间，那么使用系统时间时需要校准
     if (_calibratedTime && [_calibratedTime enable]) {
         NSTimeInterval systemUpTime = NSProcessInfo.processInfo.systemUptime;
@@ -417,16 +397,10 @@ static dispatch_queue_t dt_trackQueue;
     }
 }
 
-- (BOOL)hasDisabled {
-    return [self.config sdkDisable];
-}
-
 
 #pragma mark - timeEvent
 
 - (void)timeEvent:(NSString *)event {
-    if ([self hasDisabled])
-        return;
     NSError *error = nil;
     [DTPropertyValidator validateEventOrPropertyName:event withError:&error];
     if (error) {
@@ -436,8 +410,6 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)timeEventUpdate:(NSString *)event withState:(BOOL)state{
-    if ([self hasDisabled])
-        return;
     NSError *error = nil;
     [DTPropertyValidator validateEventOrPropertyName:event withError:&error];
     if (error) {
@@ -530,8 +502,6 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - accountId: 用户系统id
 - (void)setAcid:(NSString *)accountId {
-    if ([self hasDisabled])
-        return;
     if (![accountId isKindOfClass:[NSString class]] || accountId.length == 0) {
         DTLogError(@"accountId invald", accountId);
         return;
@@ -547,8 +517,6 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - fiid: Firebase 的 app_instance_id
 - (void)setFirebaseAppInstanceId:(NSString *)fiid {
-    if ([self hasDisabled])
-        return;
     if (![fiid isKindOfClass:[NSString class]] || fiid.length == 0) {
         DTLogError(@"FirebaseAppInstanceId invald", fiid);
         return;
@@ -560,8 +528,6 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - afuid: AppsFlyer的appsflyer_id
 - (void)setAppsFlyerId:(NSString *)afid {
-    if ([self hasDisabled])
-        return;
     if (![afid isKindOfClass:[NSString class]] || afid.length == 0) {
         DTLogError(@"AppsFlyerId invald", afid);
         return;
@@ -573,8 +539,6 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - afuid: AppsFlyer的appsflyer_id
 - (void)setKochavaId:(NSString *)koid {
-    if ([self hasDisabled])
-        return;
     if (![koid isKindOfClass:[NSString class]] || koid.length == 0) {
         DTLogError(@"KochavaId invald", koid);
         return;
@@ -585,8 +549,6 @@ static dispatch_queue_t dt_trackQueue;
 /// 设置AdjustId
 /// - Parameter adjustId: AdjustId
 - (void)setAdjustId:(NSString *)adjustId {
-    if ([self hasDisabled])
-        return;
     if (![adjustId isKindOfClass:[NSString class]] || adjustId.length == 0) {
         DTLogError(@"adjustId invald", adjustId);
         return;
@@ -595,19 +557,14 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)setIasOriginalOrderId:(NSString *)oorderId {
-    if ([self hasDisabled])
-        return;
     if (![oorderId isKindOfClass:[NSString class]] || oorderId.length == 0) {
         DTLogError(@"oorderId invald", oorderId);
         return;
     }
-    [self user_set:@{COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID:oorderId}];
-    
+    [self setSuperProperties:@{COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID:oorderId}];
 }
 
 - (NSString *)getDTid {
-    if ([self hasDisabled])
-        return @"";
     return [[DTDeviceInfo sharedManager] deviceId];
 }
 

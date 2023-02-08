@@ -56,29 +56,6 @@
     return [self unarchiveFromFile:[self deviceIdFilePath] asClass:[NSString class]];
 }
 
-- (void)archiveSdkDisable:(BOOL)disable {
-    NSString *filePath = [self sdkDisableFilePath];
-    if (![self archiveObject:[NSNumber numberWithBool:disable] withFilePath:filePath]) {
-        DTLogError(@"%@ unable to archive disable", self);
-    }
-}
-
-- (BOOL)unarchiveSdkDisable{
-    NSNumber *sdkDisable = (NSNumber *)[self unarchiveFromFile:[self sdkDisableFilePath] asClass:[NSNumber class]];
-    return sdkDisable ? [sdkDisable boolValue] : NO;
-}
-
-- (void)archiveReportUrl:(NSString *)url {
-    NSString *filePath = [self reportUrlFilePath];
-    if (![self archiveObject:[url copy] withFilePath:filePath]) {
-        DTLogError(@"%@ unable to archive ReportUrl", self);
-    }
-}
-
-- (NSString *)unarchiveReportUrl {
-    return [self unarchiveFromFile:[self reportUrlFilePath] asClass:[NSString class]];
-}
-
 - (BOOL)archiveObject:(id)object withFilePath:(NSString *)filePath {
     @try {
         if (![NSKeyedArchiver archiveRootObject:object toFile:filePath]) {
@@ -136,14 +113,6 @@
 
 - (NSString *)deviceIdFilePath {
     return [self persistenceFilePath:@"deviceId"];
-}
-
-- (NSString *)sdkDisableFilePath {
-    return [self persistenceFilePath:@"sdkDisable"];
-}
-
-- (NSString *)reportUrlFilePath {
-    return [self persistenceFilePath:@"reportUrl"];
 }
 
 // 持久化文件

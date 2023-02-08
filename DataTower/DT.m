@@ -5,26 +5,25 @@
 @implementation DT
 
 + (void)initSDK:(NSString *)appid
-      serverUrl:(NSString *)url
-        channel:(DTChannel)channel
-        isDebug:(BOOL)debug
-       logLevel:(DTLoggingLevel)logLevel {
-    
+               serverUrl:(NSString *)url
+                 channel:(DTChannel)channel
+                 isDebug:(BOOL)debug
+             logLevel:(DTLoggingLevel)logLevel {
+     
     [self initSDK:appid
         serverUrl:url
           channel:channel
           isDebug:debug
          logLevel:logLevel
- commonProperties:nil];
+        commonProperties:nil];
 }
 
 + (void)initSDK:(NSString *)appid
-      serverUrl:(NSString *)url
-        channel:(DTChannel)channel
-        isDebug:(BOOL)debug
+               serverUrl:(NSString *)url
+                 channel:(DTChannel)channel
+                 isDebug:(BOOL)debug
        logLevel:(DTLoggingLevel)logLevel
-commonProperties:(NSDictionary *)commonProperties {
-    
+        commonProperties:(NSDictionary *)commonProperties {
     DTConfig *config = [DTConfig shareInstance];
     config.appid = appid;
     config.serverUrl = url;

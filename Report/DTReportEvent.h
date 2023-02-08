@@ -86,7 +86,7 @@ static NSString * const IAS_ORIGINAL_ORDER_ID = @"#ias_original_order";
 //内购事件名称
 static NSString * const EVENT_IAP_ENTRANCE        = @"#iap_entrance";
 static NSString * const EVENT_IAP_TO_PURCHASE     = @"#iap_to_purchase";
-static NSString * const EVENT_IAP_PURCHASED       = @"#iap_purchase_success";
+static NSString * const EVENT_IAP_PURCHASED       = @"#iap_purchased";
 static NSString * const EVENT_IAP_NOT_PURCHASED   = @"#iap_not_purchased";
 //事件属性
 static NSString * const PROPERTY_IAP_SEQ          = @"#iap_seq";

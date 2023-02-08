@@ -8,6 +8,7 @@
 @interface DTCalibratedTimeWithDTServer()
 
 @property (atomic, strong) dispatch_queue_t dt_networkQueue;
+@property (atomic, copy) NSURL *sendURL;
 
 @end
 
@@ -24,7 +25,7 @@
 - (instancetype)initWithNetworkQueue:(dispatch_queue_t)queue url:(NSString *)serverUrl{
     if (self = [self init]) {
         self.dt_networkQueue = queue;
-//        self.sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", serverUrl]];
+        self.sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", serverUrl]];
         self.stopCalibrate = YES;
     }
     return self;
@@ -44,10 +45,8 @@
     
     NSString *jsonString = @"[{}]";
     NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-    NSURL *sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", [DTConfig shareInstance].reportUrl]];
-
     
-    [DTNetWork postRequestWithURL:sendURL
+    [DTNetWork postRequestWithURL:self.sendURL
                       requestBody:postBody
                           headers:header
                           success:^(NSHTTPURLResponse * _Nullable response,NSData * _Nullable data){

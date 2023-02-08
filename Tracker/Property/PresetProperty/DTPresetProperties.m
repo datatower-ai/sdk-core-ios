@@ -31,7 +31,6 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict {
     self = [super init];
     if (self) {
-        [DTPresetProperties disPresetProperties];
         [self updateActivePresetProperties:dict];
         [self updateLatestPresetProperties:dict];
     }
@@ -74,8 +73,7 @@
     activeProperties[USER_PROPERTY_ACTIVE_STORAGE_USED]     = copyDict[COMMON_PROPERTY_STORAGE_USED];
     activeProperties[USER_PROPERTY_ACTIVE_NETWORK_TYPE]     = copyDict[COMMON_PROPERTY_NETWORK_TYPE];
     activeProperties[USER_PROPERTY_ACTIVE_SIMULATOR]        = copyDict[COMMON_PROPERTY_SIMULATOR];
-    
-    [DTPresetProperties handleFilterDisPresetProperties:activeProperties];
+    activeProperties[USER_PROPERTY_ACTIVE_USER_AGENT]       = [DTDeviceInfo userAgent];
     _activeProperties = activeProperties;
     
 }
@@ -91,9 +89,6 @@
     }
     latestProperties[USER_PROPERTY_LATEST_APP_VERSION_CODE] = copyDict[COMMON_PROPERTY_APP_VERSION_CODE];
     latestProperties[USER_PROPERTY_LATEST_APP_VERSION_NAME] = copyDict[COMMON_PROPERTY_APP_VERSION_NAME];
-    
-    [DTPresetProperties handleFilterDisPresetProperties:latestProperties];
-
     _latestProperties = latestProperties;
 }
 

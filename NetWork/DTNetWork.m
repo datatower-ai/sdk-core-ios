@@ -137,31 +137,6 @@
     return dataString;
 }
 
-+ (void)fetchRemoteConfig:(NSString *)serverURL handler:(DTFlushConfigBlock)handler {
-    void (^block)(NSData *, NSURLResponse *, NSError *) = ^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error || ![response isKindOfClass:[NSHTTPURLResponse class]]) {
-//            DTLogError(@"Fetch remote config network failed:%@", error);
-            return;
-        }
-        NSError *err;
-        if (!data) {
-            return;
-        }
-        NSDictionary *ret = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
-        if (err) {
-//            DTLogError(@"Fetch remote config json error:%@", err);
-        } else if ([ret isKindOfClass:[NSDictionary class]]) {
-//            DTLogDebug(@"Fetch remote config for %@, %@", serverURL, [ret description]);
-            handler(ret, error);
-        } else {
-//            DTLogError(@"Fetch remote config failed");
-        }
-    };
-//    NSString *urlStr = [NSString stringWithFormat:@"%@?appid=%@", serverURL, appid];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:serverURL]];
-    [request setHTTPMethod:@"Get"];
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:block];
-    [task resume];
-}
+
 
 @end
