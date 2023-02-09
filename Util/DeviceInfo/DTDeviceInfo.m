@@ -52,8 +52,8 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.libName = @"iOS";
-        self.libVersion = DTConfig.version;
+        self.libName = [DTConfig shareInstance].sdkType;
+        self.libVersion = [DTConfig shareInstance].sdkVersion;
         _deviceId = [self getDTID];
         _appVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
         NSString *app_build = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
