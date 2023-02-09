@@ -1,5 +1,8 @@
 #import "DTConfig.h"
+#import "DTBaseEvent.h"
 
+#define DT_IOS_SDK_VERSION_NAME @"1.3.3.1"
+#define DT_IOS_SDK_VERSION_TYPE @"iOS"
 static DTConfig * _defaultTDConfig;
 
 @implementation DTConfig
@@ -23,8 +26,30 @@ static DTConfig * _defaultTDConfig;
     return self;
 }
 
-+ (NSString*)version{
-    return @"1.3.3-beta5";
+- (NSString*)sdkVersion{
+    if (self.commonProperties) {
+        //可能从 unity 侧传入 unity SDK version
+        if([self.commonProperties.allKeys containsObject:COMMON_PROPERTY_SDK_VERSION]){
+            NSString* version = self.commonProperties[COMMON_PROPERTY_SDK_VERSION];
+            if (version && version.length > 0) {
+                return version;
+            }
+        }
+    }
+    return DT_IOS_SDK_VERSION_NAME;
+}
+
+- (NSString*)sdkType{
+    if (self.commonProperties) {
+        //可能从 unity 侧传入 unity SDK type
+        if([self.commonProperties.allKeys containsObject:COMMON_PROPERTY_SDK_TYPE]){
+            NSString* type = self.commonProperties[COMMON_PROPERTY_SDK_TYPE];
+            if (type && type.length > 0) {
+                return type;
+            }
+        }
+    }
+    return DT_IOS_SDK_VERSION_TYPE;
 }
 
 

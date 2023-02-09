@@ -58,10 +58,14 @@
         
         if (dateString && [dateString length] > 0){
             NSDateFormatter *formatter = [NSDateFormatter new];
-            formatter.dateFormat = @"EEE, dd MM yyyy HH:mm:ss ZZZ";
+            formatter.dateFormat = @"EEE, dd MMM yyyy HH:mm:ss ZZZ";
             formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
             self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
             self.serverTime = [[formatter dateFromString:dateString] timeIntervalSince1970];
+            if (self.serverTime == 0) {
+                self.serverTime = [[NSDate date] timeIntervalSince1970];
+            }
             DTLogDebug(@"calibration time succeed");
             [[DTAnalyticsManager shareInstance] flush];
         } else {

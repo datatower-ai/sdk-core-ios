@@ -11,12 +11,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) DTLoggingLevel logLevel;
 @property (nonatomic, strong) NSDictionary *commonProperties;
 @property (nonatomic, assign) NSInteger maxNumEvents;
-@property(copy,nonatomic) NSString* version;
+@property(copy,nonatomic) NSString* sdkVersion;
+@property(copy,nonatomic) NSString* sdkType;
 
 
 + (DTConfig *)shareInstance;
 
-+ (NSString*)version;
+
 
 
 
