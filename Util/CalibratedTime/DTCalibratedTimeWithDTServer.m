@@ -38,6 +38,7 @@
     self.stopCalibrate = NO;
     NSString *networkType = [[DTReachability shareInstance] networkState];
     if (![DTReachability convertNetworkType:networkType]) {
+        self.stopCalibrate = YES;
         return;
     }
     NSMutableDictionary *header = [NSMutableDictionary dictionary];

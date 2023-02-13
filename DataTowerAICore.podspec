@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
   
   spec.name = "DataTowerAICore"
-  spec.version = '1.3.3.1'
+  spec.version = '1.3.3.2'
   spec.summary = "DataTowerAICore"
   spec.description = "DataTowerAICore"
   spec.ios.deployment_target  = '8.0'
