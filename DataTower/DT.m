@@ -2,6 +2,7 @@
 #import "DTConfig.h"
 #import "DTAnalytics.h"
 #import "DTAnalyticsManager.h"
+#import "PerfLogger.h"
 @implementation DT
 
 + (void)initSDK:(NSString *)appid
@@ -24,6 +25,9 @@
                  isDebug:(BOOL)debug
        logLevel:(DTLoggingLevel)logLevel
         commonProperties:(NSDictionary *)commonProperties {
+    
+    [[PerfLogger shareInstance] doLog:SDKINITBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    
     DTConfig *config = [DTConfig shareInstance];
     config.appid = appid;
     config.serverUrl = url;
@@ -32,6 +36,8 @@
     config.logLevel = logLevel;
     config.commonProperties = [commonProperties copy];
     [[DTAnalyticsManager shareInstance] initializeWithConfig:config];
+    
+    [[PerfLogger shareInstance] doLog:SDKINITEND time:[NSDate timeIntervalSinceReferenceDate]];
 }
 
 + (NSString *)channelTextWithChannel:(DTChannel)channel {
