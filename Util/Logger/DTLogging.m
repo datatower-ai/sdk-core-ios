@@ -23,7 +23,7 @@
         
 #ifdef __IPHONE_10_0
         if (@available(iOS 10.0, *)) {
-            [DTOSLog log:NO message:formattedMessage type:type];
+            [DTOSLog log:YES message:formattedMessage type:type];
         }
 #else
         NSLog(@"[DateTower] %@", formattedMessage);

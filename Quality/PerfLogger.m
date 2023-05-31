@@ -56,20 +56,22 @@ static PerfLogger *_instance = nil;
             NSTimeInterval start = [self.timeRecord[substr] doubleValue];
             NSTimeInterval cost = [NSDate timeIntervalSinceReferenceDate] - start;
             
-            DTLogInfo(@"[%@] action %@ cost %d", tag, action, (int)(cost * 1000));
+            DTLogError(@"[%@] action %@ cost %d", tag, action, (int)(cost * 1000));
+            
+            [self.timeRecord removeObjectForKey:substr];
+
         } else {
-            DTLogInfo(@"[%@] Error, no log action %@", tag, substr);
+            DTLogError(@"[%@] Error, no log action %@", tag, substr);
         }
-        
     } else if ([action hasSuffix:@"BEGIN"]) {
         if (self.timeRecord[action]) {
-            DTLogInfo(@"[%@] Error, duplicate log action %@", tag, action);
+            DTLogError(@"[%@] Error, duplicate log action %@", tag, action);
         }
         
         self.timeRecord[action] = @([NSDate timeIntervalSinceReferenceDate]);
     }
     
-    DTLogInfo(@"[%@] %@", tag, action);
+    DTLogError(@"[%@] %@", tag, action);
 }
 
 #pragma Getter
