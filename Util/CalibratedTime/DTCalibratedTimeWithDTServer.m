@@ -4,6 +4,7 @@
 #import "DTNetWork.h"
 #import "DTReachability.h"
 #import "DTAnalyticsManager.h"
+#import "PerfLogger.h"
 
 @interface DTCalibratedTimeWithDTServer()
 
@@ -41,6 +42,9 @@
         self.stopCalibrate = YES;
         return;
     }
+    
+    [[PerfLogger shareInstance] doLog:GETSRVTIMEBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    
     NSMutableDictionary *header = [NSMutableDictionary dictionary];
     header[@"Content-Type"] = @"text/plain";
     
@@ -73,9 +77,14 @@
             DTLogDebug(@"calibration time failed");
         }
         self.stopCalibrate = YES;
+        
+        [[PerfLogger shareInstance] doLog:GETSRVTIMEEND time:[NSDate timeIntervalSinceReferenceDate]];
+
     } failed:^(NSError * _Nonnull error) {
         DTLogError(@"calibration time failed %@", error);
         self.stopCalibrate = YES;
+        
+        [[PerfLogger shareInstance] doLog:GETSRVTIMEEND time:[NSDate timeIntervalSinceReferenceDate]];
     }];
 }
 

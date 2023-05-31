@@ -1,5 +1,6 @@
 #import "DTAnalytics.h"
 #import "DTAnalyticsManager.h"
+#import "PerfLogger.h"
 @implementation DTAnalytics
 
 
@@ -103,6 +104,12 @@
 }
 
 + (NSString *)getDataTowerId {
-    return [[DTAnalyticsManager shareInstance] getDTid];
+    [[PerfLogger shareInstance] doLog:GETDTIDBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    
+    NSString *ret = [[DTAnalyticsManager shareInstance] getDTid];
+    
+    [[PerfLogger shareInstance] doLog:GETDTIDEND time:[NSDate timeIntervalSinceReferenceDate]];
+
+    return ret;
 }
 @end

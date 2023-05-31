@@ -13,6 +13,7 @@
 #import "DTAppStartEvent.h"
 #import "DTAppEndEvent.h"
 #import "DTUserPropertyHeader.h"
+#import "PerfLogger.h"
 
 @interface DTAnalyticsManager ()
 
@@ -292,6 +293,9 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)trackEvent:(DTTrackEvent *)event properties:(NSDictionary *)properties isH5:(BOOL)isH5 {
+    
+    [[PerfLogger shareInstance] doLog:WRITEEVENTTODBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    
     // 组装通用属性
     [self configBaseEvent:event];
     // 验证事件本身的合法性，具体的验证策略由事件对象本身定义。
@@ -333,6 +337,8 @@ static dispatch_queue_t dt_trackQueue;
     
     // 录入数据
     [self.eventTracker track:jsonObj sync:event.uuid immediately:false];
+    
+    [[PerfLogger shareInstance] doLog:WRITEEVENTTODBEND time:[NSDate timeIntervalSinceReferenceDate]];
 }
 
 
