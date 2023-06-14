@@ -4,7 +4,7 @@ Pod::Spec.new do |spec|
   spec.version = '1.3.3.2'
   spec.summary = "DataTowerAICore"
   spec.description = "DataTowerAICore"
-  spec.ios.deployment_target  = '8.0'
+  spec.ios.deployment_target  = '9.0'
   spec.requires_arc = true
   spec.homepage = "https://gitlab.com/nodetower/roiquery-sdk/ios/ios-roiquery-sdk.git"
   spec.author = { "" => "" }
@@ -14,6 +14,11 @@ Pod::Spec.new do |spec|
   spec.libraries        = 'sqlite3', 'z'
   spec.source_files = "**/*.{h,m,mm,c,cc,cpp,metal}", "**/**/*.{h,m,mm,c,cc,cpp,metal}", 
   spec.public_header_files = "DataTower/*.{h}"  
-  spec.pod_target_xcconfig = {'EXCLUDED_ARCHS [sdk = iphonesimulator *]'=>'arm64'}
+  spec.pod_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesimulator*]'=>'armv7 armv7s arm64','EXCLUDED_ARCHS[sdk=iphoneos*]'=>'armv7 armv7s'}
+  spec.user_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesim*]'=>'armv7 armv7s arm64','EXCLUDED_ARCHS[sdk=iphoneos*]'=>'armv7 armv7s'}
+#   spec.xcconfig = {
+#   'ARCHS' => '${ARCHS_STANDARD_64_BIT}',
+#   'VALID_ARCHS' => '${ARCHS_STANDARD_64_BIT}'
+# }
 end
 
