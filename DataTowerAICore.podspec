@@ -14,11 +14,7 @@ Pod::Spec.new do |spec|
   spec.libraries        = 'sqlite3', 'z'
   spec.source_files = "**/*.{h,m,mm,c,cc,cpp,metal}", "**/**/*.{h,m,mm,c,cc,cpp,metal}", 
   spec.public_header_files = "DataTower/*.{h}"  
-  spec.pod_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesimulator*]'=>'armv7 armv7s arm64','EXCLUDED_ARCHS[sdk=iphoneos*]'=>'armv7 armv7s'}
-  spec.user_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesim*]'=>'armv7 armv7s arm64','EXCLUDED_ARCHS[sdk=iphoneos*]'=>'armv7 armv7s'}
-#   spec.xcconfig = {
-#   'ARCHS' => '${ARCHS_STANDARD_64_BIT}',
-#   'VALID_ARCHS' => '${ARCHS_STANDARD_64_BIT}'
-# }
+  # spec.pod_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesimulator*]'=>'armv7 armv7s arm64','EXCLUDED_ARCHS[sdk=iphoneos*]'=>'armv7 armv7s'}
+  # spec.user_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesim*]'=>'armv7 armv7s arm64','EXCLUDED_ARCHS[sdk=iphoneos*]'=>'armv7 armv7s'}
 end
 

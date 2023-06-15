@@ -64,6 +64,9 @@
     [[DTAnalyticsManager shareInstance] user_append:properties];
 }
 
++ (void)userUniqAppend:(NSDictionary<NSString *, NSArray *> *)properties {
+    [[DTAnalyticsManager shareInstance] user_uniqAppend:properties];
+}
 
 /// 设置自有用户系统的id
 /// - Parameters:

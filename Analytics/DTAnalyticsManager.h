@@ -185,6 +185,22 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 */
 - (void)user_append:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate * _Nullable)time;
 
+/**
+ 对 Array 类型的用户属性进行追加操作，并且对数组内的元素去重
+ 
+ @param properties 用户属性
+*/
+- (void)user_uniqAppend:(NSDictionary<NSString *, NSArray *> *)properties;
+
+/**
+ 对 Array 类型的用户属性进行追加操作，并且对数组内的元素去重
+ 
+ @param properties 用户属性
+ @param time 事件触发时间
+*/
+- (void)user_uniqAppend:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate *)time;
+
+
 /// 设置自有用户系统的id
 /// - Parameters:
 ///   - accountId: 用户系统id
