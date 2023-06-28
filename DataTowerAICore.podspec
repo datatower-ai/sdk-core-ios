@@ -10,7 +10,7 @@ Pod::Spec.new do |spec|
   spec.author = { "" => "" }
   spec.source = { :git => "https://gitlab.com/nodetower/roiquery-sdk/ios/ios-roiquery-sdk.git", :tag => 'v' + spec.version.to_s }
   
-  spec.frameworks       = 'Foundation', 'SystemConfiguration', 'CoreGraphics', 'Security' , 'CoreTelephony'
+  spec.frameworks       = 'QuartzCore','UIKit','Foundation', 'SystemConfiguration', 'CoreGraphics', 'Security' , 'CoreTelephony'
   spec.libraries        = 'sqlite3', 'z'
   spec.source_files = "**/*.{h,m,mm,c,cc,cpp,metal}", "**/**/*.{h,m,mm,c,cc,cpp,metal}", 
   spec.public_header_files = "DataTower/*.{h}"  
