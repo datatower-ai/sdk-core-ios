@@ -4,7 +4,7 @@ Pod::Spec.new do |spec|
   spec.version = '2.0.0-beta2'
   spec.summary = "DataTowerAICore"
   spec.description = "DataTowerAICore"
-  spec.ios.deployment_target  = '9.0'
+  spec.ios.deployment_target  = '11.0'
   spec.requires_arc = true
   spec.homepage = "https://gitlab.com/nodetower/roiquery-sdk/ios/ios-roiquery-sdk.git"
   spec.author = { "" => "" }
