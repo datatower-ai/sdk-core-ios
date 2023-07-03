@@ -29,20 +29,20 @@ const NSString *TRACKEND = @"TRACKEND";
 
 static const NSString *tag = @"PerfLog";
 
-@interface PerfLogger ()
+@interface DTPerfLogger ()
 
 @property (nonatomic) NSMutableDictionary *timeRecord;
 
 @end
 
-@implementation PerfLogger
+@implementation DTPerfLogger
 
-static PerfLogger *_instance = nil;
+static DTPerfLogger *_instance = nil;
 
-+ (PerfLogger *)shareInstance {
++ (DTPerfLogger *)shareInstance {
     static dispatch_once_t oneToken;
     dispatch_once(&oneToken, ^{
-        _instance = [[PerfLogger alloc] init];
+        _instance = [[DTPerfLogger alloc] init];
     });
     return _instance;
 }

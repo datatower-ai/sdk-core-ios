@@ -112,7 +112,7 @@ static NSUInteger const kBatchSize = 10;
 /// 该方法需要在networkQueue中进行，会持续的发送网络请求直到数据库的数据被发送完
 - (void)_syncWithSize:(NSUInteger)size completion:(void(^)(void))completion {
     
-    [[PerfLogger shareInstance] doLog:TRACKBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:TRACKBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
     //判断网络
     NSString *networkType = [[DTReachability shareInstance] networkState];
@@ -121,7 +121,7 @@ static NSUInteger const kBatchSize = 10;
             completion();
         }
         
-        [[PerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
 
         return;
     }
@@ -133,12 +133,12 @@ static NSUInteger const kBatchSize = 10;
             completion();
         }
         
-        [[PerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
 
         return;
     }
     
-    [[PerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
 
     // 获取数据库数据，取前十条数据
     NSArray<NSDictionary *> *recordArray;
@@ -155,7 +155,7 @@ static NSUInteger const kBatchSize = 10;
         recordArray = contents;
     }
     
-    [[PerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
 
     // 数据库没有数据了
     if (recordArray.count == 0 || recodSyns.count == 0) {
@@ -163,7 +163,7 @@ static NSUInteger const kBatchSize = 10;
             completion();
         }
         
-        [[PerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
 
         return;
     }
@@ -172,26 +172,26 @@ static NSUInteger const kBatchSize = 10;
     // 保证end事件发送成功
     BOOL flushSucc = YES;
     while (recordArray.count > 0 && recodSyns.count > 0 && flushSucc) {
-        [[PerfLogger shareInstance] doLog:UPLOADDATABEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:UPLOADDATABEGIN time:[NSDate timeIntervalSinceReferenceDate]];
 
         flushSucc = [self sendEventsData:recordArray];
         
-        [[PerfLogger shareInstance] doLog:UPLOADDATAEND time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:UPLOADDATAEND time:[NSDate timeIntervalSinceReferenceDate]];
 
         if (flushSucc) {
             @synchronized (DTDBManager.class) {
                 
-                [[PerfLogger shareInstance] doLog:DELETEDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+                [[DTPerfLogger shareInstance] doLog:DELETEDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
 
                 BOOL ret = [self.dataQueue deleteEventsWithSyns:recodSyns];
                 
-                [[PerfLogger shareInstance] doLog:DELETEDBEND time:[NSDate timeIntervalSinceReferenceDate]];
+                [[DTPerfLogger shareInstance] doLog:DELETEDBEND time:[NSDate timeIntervalSinceReferenceDate]];
 
                 if (!ret) {
                     break;
                 }
                 // 数据库里获取前kBatchSize条数据
-                [[PerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+                [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
 
                 NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
                 NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
@@ -202,7 +202,7 @@ static NSUInteger const kBatchSize = 10;
                 recodSyns = syns;
                 recordArray = contents;
                 
-                [[PerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
+                [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
 
             }
         } else {
@@ -213,7 +213,7 @@ static NSUInteger const kBatchSize = 10;
         completion();
     }
     
-    [[PerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
 }
 
 - (void)handleEventTime:(DTDBEventModel *) eventMode syns:(NSMutableArray *)syns contents:(NSMutableArray *)contents {

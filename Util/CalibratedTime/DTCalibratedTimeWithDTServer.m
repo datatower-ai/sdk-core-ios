@@ -43,7 +43,7 @@
         return;
     }
     
-    [[PerfLogger shareInstance] doLog:GETSRVTIMEBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:GETSRVTIMEBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
     NSMutableDictionary *header = [NSMutableDictionary dictionary];
     header[@"Content-Type"] = @"text/plain";
@@ -78,13 +78,13 @@
         }
         self.stopCalibrate = YES;
         
-        [[PerfLogger shareInstance] doLog:GETSRVTIMEEND time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:GETSRVTIMEEND time:[NSDate timeIntervalSinceReferenceDate]];
 
     } failed:^(NSError * _Nonnull error) {
         DTLogError(@"calibration time failed %@", error);
         self.stopCalibrate = YES;
         
-        [[PerfLogger shareInstance] doLog:GETSRVTIMEEND time:[NSDate timeIntervalSinceReferenceDate]];
+        [[DTPerfLogger shareInstance] doLog:GETSRVTIMEEND time:[NSDate timeIntervalSinceReferenceDate]];
     }];
 }
 

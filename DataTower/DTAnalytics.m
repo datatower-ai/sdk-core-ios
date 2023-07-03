@@ -107,11 +107,11 @@
 }
 
 + (NSString *)getDataTowerId {
-    [[PerfLogger shareInstance] doLog:GETDTIDBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:GETDTIDBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
     NSString *ret = [[DTAnalyticsManager shareInstance] getDTid];
     
-    [[PerfLogger shareInstance] doLog:GETDTIDEND time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:GETDTIDEND time:[NSDate timeIntervalSinceReferenceDate]];
 
     return ret;
 }

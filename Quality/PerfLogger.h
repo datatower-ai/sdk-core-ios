@@ -28,9 +28,9 @@ extern const NSString *DELETEDBBEGIN;
 extern const NSString *DELETEDBEND;
 extern const NSString *TRACKEND;
 
-@interface PerfLogger : NSObject
+@interface DTPerfLogger : NSObject
 
-+ (PerfLogger *)shareInstance;
++ (DTPerfLogger *)shareInstance;
 
 - (void)doLog:(const NSString *)action time:(NSTimeInterval)happenTime;
 

@@ -26,7 +26,7 @@
        logLevel:(DTLoggingLevel)logLevel
         commonProperties:(NSDictionary *)commonProperties {
     
-    [[PerfLogger shareInstance] doLog:SDKINITBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:SDKINITBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
     DTConfig *config = [DTConfig shareInstance];
     config.appid = appid;
@@ -37,7 +37,7 @@
     config.commonProperties = [commonProperties copy];
     [[DTAnalyticsManager shareInstance] initializeWithConfig:config];
     
-    [[PerfLogger shareInstance] doLog:SDKINITEND time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:SDKINITEND time:[NSDate timeIntervalSinceReferenceDate]];
 }
 
 + (NSString *)channelTextWithChannel:(DTChannel)channel {
