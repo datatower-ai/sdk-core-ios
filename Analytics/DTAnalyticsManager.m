@@ -294,7 +294,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)trackEvent:(DTTrackEvent *)event properties:(NSDictionary *)properties isH5:(BOOL)isH5 {
     
-    [[PerfLogger shareInstance] doLog:WRITEEVENTTODBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:WRITEEVENTTODBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
     // 组装通用属性
     [self configBaseEvent:event];
@@ -338,7 +338,7 @@ static dispatch_queue_t dt_trackQueue;
     // 录入数据
     [self.eventTracker track:jsonObj sync:event.uuid immediately:false];
     
-    [[PerfLogger shareInstance] doLog:WRITEEVENTTODBEND time:[NSDate timeIntervalSinceReferenceDate]];
+    [[DTPerfLogger shareInstance] doLog:WRITEEVENTTODBEND time:[NSDate timeIntervalSinceReferenceDate]];
 }
 
 
