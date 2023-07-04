@@ -32,9 +32,11 @@
         return DTAutoTrackEventTypeAppStart;
     } else if ([self.eventName isEqualToString:DT_APP_END_EVENT]) {
         return DTAutoTrackEventTypeAppEnd;
-    } else if ([self.eventName isEqualToString:DT_APP_INITIALIZE]) {
-        return DTAutoTrackEventTypeInitialize;
-    } else if ([self.eventName isEqualToString:DT_APP_INSTALL_EVENT]) {
+    }
+//    else if ([self.eventName isEqualToString:DT_APP_INITIALIZE]) {
+//        return DTAutoTrackEventTypeInitialize;
+//    }
+    else if ([self.eventName isEqualToString:DT_APP_INSTALL_EVENT]) {
         return DTAutoTrackEventTypeAppInstall;
     } else {
         return DTAutoTrackEventTypeNone;

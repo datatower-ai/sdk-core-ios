@@ -70,10 +70,10 @@
     }
     
     //初始化事件
-    if (type & DTAutoTrackEventTypeInitialize) {
-        DTAppInitializeEvent *event = [[DTAppInitializeEvent alloc] initWithName:DT_APP_INITIALIZE];
-        [self.appInitializeTracker trackWithInstanceTag:appid event:event params:nil];
-    }
+//    if (type & DTAutoTrackEventTypeInitialize) {
+//        DTAppInitializeEvent *event = [[DTAppInitializeEvent alloc] initWithName:DT_APP_INITIALIZE];
+//        [self.appInitializeTracker trackWithInstanceTag:appid event:event params:nil];
+//    }
     
     // 开始记录end事件时长
     if (type & DTAutoTrackEventTypeAppEnd) {
