@@ -211,6 +211,7 @@
                 }
             }
         }
+        sqlite3_finalize(stmt);
         return records;
     } else {
         [DTASDKQualityHelper reportQualityCode:CODE_QUERY_DB_ERROR

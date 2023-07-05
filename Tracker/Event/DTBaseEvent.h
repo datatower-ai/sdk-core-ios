@@ -62,7 +62,7 @@ static kEDEventTypeName const DT_EVENT_TYPE_TRACK_FIRST     = @"track_first";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_UPDATE    = @"track_update";
 static kEDEventTypeName const DT_EVENT_TYPE_TRACK_OVERWRITE = @"track_overwrite";
 
-static kEDEventTypeName const DT_EVENT_TYPE_USER_DEL        = @"#user_del";
+static kEDEventTypeName const DT_EVENT_TYPE_USER_DEL        = @"#user_delete";
 static kEDEventTypeName const DT_EVENT_TYPE_USER_ADD        = @"#user_add";
 static kEDEventTypeName const DT_EVENT_TYPE_USER_SET        = @"#user_set";
 static kEDEventTypeName const DT_EVENT_TYPE_USER_SETONCE    = @"#user_set_once";

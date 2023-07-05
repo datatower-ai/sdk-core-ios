@@ -34,6 +34,8 @@ extern const NSString *TRACKEND;
 
 - (void)doLog:(const NSString *)action time:(NSTimeInterval)happenTime;
 
+- (void)clean;
+
 @end
 
 NS_ASSUME_NONNULL_END

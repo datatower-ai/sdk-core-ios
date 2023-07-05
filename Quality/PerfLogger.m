@@ -74,6 +74,10 @@ static DTPerfLogger *_instance = nil;
     DTLogInfo(@"[%@] %@", tag, action);
 }
 
+- (void)clean {
+    [self.timeRecord removeAllObjects];
+}
+
 #pragma Getter
 
 - (NSMutableDictionary *)timeRecord {

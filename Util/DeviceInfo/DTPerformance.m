@@ -9,6 +9,9 @@
 #import "DTPresetProperties+DTDisProperties.h"
 #import "DTBaseEvent.h"
 
+#include <sys/param.h>
+#include <sys/mount.h>
+
 typedef DTPresetProperties DTAPMPresetProperty;
 
 static const NSString *kDTPerformanceRAM  = COMMON_PROPERTY_MEMORY_USED;
@@ -27,7 +30,7 @@ DTFPSMonitor *fpsMonitor;
 @implementation DTPerformance
 
 + (NSDictionary *)getPresetProperties {
-
+    
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
     
     // 内存
@@ -54,13 +57,13 @@ DTFPSMonitor *fpsMonitor;
     if (![DTAPMPresetProperty disableSimulator]) {
         
 #ifdef TARGET_OS_IPHONE
-    #if TARGET_IPHONE_SIMULATOR
+#if TARGET_IPHONE_SIMULATOR
         [dic setObject:@(YES) forKey:kDTPerformanceSIM];
-    #elif TARGET_OS_SIMULATOR
+#elif TARGET_OS_SIMULATOR
         [dic setObject:@(YES) forKey:kDTPerformanceSIM];
-    #else
+#else
         [dic setObject:@(NO) forKey:kDTPerformanceSIM];
-    #endif
+#endif
 #else
         [dic setObject:@(YES) forKey:kDTPerformanceSIM];
 #endif
@@ -131,16 +134,38 @@ DTFPSMonitor *fpsMonitor;
 }
 
 + (long long)dt_get_disk_free_size {
-    NSDictionary<NSFileAttributeKey, id> *directory = [self dt_pm_getFileAttributeDic];
-    if (directory) {
-        return [[directory objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
+    
+    if (@available(iOS 11.0, *)) {
+        NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:@"/"];
+        NSError *error = nil;
+        NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeAvailableCapacityForImportantUsageKey] error:&error];
+        if (results) {
+            return [results[NSURLVolumeAvailableCapacityForImportantUsageKey] unsignedLongLongValue];
+        }
+    } else {
+        NSDictionary<NSFileAttributeKey, id> *directory = [self dt_pm_getFileAttributeDic];
+        if (directory) {
+            return [[directory objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
+        }
     }
+    
     return -1;
 }
 
 + (long long)dt_get_storage_size {
-    NSDictionary<NSFileAttributeKey, id> *directory = [self dt_pm_getFileAttributeDic];
-    return directory ? ((NSNumber *)[directory objectForKey:NSFileSystemSize]).unsignedLongLongValue:-1;
+    if (@available(iOS 11.0, *)) {
+        NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:@"/"];
+        NSError *error = nil;
+        NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeTotalCapacityKey] error:&error];
+        if (results) {
+            return [results[NSURLVolumeTotalCapacityKey] unsignedLongLongValue];
+        }
+    } else {
+        NSDictionary<NSFileAttributeKey, id> *directory = [self dt_pm_getFileAttributeDic];
+        return directory ? ((NSNumber *)[directory objectForKey:NSFileSystemSize]).unsignedLongLongValue:-1;
+    }
+    
+    return -1;
 }
 
 @end

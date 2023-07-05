@@ -122,7 +122,7 @@ static NSUInteger const kBatchSize = 10;
         }
         
         [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
-
+        
         return;
     }
     //判断时间是否校准
@@ -134,12 +134,12 @@ static NSUInteger const kBatchSize = 10;
         }
         
         [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
-
+        
         return;
     }
     
     [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
-
+    
     // 获取数据库数据，取前十条数据
     NSArray<NSDictionary *> *recordArray;
     NSArray *recodSyns;
@@ -156,7 +156,7 @@ static NSUInteger const kBatchSize = 10;
     }
     
     [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
-
+    
     // 数据库没有数据了
     if (recordArray.count == 0 || recodSyns.count == 0) {
         if (completion) {
@@ -164,7 +164,7 @@ static NSUInteger const kBatchSize = 10;
         }
         
         [[DTPerfLogger shareInstance] doLog:TRACKEND time:[NSDate timeIntervalSinceReferenceDate]];
-
+        
         return;
     }
     
@@ -172,41 +172,43 @@ static NSUInteger const kBatchSize = 10;
     // 保证end事件发送成功
     BOOL flushSucc = YES;
     while (recordArray.count > 0 && recodSyns.count > 0 && flushSucc) {
-        [[DTPerfLogger shareInstance] doLog:UPLOADDATABEGIN time:[NSDate timeIntervalSinceReferenceDate]];
-
-        flushSucc = [self sendEventsData:recordArray];
-        
-        [[DTPerfLogger shareInstance] doLog:UPLOADDATAEND time:[NSDate timeIntervalSinceReferenceDate]];
-
-        if (flushSucc) {
-            @synchronized (DTDBManager.class) {
-                
-                [[DTPerfLogger shareInstance] doLog:DELETEDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
-
-                BOOL ret = [self.dataQueue deleteEventsWithSyns:recodSyns];
-                
-                [[DTPerfLogger shareInstance] doLog:DELETEDBEND time:[NSDate timeIntervalSinceReferenceDate]];
-
-                if (!ret) {
-                    break;
+        @autoreleasepool {
+            [[DTPerfLogger shareInstance] doLog:UPLOADDATABEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+            
+            flushSucc = [self sendEventsData:recordArray];
+            
+            [[DTPerfLogger shareInstance] doLog:UPLOADDATAEND time:[NSDate timeIntervalSinceReferenceDate]];
+            
+            if (flushSucc) {
+                @synchronized (DTDBManager.class) {
+                    
+                    [[DTPerfLogger shareInstance] doLog:DELETEDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+                    
+                    BOOL ret = [self.dataQueue deleteEventsWithSyns:recodSyns];
+                    
+                    [[DTPerfLogger shareInstance] doLog:DELETEDBEND time:[NSDate timeIntervalSinceReferenceDate]];
+                    
+                    if (!ret) {
+                        break;
+                    }
+                    // 数据库里获取前kBatchSize条数据
+                    [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
+                    
+                    NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
+                    NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+                    NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
+                    for (DTDBEventModel *eventMode in eventModes) {
+                        [self handleEventTime:eventMode syns:syns contents:contents];
+                    }
+                    recodSyns = syns;
+                    recordArray = contents;
+                    
+                    [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
+                    
                 }
-                // 数据库里获取前kBatchSize条数据
-                [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
-
-                NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
-                NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
-                NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
-                for (DTDBEventModel *eventMode in eventModes) {
-                    [self handleEventTime:eventMode syns:syns contents:contents];
-                }
-                recodSyns = syns;
-                recordArray = contents;
-                
-                [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBEND time:[NSDate timeIntervalSinceReferenceDate]];
-
+            } else {
+                break;
             }
-        } else {
-            break;
         }
     }
     if (completion) {
@@ -225,13 +227,13 @@ static NSUInteger const kBatchSize = 10;
         [syns addObject:eventMode.eventSyn];
         [contents addObject:eventMode.data];
     } else {
-    //时间同步器可用
+        //时间同步器可用
         if (timeCalibrater && [timeCalibrater enable]) {
             NSNumber *eventSystemUpTime = eventMode.data[@"#event_su_time"];
             NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
             NSTimeInterval realTime = timeCalibrater.serverTime + outTime;
             [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
-                                
+            
             [eventMode.data removeObjectForKey:@"#event_su_time"];
             [syns addObject:eventMode.eventSyn];
             [contents addObject:eventMode.data];
@@ -242,6 +244,14 @@ static NSUInteger const kBatchSize = 10;
 - (void)syncSendAllData {
     dispatch_sync(dt_networkQueue, ^{});
 }
+
+//just for test purpose only
++ (NSInteger)getDBCount {
+    @synchronized (DTDBManager.class) {
+        return [[DTDBManager sharedInstance] queryEventCount];
+    }
+}
+
 - (BOOL)sendEventsData:(NSArray<NSDictionary *> *) eventArray{
     NSMutableDictionary *header = [NSMutableDictionary dictionary];
     header[@"Content-Type"] = @"text/plain";

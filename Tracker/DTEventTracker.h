@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 同步把网络队列中的数据发送完毕
 - (void)syncSendAllData;
 
+//just for test purpose only
++ (NSInteger)getDBCount;
+
 #pragma mark - UNAVAILABLE
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
