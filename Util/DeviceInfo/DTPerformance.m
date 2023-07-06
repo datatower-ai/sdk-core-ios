@@ -45,8 +45,10 @@ DTFPSMonitor *fpsMonitor;
     
     // 磁盘
     if (![DTAPMPresetProperty disableDisk]) {
+        int64_t freeSize = [DTPerformance dt_get_disk_free_size];
+        int64_t usedDiskSize = [DTPerformance dt_get_storage_size] - freeSize;
         NSString *disk = [NSString stringWithFormat:@"%.1f/%.1f",
-                          [DTPerformance dt_get_disk_free_size]*1.0/TD_PM_UNIT_GB,
+                          usedDiskSize*1.0/TD_PM_UNIT_GB,
                           [DTPerformance dt_get_storage_size]*1.0/TD_PM_UNIT_GB];
         if (disk && disk.length) {
             [dic setObject:disk forKey:kDTPerformanceDISK];
