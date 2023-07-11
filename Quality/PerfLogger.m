@@ -29,6 +29,8 @@ const NSString *TRACKEND = @"TRACKEND";
 
 static const NSString *tag = @"PerfLog";
 
+//#define EnablePerfLog
+
 @interface DTPerfLogger ()
 
 @property (nonatomic) NSMutableDictionary *timeRecord;
@@ -48,6 +50,7 @@ static DTPerfLogger *_instance = nil;
 }
 
 - (void)doLog:(const NSString *)action time:(NSTimeInterval)happenTime {
+#ifdef EnablePerfLog
     
     if ([action hasSuffix:@"END"]) {
         NSString *substr = [action substringToIndex:[action length] - 3];
@@ -72,6 +75,8 @@ static DTPerfLogger *_instance = nil;
     }
     
     DTLogInfo(@"[%@] %@", tag, action);
+    
+#endif
 }
 
 - (void)clean {
