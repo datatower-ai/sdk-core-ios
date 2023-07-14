@@ -6,6 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) NSTimeInterval systemUptime;
 @property (nonatomic, assign) NSTimeInterval serverTime;
+@property (nonatomic, assign) NSTimeInterval deviceTime;
 @property (nonatomic, assign) BOOL stopCalibrate;
 
 + (instancetype)sharedInstance;

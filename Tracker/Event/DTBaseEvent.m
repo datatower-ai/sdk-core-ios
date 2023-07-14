@@ -84,12 +84,12 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     
     dict[@"#event_time"] = [self formatTime:self.time * 1000];
     dict[@"#event_su_time"] = [NSNumber numberWithDouble:self.systemUpTime];
+    dict[@"#event_device_time"] = @([[NSDate date] timeIntervalSince1970]);
     dict[@"#event_syn"]  = self.uuid;
     dict[@"#event_type"] = [self eventTypeString];
-    
     dict[@"#event_name"] = self.eventName;
-
     dict[@"properties"] = self.properties;
+    dict[@"#process_sessionId"] = [self.class sessionId];
     return dict;
 }
 
@@ -238,6 +238,15 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     NSArray *arr = [timeDoubleStr componentsSeparatedByString:@"."];
     NSString *timeLongStr = [arr objectAtIndex:0];
     return @([timeLongStr longLongValue]);
+}
+
++ (NSString *)sessionId {
+    static dispatch_once_t oneToken;
+    static NSString *processSessionId;
+    dispatch_once(&oneToken, ^{
+        processSessionId = [[NSUUID UUID] UUIDString];
+    });
+    return processSessionId;
 }
 
 @end

@@ -230,16 +230,65 @@ static NSUInteger const kBatchSize = 10;
         //时间同步器可用
         if (timeCalibrater && [timeCalibrater enable]) {
             NSNumber *eventSystemUpTime = eventMode.data[@"#event_su_time"];
-            NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
-            NSTimeInterval realTime = timeCalibrater.serverTime + outTime;
-            [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
             
-            [eventMode.data removeObjectForKey:@"#event_su_time"];
-            [syns addObject:eventMode.eventSyn];
-            [contents addObject:eventMode.data];
+            void(^defaulHandle)(void) = ^{
+                
+                NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
+                NSTimeInterval realTime = timeCalibrater.serverTime + outTime;
+                [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
+                [eventMode.data removeObjectForKey:@"#event_device_time"];
+                [eventMode.data removeObjectForKey:@"#event_su_time"];
+                [syns addObject:eventMode.eventSyn];
+                [contents addObject:eventMode.data];
+            };
+            
+            NSString *sessionId = eventMode.data[@"#process_sessionId"];
+            NSNumber *dHistoryTime = [eventMode.data objectForKey:@"#event_device_time"];
+            if ([sessionId isEqualToString:[DTBaseEvent sessionId]] || !dHistoryTime) {
+                //               当次进程采集的上报，时间是完全可信的
+                defaulHandle();
+            } else {
+                
+                //更新服务器时开机时间
+                NSTimeInterval updateSystemUpTime = timeCalibrater.systemUptime;
+                
+                // 开机时间的间隔
+                NSTimeInterval sInterval = updateSystemUpTime - [eventSystemUpTime doubleValue];
+                NSTimeInterval deviceTime = timeCalibrater.deviceTime;
+                
+                // 系统时间间隔
+                NSTimeInterval dInterval = deviceTime - [dHistoryTime doubleValue];
+                NSTimeInterval realTime = 0.;
+                
+                if ([timeCalibrater isDeviceTimeCorrect]) {
+                    if ((sInterval * dInterval) > 0 && fabs( sInterval - dInterval) < 5 * 60 * 1000) {
+                        NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
+                        realTime = timeCalibrater.serverTime + outTime;
+                    } else {
+                        realTime = [dHistoryTime doubleValue];
+                    }
+                } else {
+                    if ((sInterval * dInterval) > 0 && fabs( sInterval - dInterval) < 5 * 60 * 1000) {
+                        NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
+                        realTime = timeCalibrater.serverTime + outTime;
+                    } else {
+                        NSMutableDictionary *props = [eventMode.data objectForKey:@"properties"];
+                        [props setValue:@(false) forKey:@"time_trusted"];
+                        realTime = [dHistoryTime doubleValue];
+                    }
+                }
+                
+                [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
+                [eventMode.data removeObjectForKey:@"#event_device_time"];
+                [eventMode.data removeObjectForKey:@"#event_su_time"];
+                [syns addObject:eventMode.eventSyn];
+                [contents addObject:eventMode.data];
+            }
         }
     }
 }
+
+
 
 - (void)syncSendAllData {
     dispatch_sync(dt_networkQueue, ^{});

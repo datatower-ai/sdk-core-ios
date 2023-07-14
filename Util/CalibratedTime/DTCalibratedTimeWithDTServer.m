@@ -68,6 +68,7 @@
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
             self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
             self.serverTime = [[formatter dateFromString:dateString] timeIntervalSince1970];
+            self.deviceTime = [[NSDate date] timeIntervalSince1970];
             if (self.serverTime == 0) {
                 self.serverTime = [[NSDate date] timeIntervalSince1970];
             }
@@ -94,6 +95,15 @@
 
 - (BOOL)enable{
     return (self.stopCalibrate == YES) && (self.serverTime != 0) && (self.systemUptime != 0);
+}
+
+- (BOOL)isDeviceTimeCorrect {
+    if (self.deviceTime == 0){
+        return NO;
+    }
+
+  //        5分钟的误差
+    return fabs(self.serverTime - self.deviceTime) < 5 * 60 * 1000;
 }
 
 @end

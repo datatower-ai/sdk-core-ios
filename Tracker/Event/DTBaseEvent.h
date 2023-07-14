@@ -156,7 +156,7 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 /// 获取事件类型
 + (DTEventType)typeWithTypeString:(NSString *)typeString;
 
-
++ (NSString *)sessionId;
 
 @end
 

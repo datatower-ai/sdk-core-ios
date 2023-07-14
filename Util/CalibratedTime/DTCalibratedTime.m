@@ -15,6 +15,7 @@
     if (self = [super init]) {
         self.serverTime = 0;
         self.systemUptime = 0;
+        self.deviceTime = 0;
     }
 
     return self;
@@ -23,6 +24,7 @@
 - (void)recalibrationWithTimeInterval:(NSTimeInterval)timestamp {
     self.serverTime = timestamp;
     self.systemUptime = [[NSProcessInfo processInfo] systemUptime];
+    self.deviceTime = [[NSDate date] timeIntervalSince1970];
 }
 
 @end

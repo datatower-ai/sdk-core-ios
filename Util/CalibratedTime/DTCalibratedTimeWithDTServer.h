@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)enable;
 
+- (BOOL)isDeviceTimeCorrect;
+
 @end
 
 NS_ASSUME_NONNULL_END
