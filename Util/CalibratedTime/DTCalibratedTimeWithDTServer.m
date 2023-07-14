@@ -103,7 +103,7 @@
     }
 
   //        5分钟的误差
-    return fabs(self.serverTime - self.deviceTime) < 5 * 60 * 1000;
+    return fabs(self.serverTime - self.deviceTime) < 5 * 60;
 }
 
 @end

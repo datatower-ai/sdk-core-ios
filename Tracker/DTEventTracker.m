@@ -261,14 +261,14 @@ static NSUInteger const kBatchSize = 10;
                 NSTimeInterval realTime = 0.;
                 
                 if ([timeCalibrater isDeviceTimeCorrect]) {
-                    if ((sInterval * dInterval) > 0 && fabs( sInterval - dInterval) < 5 * 60 * 1000) {
+                    if ((sInterval * dInterval) > 0 && fabs( sInterval - dInterval) < 5 * 60) {
                         NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
                         realTime = timeCalibrater.serverTime + outTime;
                     } else {
                         realTime = [dHistoryTime doubleValue];
                     }
                 } else {
-                    if ((sInterval * dInterval) > 0 && fabs( sInterval - dInterval) < 5 * 60 * 1000) {
+                    if ((sInterval * dInterval) > 0 && fabs( sInterval - dInterval) < 5 * 60) {
                         NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
                         realTime = timeCalibrater.serverTime + outTime;
                     } else {
