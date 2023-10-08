@@ -13,7 +13,7 @@
      
     [self initSDK:appid
         serverUrl:url
-          channel:channel
+          channel:DTChannelAppStore
           isDebug:debug
          logLevel:logLevel
         commonProperties:nil];
