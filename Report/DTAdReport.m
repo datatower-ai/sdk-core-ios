@@ -20,6 +20,8 @@
                     type:(DTAdType)type
                 platform:(DTAdPlatform)platform
                      seq:(NSString *)seq
+               mediation:(DTAdMediation)mediation
+             mediationId:(NSString *)mediationId
               properties:(NSDictionary *)properties {
     
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
@@ -27,6 +29,8 @@
     propertiesCopy[PROPERTY_AD_TYPE] = [NSNumber numberWithInteger:type];
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     DTReportEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_LOAD_BEGIN];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
 }
@@ -50,6 +54,8 @@
               duration:(NSNumber *)duration
                 result:(BOOL)result
                    seq:(NSString *)seq
+             mediation:(DTAdMediation)mediation
+           mediationId:(NSString *)mediationId
              errorCode:(NSInteger)errorCode
           errorMessage:(NSString *)errorMessage
             properties:(NSDictionary *)properties {
@@ -61,6 +67,8 @@
     propertiesCopy[PROPERTY_LOAD_RESULT] = @(result);
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_ERROR_CODE] = [NSNumber numberWithInteger:errorCode];
     propertiesCopy[PROPERTY_ERROR_MESSAGE] = errorMessage;
     DTReportEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_LOAD_END];
@@ -79,11 +87,13 @@
  * @param entrance 广告入口
  */
 + (void) reportToShow:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+                 type:(DTAdType)type
+             platform:(DTAdPlatform)platform
+             location:(NSString *)location
+                  seq:(NSString *)seq
+            mediation:(DTAdMediation)mediation
+          mediationId:(NSString *)mediationId
+           properties:(NSDictionary *)properties
              entrance:(NSString *)entrance {
     
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
@@ -92,6 +102,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_TO_SHOW];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
@@ -111,11 +123,13 @@
  * @param entrance 广告入口
  */
 + (void) reportShow:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+               type:(DTAdType)type
+           platform:(DTAdPlatform)platform
+           location:(NSString *)location
+                seq:(NSString *)seq
+          mediation:(DTAdMediation)mediation
+        mediationId:(NSString *)mediationId
+         properties:(NSDictionary *)properties
            entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -123,6 +137,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_SHOW];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
@@ -143,14 +159,16 @@
  * @param entrance 广告入口
  */
 + (void) reportAdShowFail:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
+                     type:(DTAdType)type
+                 platform:(DTAdPlatform)platform
+                 location:(NSString *)location
+                      seq:(NSString *)seq
+                mediation:(DTAdMediation)mediation
+              mediationId:(NSString *)mediationId
                 errorCode:(NSInteger)errorCode
              errorMessage:(NSString *)errorMessage
-              properties:(NSDictionary *)properties
-                entrance:(NSString *)entrance {
+               properties:(NSDictionary *)properties
+                 entrance:(NSString *)entrance {
     
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -158,6 +176,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_ERROR_CODE] = [NSNumber numberWithInteger:errorCode];
     propertiesCopy[PROPERTY_ERROR_MESSAGE] = errorMessage;
@@ -178,18 +198,22 @@
  * @param entrance 广告入口
  */
 + (void) reportClick:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
-                entrance:(NSString *)entrance {
+                type:(DTAdType)type
+            platform:(DTAdPlatform)platform
+            location:(NSString *)location
+                 seq:(NSString *)seq
+           mediation:(DTAdMediation)mediation
+         mediationId:(NSString *)mediationId
+          properties:(NSDictionary *)properties
+            entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
     propertiesCopy[PROPERTY_AD_TYPE] = [NSNumber numberWithInteger:type];
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_CLICK];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
@@ -207,18 +231,22 @@
  * @param entrance 广告入口
  */
 + (void) reportConversionByClick:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
-                entrance:(NSString *)entrance {
+                            type:(DTAdType)type
+                        platform:(DTAdPlatform)platform
+                        location:(NSString *)location
+                             seq:(NSString *)seq
+                       mediation:(DTAdMediation)mediation
+                     mediationId:(NSString *)mediationId
+                      properties:(NSDictionary *)properties
+                        entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
     propertiesCopy[PROPERTY_AD_TYPE] = [NSNumber numberWithInteger:type];
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_AD_CONVERSION_SOURCE] = @"by_click";
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_CONVERSION];
@@ -238,11 +266,13 @@
  * @param entrance 广告入口
  */
 + (void) reportRewarded:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+                   type:(DTAdType)type
+               platform:(DTAdPlatform)platform
+               location:(NSString *)location
+                    seq:(NSString *)seq
+              mediation:(DTAdMediation)mediation
+            mediationId:(NSString *)mediationId
+             properties:(NSDictionary *)properties
                entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -250,6 +280,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_REWARDED];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
@@ -268,11 +300,13 @@
  * @param entrance 广告入口
  */
 + (void) reportConversionByRewarded:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+                               type:(DTAdType)type
+                           platform:(DTAdPlatform)platform
+                           location:(NSString *)location
+                                seq:(NSString *)seq
+                          mediation:(DTAdMediation)mediation
+                        mediationId:(NSString *)mediationId
+                         properties:(NSDictionary *)properties
                            entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -280,6 +314,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_AD_CONVERSION_SOURCE] = @"by_rewarded";
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_CONVERSION];
@@ -298,11 +334,13 @@
  * @param entrance 广告入口
  */
 + (void) reportLeftApp:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+                  type:(DTAdType)type
+              platform:(DTAdPlatform)platform
+              location:(NSString *)location
+                   seq:(NSString *)seq
+             mediation:(DTAdMediation)mediation
+           mediationId:(NSString *)mediationId
+            properties:(NSDictionary *)properties
               entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -310,6 +348,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_LEFT_APP];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
@@ -327,11 +367,13 @@
  * @param entrance 广告入口
  */
 + (void) reportConversionByLeftApp:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+                              type:(DTAdType)type
+                          platform:(DTAdPlatform)platform
+                          location:(NSString *)location
+                               seq:(NSString *)seq
+                         mediation:(DTAdMediation)mediation
+                       mediationId:(NSString *)mediationId
+                        properties:(NSDictionary *)properties
                           entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -339,6 +381,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_AD_CONVERSION_SOURCE] = @"by_left_app";
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_CONVERSION];
@@ -362,8 +406,10 @@
                 platform:(DTAdPlatform)platform
                 location:(NSString *)location
                 clickGap:(NSNumber *)clickGap
-                returnGap:(NSNumber *)returnGap
+               returnGap:(NSNumber *)returnGap
                      seq:(NSString *)seq
+               mediation:(DTAdMediation)mediation
+             mediationId:(NSString *)mediationId
               properties:(NSDictionary *)properties
                 entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
@@ -374,6 +420,8 @@
     propertiesCopy[PROPERTY_AD_CLICK_GAP] = clickGap;
     propertiesCopy[PROPERTY_AD_RETURN_GAP] = returnGap;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_RETURN_APP];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
@@ -394,21 +442,25 @@
  * @param entrance 广告入口
  */
 + (void) reportPaid:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-                    value:(NSString *)value
-                currency:(NSString *)currency
-                precision:(NSString *)precision
-              properties:(NSDictionary *)properties
-                entrance:(NSString *)entrance {
+               type:(DTAdType)type
+           platform:(DTAdPlatform)platform
+           location:(NSString *)location
+                seq:(NSString *)seq
+          mediation:(DTAdMediation)mediation
+        mediationId:(NSString *)mediationId
+              value:(NSString *)value
+           currency:(NSString *)currency
+          precision:(NSString *)precision
+         properties:(NSDictionary *)properties
+           entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
     propertiesCopy[PROPERTY_AD_TYPE] = [NSNumber numberWithInteger:type];
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_AD_VALUE_MICROS] = value;
     propertiesCopy[PROPERTY_AD_CURRENCY_CODE] = currency;
@@ -450,9 +502,9 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
-    propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
     propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
+    propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     propertiesCopy[PROPERTY_AD_VALUE_MICROS] = value;
     propertiesCopy[PROPERTY_AD_COUNTRY] = country;
     propertiesCopy[PROPERTY_AD_PRECISION_TYPE] = precision;
@@ -473,11 +525,13 @@
  * @param entrance 广告入口
  */
 + (void) reportClose:(NSString *)adid
-                    type:(DTAdType)type
-                platform:(DTAdPlatform)platform
-                location:(NSString *)location
-                     seq:(NSString *)seq
-              properties:(NSDictionary *)properties
+                type:(DTAdType)type
+            platform:(DTAdPlatform)platform
+            location:(NSString *)location
+                 seq:(NSString *)seq
+           mediation:(DTAdMediation)mediation
+         mediationId:(NSString *)mediationId
+          properties:(NSDictionary *)properties
             entrance:(NSString *)entrance {
     NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_AD_ID] = adid;
@@ -485,6 +539,8 @@
     propertiesCopy[PROPERTY_AD_PLATFORM] = [NSNumber numberWithInteger:platform];
     propertiesCopy[PROPERTY_AD_LOCATION] = location;
     propertiesCopy[PROPERTY_AD_SEQ] = seq;
+    propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
+    propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
     DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_AD_CLOSE];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];

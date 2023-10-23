@@ -428,48 +428,28 @@ static dispatch_queue_t dt_trackQueue;
 #pragma mark - User
 
 - (void)user_add:(NSString *)propertyName andPropertyValue:(NSNumber *)propertyValue {
-    [self user_add:propertyName andPropertyValue:propertyValue withTime:nil];
-}
-
-- (void)user_add:(NSString *)propertyName andPropertyValue:(NSNumber *)propertyValue withTime:(NSDate *)time {
     if (propertyName && propertyValue) {
-        [self user_add:@{propertyName: propertyValue} withTime:time];
+        [self user_add:@{propertyName: propertyValue}];
     }
 }
 
 - (void)user_add:(NSDictionary *)properties {
-    [self user_add:properties withTime:nil];
-}
-
-- (void)user_add:(NSDictionary *)properties withTime:(NSDate *)time {
     DTUserEventAdd *event = [[DTUserEventAdd alloc] init];
     
     [self asyncUserEventObject:event properties:properties];
 }
 
 - (void)user_setOnce:(NSDictionary *)properties {
-    [self user_setOnce:properties withTime:nil];
-}
-
-- (void)user_setOnce:(NSDictionary *)properties withTime:(NSDate *)time {
     DTUserEventSetOnce *event = [[DTUserEventSetOnce alloc] init];
     [self asyncUserEventObject:event properties:properties];
 }
 
 - (void)user_set:(NSDictionary *)properties {
-    [self user_set:properties withTime:nil];
-}
-
-- (void)user_set:(NSDictionary *)properties withTime:(NSDate *)time {
     DTUserEventSet *event = [[DTUserEventSet alloc] init];
     [self asyncUserEventObject:event properties:properties];
 }
 
 - (void)user_unset:(NSString *)propertyName {
-    [self user_unset:propertyName withTime:nil];
-}
-
-- (void)user_unset:(NSString *)propertyName withTime:(NSDate *)time {
     if ([propertyName isKindOfClass:[NSString class]] && propertyName.length > 0) {
         NSDictionary *properties = @{propertyName: @0};
         DTUserEventUnset *event = [[DTUserEventUnset alloc] init];
@@ -478,28 +458,27 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)user_delete {
-    [self user_delete:nil];
-}
-
-- (void)user_delete:(NSDate *)time {
     DTUserEventDelete *event = [[DTUserEventDelete alloc] init];
     [self asyncUserEventObject:event properties:nil];
 }
 
 - (void)user_append:(NSDictionary<NSString *, NSArray *> *)properties {
-    [self user_append:properties withTime:nil];
-}
-
-- (void)user_append:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate *)time {
+    if (![self allElementIsArray:properties]) {
+        DTLogError(@"invalie arg, user_append only receive array arg");
+        NSLog(@"invalie arg, user_append only receive array arg");
+        return;
+    }
+    
     DTUserEventAppend *event = [[DTUserEventAppend alloc] init];
     [self asyncUserEventObject:event properties:properties];
 }
 
 - (void)user_uniqAppend:(NSDictionary<NSString *, NSArray *> *)properties {
-    [self user_uniqAppend:properties withTime:nil];
-}
-
-- (void)user_uniqAppend:(NSDictionary<NSString *, NSArray *> *)properties withTime:(NSDate *)time {
+    if (![self allElementIsArray:properties]) {
+        DTLogError(@"invalie arg, user_append only receive array arg");
+        NSLog(@"invalie arg, user_append only receive array arg");
+        return;
+    }
     DTUserEventUniqueAppend *event = [[DTUserEventUniqueAppend alloc] init];
     [self asyncUserEventObject:event properties:properties];
 }
@@ -572,6 +551,19 @@ static dispatch_queue_t dt_trackQueue;
 
 - (NSString *)getDTid {
     return [[DTDeviceInfo sharedManager] deviceId];
+}
+
+- (BOOL)allElementIsArray:(NSDictionary *)dict {
+    BOOL ret = YES;
+    for (NSString *k in dict.allKeys) {
+        NSArray *ary = dict[k];
+        
+        if (![ary isKindOfClass:[NSArray class]]) {
+            ret = NO;
+            break;
+        }
+    }
+    return ret;
 }
 
 @end

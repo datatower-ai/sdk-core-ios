@@ -134,7 +134,7 @@ static NSRegularExpression *_regexForAutoTrackValidateKey;
     NSMutableDictionary *propertiesCopy = [NSMutableDictionary dictionaryWithDictionary:properties];
     NSMutableArray *invalidKeys = [NSMutableArray arrayWithCapacity:0];
     
-    for (id key in propertiesCopy) {
+    for (id key in propertiesCopy.allKeys) {
         NSError *error = nil;
         id value = propertiesCopy[key];
         
