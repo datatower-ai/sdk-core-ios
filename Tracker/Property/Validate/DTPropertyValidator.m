@@ -128,7 +128,7 @@ static NSRegularExpression *_regexForAutoTrackValidateKey;
 /// @param validator 验证器
 + (NSMutableDictionary *)validateProperties:(NSDictionary *)properties validator:(id<DTEventPropertyValidating>)validator {
     if (![properties isKindOfClass:[NSDictionary class]] || ![validator conformsToProtocol:@protocol(DTEventPropertyValidating)]) {
-        return nil;
+        return [NSMutableDictionary dictionary];
     }
     
     NSMutableDictionary *propertiesCopy = [NSMutableDictionary dictionaryWithDictionary:properties];
