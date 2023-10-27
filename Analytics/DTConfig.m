@@ -1,7 +1,7 @@
 #import "DTConfig.h"
 #import "DTBaseEvent.h"
 
-#define DT_IOS_SDK_VERSION_NAME @"2.0.6"
+#define DT_IOS_SDK_VERSION_NAME @"2.1.0"
 #define DT_IOS_SDK_VERSION_TYPE @"iOS"
 static DTConfig * _defaultTDConfig;
 

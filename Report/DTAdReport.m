@@ -448,7 +448,7 @@
                 seq:(NSString *)seq
           mediation:(DTAdMediation)mediation
         mediationId:(NSString *)mediationId
-              value:(NSString *)value
+              value:(double)value
            currency:(NSString *)currency
           precision:(NSString *)precision
          properties:(NSDictionary *)properties
@@ -462,7 +462,7 @@
     propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
     propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
-    propertiesCopy[PROPERTY_AD_VALUE_MICROS] = value;
+    propertiesCopy[PROPERTY_AD_VALUE_MICROS] = @(value);
     propertiesCopy[PROPERTY_AD_CURRENCY_CODE] = currency;
     propertiesCopy[PROPERTY_AD_PRECISION_TYPE] = precision;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
@@ -491,7 +491,7 @@
                 seq:(NSString *)seq
           mediation:(DTAdMediation)mediation
         mediationId:(NSString *)mediationId
-              value:(NSString *)value
+              value:(double)value
           precision:(NSString *)precision
             country:(NSString *)country
          properties:(NSDictionary *)properties
@@ -505,7 +505,7 @@
     propertiesCopy[PROPERTY_AD_MEDIAITON] = [NSNumber numberWithInteger:mediation];
     propertiesCopy[PROPERTY_AD_MEDIAITON_ID] = mediationId;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
-    propertiesCopy[PROPERTY_AD_VALUE_MICROS] = value;
+    propertiesCopy[PROPERTY_AD_VALUE_MICROS] = @(value);
     propertiesCopy[PROPERTY_AD_COUNTRY] = country;
     propertiesCopy[PROPERTY_AD_PRECISION_TYPE] = precision;
     propertiesCopy[PROPERTY_AD_ENTRANCE] = entrance;
