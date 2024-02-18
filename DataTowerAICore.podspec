@@ -6,9 +6,9 @@ Pod::Spec.new do |spec|
   spec.description = "DataTowerAICore"
   spec.ios.deployment_target  = '11.0'
   spec.requires_arc = true
-  spec.homepage = "https://gitlab.com/nodetower/roiquery-sdk/ios/ios-roiquery-sdk.git"
+  spec.homepage = "https://github.com/datatower-ai/sdk-core-ios.git"
   spec.author = { "" => "" }
-  spec.source = { :git => "https://gitlab.com/nodetower/roiquery-sdk/ios/ios-roiquery-sdk.git", :tag => 'v' + spec.version.to_s }
+  spec.source = { :git => "https://github.com/datatower-ai/sdk-core-ios.git", :tag => 'v' + spec.version.to_s }
   
   spec.frameworks       = 'QuartzCore','UIKit','Foundation', 'SystemConfiguration', 'CoreGraphics', 'Security' , 'CoreTelephony'
   spec.libraries        = 'sqlite3', 'z'
