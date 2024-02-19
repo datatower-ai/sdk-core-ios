@@ -21,7 +21,11 @@ static NSString *dt_quality_error_message     = @"error_message";
 + (void)reportQualityCode:(DTQualityErrorCode)code
                  errorMsg:(DTQualityErrorMSG)errorMsg
                       msg:(NSString *)msg {
-    NSURL *url = [NSURL URLWithString:@"https://debug.roiquery.com/debug"];
+    NSString *urlStr = @(QualityUrl);
+    if([urlStr length] == 0)
+        return;
+    
+    NSURL *url = [NSURL URLWithString:urlStr];
     NSDictionary *header = @{
         @"Accept-Encoding": @"gzip"
     };

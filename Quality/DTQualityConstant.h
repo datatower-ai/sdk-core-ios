@@ -30,3 +30,5 @@ typedef enum : NSUInteger {
     MSG_UPDATE_DB_EXCEPTION,
     MSG_ILLEGAL_TIME_ERROR,
 }DTQualityErrorMSG;
+
+#define QualityUrl "https://debug.roiquery.com/debug"
