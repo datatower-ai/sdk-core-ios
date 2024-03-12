@@ -61,6 +61,11 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - accountId: 用户系统id
 + (void)setAccountId:(NSString *)accountId;
 
+/// 设置访客id
+/// - Parameters:
+///   - accountId: 访客id，必须唯一
++ (void)setDistinctId:(NSString *)distinctId;
+
 /// 设置Firebase的app_instance_id
 /// - Parameters:
 ///   - fiid: Firebase 的 app_instance_id

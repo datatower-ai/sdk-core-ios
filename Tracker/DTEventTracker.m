@@ -22,7 +22,7 @@ static NSUInteger const kBatchSize = 10;
 @property (atomic, strong) DTConfig *config;
 @property (atomic, copy) NSURL *sendURL;
 @property (atomic, strong) dispatch_queue_t queue;
-@property (nonatomic, strong) DTDBManager *dataQueue;
+@property (nonatomic, strong) DTDBManager *dbOp;
 
 @end
 
@@ -46,7 +46,7 @@ static NSUInteger const kBatchSize = 10;
         self.queue = queue;
         self.config = [DTAnalyticsManager shareInstance].config;
         self.sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", self.config.serverUrl]];
-        self.dataQueue = [DTDBManager sharedInstance];
+        self.dbOp = [DTDBManager sharedInstance];
     }
     return self;
 }
@@ -78,7 +78,7 @@ static NSUInteger const kBatchSize = 10;
 - (void)saveEventsData:(NSDictionary *)data sync:(NSString *)sync{
     NSMutableDictionary *event = [[NSMutableDictionary alloc] initWithDictionary:data];
     @synchronized (DTDBManager.class) {
-        BOOL result = [self.dataQueue addEvent:event eventSyn:sync];
+        BOOL result = [self.dbOp addEvent:event eventSyn:sync];
         if(result) {
             DTLogDebug(@"save data success:%@", data[@"#event_name"]);
         }
@@ -145,7 +145,7 @@ static NSUInteger const kBatchSize = 10;
     NSArray *recodSyns;
     @synchronized (DTDBManager.class) {
         // 数据库里获取前kBatchSize条数据
-        NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
+        NSArray<DTDBEventModel *> *eventModes = [self.dbOp queryEventsCount:size];
         NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
         NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
         for (DTDBEventModel *eventMode in eventModes) {
@@ -184,7 +184,7 @@ static NSUInteger const kBatchSize = 10;
                     
                     [[DTPerfLogger shareInstance] doLog:DELETEDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
                     
-                    BOOL ret = [self.dataQueue deleteEventsWithSyns:recodSyns];
+                    BOOL ret = [self.dbOp deleteEventsWithSyns:recodSyns];
                     
                     [[DTPerfLogger shareInstance] doLog:DELETEDBEND time:[NSDate timeIntervalSinceReferenceDate]];
                     
@@ -194,7 +194,7 @@ static NSUInteger const kBatchSize = 10;
                     // 数据库里获取前kBatchSize条数据
                     [[DTPerfLogger shareInstance] doLog:READEVENTDATAFROMDBBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
                     
-                    NSArray<DTDBEventModel *> *eventModes = [self.dataQueue queryEventsCount:size];
+                    NSArray<DTDBEventModel *> *eventModes = [self.dbOp queryEventsCount:size];
                     NSMutableArray *syns = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
                     NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
                     for (DTDBEventModel *eventMode in eventModes) {

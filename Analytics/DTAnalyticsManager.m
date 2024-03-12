@@ -24,6 +24,8 @@
 
 @property (atomic, copy, nullable) NSString *accountId;
 
+@property (atomic, copy, nullable) NSString *distinctId;
+
 @property (strong, nonatomic) DTFile *file;
 
 
@@ -40,7 +42,7 @@ static dispatch_queue_t dt_trackQueue;
     static dispatch_once_t oneToken;
     dispatch_once(&oneToken, ^{
         _manager = [[DTAnalyticsManager alloc] init];
-        NSString *queuelabel = [NSString stringWithFormat:@"com.datatower.%p", (void *)self];
+        NSString *queuelabel = [NSString stringWithFormat:@"com.datatower.main.%p", (void *)self];
         dt_trackQueue = dispatch_queue_create([queuelabel UTF8String], DISPATCH_QUEUE_SERIAL);
     });
     return _manager;
@@ -171,9 +173,9 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)retrievePersistedData {
     self.file = [[DTFile alloc] initWithAppid:[[self config] appid]];
-    self.accountId = [self.file unarchiveAccountId];
+//    self.accountId = [self.file unarchiveAccountId];
+    self.distinctId = [self.file unarchiveDistinctId];
 }
-
 
 - (void)setSuperProperties:(NSDictionary *)properties {
     dispatch_async(dt_trackQueue, ^{
@@ -316,12 +318,17 @@ static dispatch_queue_t dt_trackQueue;
     }
     // 静态公共属性
     NSDictionary *superProperties = self.superProperty.currentSuperProperties;
+    
+    // 动态公共属性
+    NSDictionary *superDynamicProperties = self.superProperty.obtainDynamicSuperProperties;
+
     // 添加从属性插件获取的属性，属性插件只有系统使用，不支持用户自定义。所以属性名字是可信的，不用验证格式
     NSMutableDictionary *pluginProperties = [self.propertyPluginManager propertiesWithEventType:event.eventType];
   
     NSMutableDictionary *jsonObj = [NSMutableDictionary dictionary];
     
     [event.properties addEntriesFromDictionary:superProperties];
+    [event.properties addEntriesFromDictionary:superDynamicProperties];
     [event.properties addEntriesFromDictionary:pluginProperties];
     
     if ([event isKindOfClass:[DTAppEndEvent class]]) {
@@ -390,6 +397,7 @@ static dispatch_queue_t dt_trackQueue;
 - (void)configBaseEvent:(DTBaseEvent *)event {
     // 添加通用的属性
     event.accountId = self.accountId;
+    event.distinctId = self.distinctId;
     event.dtid = [[DTDeviceInfo sharedManager] deviceId];
     event.appid = [self.config appid];
     event.isDebug = [self.config enabledDebug];
@@ -495,6 +503,18 @@ static dispatch_queue_t dt_trackQueue;
     self.accountId = accountId;
     @synchronized (self.file) {
         [self.file archiveAccountId:accountId];
+    }
+}
+
+- (void)setDistinctid:(NSString *)distinctId {
+    if (![distinctId isKindOfClass:[NSString class]] || distinctId.length == 0) {
+        DTLogError(@"distinctId invald", distinctId);
+        return;
+    }
+
+    self.distinctId = distinctId;
+    @synchronized (self.file) {
+        [self.file archiveDistinctId:self.distinctId];
     }
 }
 

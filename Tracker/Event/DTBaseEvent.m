@@ -81,6 +81,9 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     if (self.isDebug){
         dict[@"#debug"] = @YES;
     }
+    if (self.distinctId) {
+        dict[@"#disctId"] = self.distinctId;
+    }
     
     dict[@"#event_time"] = [self formatTime:self.time * 1000];
     dict[@"#event_su_time"] = [NSNumber numberWithDouble:self.systemUpTime];

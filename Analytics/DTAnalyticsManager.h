@@ -141,6 +141,12 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 ///   - accountId: 用户系统id
 - (void)setAcid:(NSString *)accountId;
 
+/// 设置访客的id
+/// - Parameters:
+///   - distinctId: 访客id
+- (void)setDistinctid:(NSString *)distinctId;
+
+
 /// 设置Firebase的app_instance_id
 /// - Parameters:
 ///   - fiid: Firebase 的 app_instance_id

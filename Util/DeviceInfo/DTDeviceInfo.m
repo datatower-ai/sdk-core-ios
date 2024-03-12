@@ -71,16 +71,6 @@ static CTTelephonyNetworkInfo *__td_TelephonyNetworkInfo;
     return [self sharedManager].deviceId;
 }
 
-//- (void)setIsAppInsatlled:(BOOL)isAppInsatlled {
-//    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"datatower_appInsatll"];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
-//}
-//
-//- (void)setIsFirstOpen:(BOOL)isFirstOpen {
-//    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"datatower_isfirst"];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
-//}
-
 - (BOOL)isAppInsatlled{
     BOOL isExistRecord = [[[NSUserDefaults standardUserDefaults] objectForKey:@"datatower_appInsatll"] boolValue];
     if (!isExistRecord) {

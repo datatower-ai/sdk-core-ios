@@ -45,22 +45,29 @@
     }
 }
 
-- (void)archiveDeviceId:(NSString *)deviceId {
-    NSString *filePath = [self deviceIdFilePath];
-    if (![self archiveObject:[deviceId copy] withFilePath:filePath]) {
+- (void)archiveDistinctId:(NSString *)distinctId {
+    NSString *filePath = [self distinctIdFilePath];
+    if (![self archiveObject:[distinctId copy] withFilePath:filePath]) {
         DTLogError(@"%@ unable to archive deviceId", self);
     }
 }
 
-- (NSString *)unarchiveDeviceId {
-    return [self unarchiveFromFile:[self deviceIdFilePath] asClass:[NSString class]];
+- (NSString *)unarchiveDistinctId {
+    return [self unarchiveFromFile:[self distinctIdFilePath] asClass:[NSString class]];
 }
 
 - (BOOL)archiveObject:(id)object withFilePath:(NSString *)filePath {
     @try {
-        if (![NSKeyedArchiver archiveRootObject:object toFile:filePath]) {
+        NSError *error = nil;
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object requiringSecureCoding:YES error:&error];
+        
+        if (!error)
             return NO;
-        }
+        
+        [data writeToFile:filePath options:0 error:&error];
+        if (!error)
+            return NO;
+                        
     } @catch (NSException *exception) {
         DTLogError(@"Got exception: %@, reason: %@. You can only send to DT values that inherit from NSObject and implement NSCoding.", exception.name, exception.reason);
         return NO;
@@ -86,8 +93,10 @@
 - (id)unarchiveFromFile:(NSString *)filePath asClass:(Class)class {
     id unarchivedData = nil;
     @try {
-        unarchivedData = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        if (![unarchivedData isKindOfClass:class]) {
+        NSData *data = [NSData dataWithContentsOfFile:filePath options:0 error:nil];
+        NSError *error;
+        unarchivedData = [NSKeyedUnarchiver unarchivedObjectOfClass:class fromData:data error:&error];
+        if (![unarchivedData isKindOfClass:class] || !error) {
             unarchivedData = nil;
         }
     }
@@ -111,8 +120,8 @@
     return [self persistenceFilePath:@"accountID"];
 }
 
-- (NSString *)deviceIdFilePath {
-    return [self persistenceFilePath:@"deviceId"];
+- (NSString *)distinctIdFilePath {
+    return [self persistenceFilePath:@"distinctId"];
 }
 
 // 持久化文件

@@ -110,6 +110,7 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 @property (nonatomic, assign) DTEventType eventType;
 @property (nonatomic, copy) NSString *uuid;
 @property (nonatomic, copy) NSString *accountId;
+@property (nonatomic, copy) NSString *distinctId;
 @property (nonatomic, copy) NSString *appid;
 @property (nonatomic, copy) NSString *dtid;
 @property (nonatomic, copy) NSString *bundleId;

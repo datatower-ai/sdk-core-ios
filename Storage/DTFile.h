@@ -16,13 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithAppid:(NSString*)appid;
 
-- (void)archiveDeviceId:(NSString *)deviceId;
+- (void)archiveDistinctId:(NSString *)distinctId;
 
-- (NSString *)unarchiveDeviceId;
-
-- (BOOL)archiveObject:(id)object withFilePath:(NSString *)filePath;
-
-- (BOOL)addSkipBackupAttributeToItemAtPath:(NSString *)filePathString;
+- (NSString *)unarchiveDistinctId;
 
 - (void)archiveSuperProperties:(NSDictionary *)superProperties;
 
@@ -31,8 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)archiveAccountId:(nullable NSString *)accountId;
 
 - (NSString*)unarchiveAccountId;
-
-
 
 @end;
 
