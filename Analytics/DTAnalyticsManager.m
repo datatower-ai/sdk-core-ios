@@ -28,6 +28,7 @@
 
 @property (strong, nonatomic) DTFile *file;
 
+@property (nonatomic, assign) BOOL hasSetUserOnce;
 
 @end
 
@@ -71,8 +72,6 @@ static dispatch_queue_t dt_trackQueue;
     [self appLifeCycleObserver];
     //采集预置事件
     [self trackPresetEvents];
-    
-    
 }
 
 - (void)initLog {
@@ -115,7 +114,11 @@ static dispatch_queue_t dt_trackQueue;
     [self enableAutoTrack:DTAutoTrackEventTypeAll];
     
     [self user_set: [self.presetProperty getLatestPresetProperties]];
-    [self user_setOnce: [self.presetProperty getActivePresetProperties]];
+    if(!self.hasSetUserOnce) {
+        [self user_setOnce: [self.presetProperty getActivePresetProperties]];
+        self.hasSetUserOnce = true;
+        [self saveUserDefaultData];
+    }
 }
 
 //MARK: - AppLifeCycle
@@ -175,6 +178,7 @@ static dispatch_queue_t dt_trackQueue;
     self.file = [[DTFile alloc] initWithAppid:[[self config] appid]];
 //    self.accountId = [self.file unarchiveAccountId];
     self.distinctId = [self.file unarchiveDistinctId];
+    [self loadUserDefaultData];
 }
 
 - (void)setSuperProperties:(NSDictionary *)properties {
@@ -197,6 +201,15 @@ static dispatch_queue_t dt_trackQueue;
 
 - (NSDictionary *)currentSuperProperties {
     return [self.superProperty currentSuperProperties];
+}
+
+- (void)loadUserDefaultData {
+    self.hasSetUserOnce = [[[NSUserDefaults standardUserDefaults] objectForKey:@"hasSetUserOnce"] boolValue];
+}
+
+- (void)saveUserDefaultData {
+    [[NSUserDefaults standardUserDefaults] setBool:self.hasSetUserOnce forKey:@"hasSetUserOnce"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 //MARK: - Auto Track
