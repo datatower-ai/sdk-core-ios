@@ -48,7 +48,9 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
         _systemUpTime = NSProcessInfo.processInfo.systemUptime;
         _timeValueType = DTEventTimeValueTypeNone;
         _uuid = [NSUUID UUID].UUIDString;
-        _hasSetCommonProperties = NO;
+        
+        // 默认不用添加公共属性，比如userset等
+        _hasSetCommonProperties = YES;
     }
     return self;
 }
