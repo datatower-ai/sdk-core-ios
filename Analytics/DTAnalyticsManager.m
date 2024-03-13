@@ -176,7 +176,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)retrievePersistedData {
     self.file = [[DTFile alloc] initWithAppid:[[self config] appid]];
-//    self.accountId = [self.file unarchiveAccountId];
+    self.accountId = [self.file unarchiveAccountId];
     self.distinctId = [self.file unarchiveDistinctId];
     [self loadUserDefaultData];
 }
@@ -537,6 +537,10 @@ static dispatch_queue_t dt_trackQueue;
     @synchronized (self.file) {
         [self.file archiveDistinctId:self.distinctId];
     }
+}
+
+- (NSString *)currentDistinctID {
+    return self.distinctId;
 }
 
 /// 设置Firebase的app_instance_id

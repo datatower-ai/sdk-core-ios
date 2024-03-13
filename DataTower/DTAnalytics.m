@@ -76,7 +76,7 @@
 }
 
 + (void)setDistinctId:(NSString *)distinctId; {
-    [[DTAnalyticsManager shareInstance] setAcid:distinctId];
+    [[DTAnalyticsManager shareInstance] setDistinctid:distinctId];
 }
 
 /// 设置Firebase的app_instance_id
@@ -118,6 +118,10 @@
     [[DTPerfLogger shareInstance] doLog:GETDTIDEND time:[NSDate timeIntervalSinceReferenceDate]];
     
     return ret;
+}
+
++ (NSString *)getDistinceId {
+    return [[DTAnalyticsManager shareInstance] currentDistinctID];
 }
 
 + (void)setEnableTracking:(BOOL)track {

@@ -146,6 +146,7 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 ///   - distinctId: 访客id
 - (void)setDistinctid:(NSString *)distinctId;
 
+- (NSString *)currentDistinctID;
 
 /// 设置Firebase的app_instance_id
 /// - Parameters:
