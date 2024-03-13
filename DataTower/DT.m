@@ -6,25 +6,28 @@
 @implementation DT
 
 + (void)initSDK:(NSString *)appid
-               serverUrl:(NSString *)url
-                 channel:(DTChannel)channel
-                 isDebug:(BOOL)debug
-             logLevel:(DTLoggingLevel)logLevel {
-     
+      serverUrl:(NSString *)url
+        channel:(DTChannel)channel
+        isDebug:(BOOL)debug
+       logLevel:(DTLoggingLevel)logLevel
+    enableTrack:(BOOL)enableTrack {
+    
     [self initSDK:appid
         serverUrl:url
           channel:DTChannelAppStore
           isDebug:debug
          logLevel:logLevel
-        commonProperties:nil];
+ commonProperties:nil
+      enableTrack:enableTrack];
 }
 
 + (void)initSDK:(NSString *)appid
-               serverUrl:(NSString *)url
-                 channel:(DTChannel)channel
-                 isDebug:(BOOL)debug
+      serverUrl:(NSString *)url
+        channel:(DTChannel)channel
+        isDebug:(BOOL)debug
        logLevel:(DTLoggingLevel)logLevel
-        commonProperties:(NSDictionary *)commonProperties {
+commonProperties:(NSDictionary *)commonProperties
+    enableTrack:(BOOL)enableTrack; {
     
     [[DTPerfLogger shareInstance] doLog:SDKINITBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
@@ -35,6 +38,7 @@
     config.enabledDebug = debug;
     config.logLevel = logLevel;
     config.commonProperties = [commonProperties copy];
+    config.enableUpload = enableTrack;
     [[DTAnalyticsManager shareInstance] initializeWithConfig:config];
     
     [[DTPerfLogger shareInstance] doLog:SDKINITEND time:[NSDate timeIntervalSinceReferenceDate]];

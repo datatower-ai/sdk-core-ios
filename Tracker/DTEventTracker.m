@@ -112,6 +112,12 @@ static NSUInteger const kBatchSize = 10;
 /// 该方法需要在networkQueue中进行，会持续的发送网络请求直到数据库的数据被发送完
 - (void)_syncWithSize:(NSUInteger)size completion:(void(^)(void))completion {
     
+    if(![DTConfig shareInstance].enableUpload)
+    {
+        DTLogDebug(@"upload not enable");
+        return;
+    }
+    
     [[DTPerfLogger shareInstance] doLog:TRACKBEGIN time:[NSDate timeIntervalSinceReferenceDate]];
     
     //判断网络
@@ -150,6 +156,7 @@ static NSUInteger const kBatchSize = 10;
         NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:eventModes.count];
         for (DTDBEventModel *eventMode in eventModes) {
             [self handleEventTime:eventMode syns:syns contents:contents];
+            [self applySuperPropertiesIfNeeded:eventMode];
         }
         recodSyns = syns;
         recordArray = contents;
@@ -272,8 +279,9 @@ static NSUInteger const kBatchSize = 10;
                         NSTimeInterval outTime = [eventSystemUpTime doubleValue] - timeCalibrater.systemUptime ;
                         realTime = timeCalibrater.serverTime + outTime;
                     } else {
-                        NSMutableDictionary *props = [eventMode.data objectForKey:@"properties"];
-                        [props setValue:@(false) forKey:@"time_trusted"];
+//                        NSMutableDictionary *props = [eventMode.data objectForKey:@"properties"];
+//                        [props setValue:@(false) forKey:@"#time_trusted"];
+                        [eventMode.data setValue:@(false) forKey:@"#time_trusted"];
                         realTime = [dHistoryTime doubleValue];
                     }
                 }
@@ -288,6 +296,25 @@ static NSUInteger const kBatchSize = 10;
     }
 }
 
+- (void)applySuperPropertiesIfNeeded:(DTDBEventModel *)eventMode {
+    BOOL hasSet = [eventMode.data[@"hasSetCommonProperties"] boolValue];
+    if (!hasSet) {
+        NSDictionary *properties = [eventMode.data objectForKey:@"properties"];
+        NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithDictionary:properties];
+        
+        DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
+        // 静态公共属性
+        NSDictionary *superProperties = instance.superProperty.currentSuperProperties;
+        
+        // 动态公共属性
+        NSDictionary *superDynamicProperties = instance.superProperty.obtainDynamicSuperProperties;
+        
+        [temp addEntriesFromDictionary:superProperties];
+        [temp addEntriesFromDictionary:superDynamicProperties];
+        [eventMode.data setObject:temp forKey:@"properties"];
+    }
+    [eventMode.data removeObjectForKey:@"hasSetCommonProperties"];
+}
 
 
 - (void)syncSendAllData {

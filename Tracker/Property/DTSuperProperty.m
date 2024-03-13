@@ -54,10 +54,13 @@
     NSMutableDictionary *tmp = [NSMutableDictionary dictionaryWithDictionary:self.superProperties];
     // 追加新的属性，会覆盖旧的属性
     [tmp addEntriesFromDictionary:properties];
-    self.superProperties = [NSDictionary dictionaryWithDictionary:tmp];
-
-    // 持久化
-    [self.file archiveSuperProperties:self.superProperties];
+    @synchronized (self) {
+        
+        self.superProperties = tmp;
+        
+        // 持久化
+        [self.file archiveSuperProperties:self.superProperties];
+    }
 }
 
 - (void)unregisterSuperProperty:(NSString *)property {
@@ -69,21 +72,27 @@
 
     NSMutableDictionary *tmp = [NSMutableDictionary dictionaryWithDictionary:self.superProperties];
     tmp[property] = nil;
-    self.superProperties = [NSDictionary dictionaryWithDictionary:tmp];
-    
-    [self.file archiveSuperProperties:self.superProperties];
+    @synchronized (self) {
+        self.superProperties = [NSDictionary dictionaryWithDictionary:tmp];
+        
+        [self.file archiveSuperProperties:self.superProperties];
+    }
 }
 
 - (void)clearSuperProperties {
-    self.superProperties = @{};
-    [self.file archiveSuperProperties:self.superProperties];
+    @synchronized (self) {
+        self.superProperties = @{};
+        [self.file archiveSuperProperties:self.superProperties];
+    }
 }
 
 - (NSDictionary *)currentSuperProperties {
-    if (self.superProperties) {
-        return [self.superProperties copy];
-    } else {
-        return @{};
+    @synchronized (self) {
+        if (self.superProperties) {
+            return [self.superProperties copy];
+        } else {
+            return @{};
+        }
     }
 }
 

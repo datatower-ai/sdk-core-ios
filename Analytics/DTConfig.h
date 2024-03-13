@@ -13,15 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger maxNumEvents;
 @property(copy,nonatomic) NSString* sdkVersion;
 @property(copy,nonatomic) NSString* sdkType;
-
+@property(assign,nonatomic) BOOL enableUpload;
 
 + (DTConfig *)shareInstance;
-
-
-
-
-
-
 
 @end
 

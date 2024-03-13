@@ -137,6 +137,8 @@ typedef NS_OPTIONS(NSInteger, DTEventTimeValueType) {
 @property (nonatomic, assign) BOOL isEnabled;
 /// 标识SDK是否停止
 @property (atomic, assign) BOOL isOptOut;
+/// 标识该事假是否是否设置了公共属性
+@property (nonatomic, assign) BOOL hasSetCommonProperties;
 
 - (instancetype)initWithType:(DTEventType)type;
 

@@ -14,7 +14,7 @@
 
 /**
  设置用户属性
-
+ 
  @param properties 用户属性
  */
 + (void)userSet:(NSDictionary *)properties{
@@ -32,7 +32,7 @@
 
 /**
  设置单次用户属性
-
+ 
  @param properties 用户属性
  */
 + (void)userSetOnce:(NSDictionary *)properties{
@@ -41,7 +41,7 @@
 
 /**
  对数值类型用户属性进行累加操作
-
+ 
  @param properties 用户属性
  */
 + (void)userAdd:(NSDictionary *)properties{
@@ -59,7 +59,7 @@
  对 Array 类型的用户属性进行追加操作
  
  @param properties 用户属性
-*/
+ */
 + (void)userAppend:(NSDictionary<NSString *, NSArray *> *)properties{
     [[DTAnalyticsManager shareInstance] user_append:properties];
 }
@@ -116,7 +116,30 @@
     NSString *ret = [[DTAnalyticsManager shareInstance] getDTid];
     
     [[DTPerfLogger shareInstance] doLog:GETDTIDEND time:[NSDate timeIntervalSinceReferenceDate]];
-
+    
     return ret;
 }
+
++ (void)setEnableTracking:(BOOL)track {
+    [DTConfig shareInstance].enableUpload = track;
+    if(track)
+    {
+        [[DTAnalyticsManager shareInstance] flush];
+    }
+}
+
++ (void)setSuperProperties:(NSDictionary *)superProps {
+    if(!superProps || superProps.count == 0) {
+        [[DTAnalyticsManager shareInstance].superProperty clearSuperProperties];
+    } else {
+        [[DTAnalyticsManager shareInstance].superProperty registerSuperProperties:superProps];
+    }
+}
+
++ (void)setDynamicSuperProperties:(NSDictionary<NSString *, id> *(^ _Nullable)(void))dynamicSuperProperties {
+    
+    [[DTAnalyticsManager shareInstance].superProperty registerDynamicSuperProperties:dynamicSuperProperties
+    ];
+}
+
 @end

@@ -329,19 +329,27 @@ static dispatch_queue_t dt_trackQueue;
         event.properties[COMMON_PROPERTY_EVENT_SESSION] = session;
         [self setSuperProperties:@{COMMON_PROPERTY_EVENT_SESSION:session}];
     }
-    // 静态公共属性
-    NSDictionary *superProperties = self.superProperty.currentSuperProperties;
     
-    // 动态公共属性
-    NSDictionary *superDynamicProperties = self.superProperty.obtainDynamicSuperProperties;
+    //    如果没有开启上传，说明用户需要设置额外的属性，公共属性等到上传时再添加
+    event.hasSetCommonProperties = NO;
+    if([DTConfig shareInstance].enableUpload)
+    {
+        // 静态公共属性
+        NSDictionary *superProperties = self.superProperty.currentSuperProperties;
+        
+        // 动态公共属性
+        NSDictionary *superDynamicProperties = self.superProperty.obtainDynamicSuperProperties;
+        
+        [event.properties addEntriesFromDictionary:superProperties];
+        [event.properties addEntriesFromDictionary:superDynamicProperties];
+        event.hasSetCommonProperties = YES;
+    }
 
     // 添加从属性插件获取的属性，属性插件只有系统使用，不支持用户自定义。所以属性名字是可信的，不用验证格式
     NSMutableDictionary *pluginProperties = [self.propertyPluginManager propertiesWithEventType:event.eventType];
   
     NSMutableDictionary *jsonObj = [NSMutableDictionary dictionary];
-    
-    [event.properties addEntriesFromDictionary:superProperties];
-    [event.properties addEntriesFromDictionary:superDynamicProperties];
+
     [event.properties addEntriesFromDictionary:pluginProperties];
     
     if ([event isKindOfClass:[DTAppEndEvent class]]) {

@@ -48,6 +48,7 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
         _systemUpTime = NSProcessInfo.processInfo.systemUptime;
         _timeValueType = DTEventTimeValueTypeNone;
         _uuid = [NSUUID UUID].UUIDString;
+        _hasSetCommonProperties = NO;
     }
     return self;
 }
@@ -83,6 +84,9 @@ kDTEventType const kDTEventTypeUserUniqueAppend = @"user_uniq_append";
     }
     if (self.distinctId) {
         dict[@"#disctId"] = self.distinctId;
+    }
+    if (self.hasSetCommonProperties) {
+        dict[@"hasSetCommonProperties"] = @YES;
     }
     
     dict[@"#event_time"] = [self formatTime:self.time * 1000];

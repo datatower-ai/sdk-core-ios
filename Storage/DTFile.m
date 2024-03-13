@@ -61,12 +61,16 @@
         NSError *error = nil;
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object requiringSecureCoding:YES error:&error];
         
-        if (!error)
+        if (error) {
+            DTLogError(@"archiveObject Got error: %d, reason: %@. ", error.code, error.domain);
             return NO;
+        }
         
         [data writeToFile:filePath options:0 error:&error];
-        if (!error)
+        if (error) {
+            DTLogError(@"writeToFile Got error: %d, reason: %@. ", error.code, error.domain);
             return NO;
+        }
                         
     } @catch (NSException *exception) {
         DTLogError(@"Got exception: %@, reason: %@. You can only send to DT values that inherit from NSObject and implement NSCoding.", exception.name, exception.reason);
@@ -95,8 +99,11 @@
     @try {
         NSData *data = [NSData dataWithContentsOfFile:filePath options:0 error:nil];
         NSError *error;
-        unarchivedData = [NSKeyedUnarchiver unarchivedObjectOfClass:class fromData:data error:&error];
-        if (![unarchivedData isKindOfClass:class] || !error) {
+        unarchivedData = [NSKeyedUnarchiver unarchivedObjectOfClasses:@[NSString.class, NSDictionary.class, NSNumber.class] fromData:data error:&error];
+        
+        if (![unarchivedData isKindOfClass:class] || error) {
+            DTLogError(@"unarchiveFromFile Got error: %d, reason: %@. ", error.code, error.domain);
+            
             unarchivedData = nil;
         }
     }

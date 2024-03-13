@@ -93,6 +93,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)getDataTowerId;
 
++ (void)setEnableTracking:(BOOL)track;
+
++ (void)setSuperProperties:(NSDictionary *)superProps;
+
++ (void)setDynamicSuperProperties:(NSDictionary<NSString *, id> *(^ _Nullable)(void))dynamicSuperProperties;
+
 @end
 
 NS_ASSUME_NONNULL_END
