@@ -120,7 +120,7 @@
     return ret;
 }
 
-+ (NSString *)getDistinceId {
++ (NSString *)getDistinctId {
     return [[DTAnalyticsManager shareInstance] currentDistinctID];
 }
 
@@ -132,7 +132,7 @@
     }
 }
 
-+ (void)setSuperProperties:(NSDictionary *)superProps {
++ (void)setSuperProperties:(nullable NSDictionary *)superProps {
     if(!superProps || superProps.count == 0) {
         [[DTAnalyticsManager shareInstance].superProperty clearSuperProperties];
     } else {
