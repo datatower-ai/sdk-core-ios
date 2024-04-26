@@ -10,6 +10,7 @@
 
 @property (atomic, strong) dispatch_queue_t dt_networkQueue;
 @property (atomic, copy) NSURL *sendURL;
+@property (nonatomic, strong) NSString *appId;
 
 @end
 
@@ -23,11 +24,12 @@
     });
 }
 
-- (instancetype)initWithNetworkQueue:(dispatch_queue_t)queue url:(NSString *)serverUrl{
+- (instancetype)initWithNetworkQueue:(dispatch_queue_t)queue url:(NSString *)serverUrl appId:(NSString *)appId {
     if (self = [self init]) {
         self.dt_networkQueue = queue;
         self.sendURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/report", serverUrl]];
         self.stopCalibrate = YES;
+        self.appId = appId;
     }
     return self;
 }
@@ -48,7 +50,7 @@
     NSMutableDictionary *header = [NSMutableDictionary dictionary];
     header[@"Content-Type"] = @"text/plain";
     
-    NSString *jsonString = @"[{}]";
+    NSString *jsonString = [NSString stringWithFormat:@"[{\"#app_id\":\"%@\"}]",self.appId];
     NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     
     [DTNetWork postRequestWithURL:self.sendURL

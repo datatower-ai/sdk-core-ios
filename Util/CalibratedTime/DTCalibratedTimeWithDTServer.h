@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DTCalibratedTimeWithDTServer : DTCalibratedTime
 
-- (instancetype)initWithNetworkQueue:(dispatch_queue_t)queue url:(NSString *)serverUrl;
+- (instancetype)initWithNetworkQueue:(dispatch_queue_t)queue url:(NSString *)serverUrl appId:(NSString *)appId;
 
 - (void)recalibrationWithDTServer;
 

@@ -93,7 +93,7 @@ static dispatch_queue_t dt_trackQueue;
 
 - (void)calibratedTimeWithDTServer {
     self.calibratedTime = [[DTCalibratedTimeWithDTServer alloc]
-                           initWithNetworkQueue:[self.eventTracker dt_networkQueue] url:self.config.serverUrl];
+                           initWithNetworkQueue:[self.eventTracker dt_networkQueue] url:self.config.serverUrl appId:self.config.appid];
     [self.calibratedTime recalibrationWithDTServer];
 }
 
