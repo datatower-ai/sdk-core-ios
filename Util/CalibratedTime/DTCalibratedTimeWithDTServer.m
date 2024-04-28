@@ -50,7 +50,9 @@
     NSMutableDictionary *header = [NSMutableDictionary dictionary];
     header[@"Content-Type"] = @"text/plain";
     
-    NSString *jsonString = [NSString stringWithFormat:@"[{\"#app_id\":\"%@\"}]",self.appId];
+    //    NSString *jsonString = [NSString stringWithFormat:@"[{\"#app_id\":\"%@\"}]",self.appId];
+    NSString *jsonString = [NSString stringWithFormat:@"[]"];
+
     NSData *postBody = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     
     [DTNetWork postRequestWithURL:self.sendURL
