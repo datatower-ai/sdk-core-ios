@@ -81,6 +81,14 @@ DTFPSMonitor *fpsMonitor;
             [dic setObject:[fpsMonitor getPFS] forKey:kDTPerformanceFPS];
         }
     }
+    
+    // 时区
+    if(![DTAPMPresetProperty disableZoneOffset])
+    {
+        NSTimeZone *timeZone = [NSTimeZone localTimeZone];
+        NSInteger offset = [timeZone secondsFromGMT] * 1000;
+        [dic setObject:@(offset) forKey:COMMON_PROPERTY_ZONE_OFFSET];
+    }
     return dic;
 }
 

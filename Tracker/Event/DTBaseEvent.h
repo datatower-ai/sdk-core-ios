@@ -49,6 +49,7 @@ static NSString * const COMMON_PROPERTY_SCREEN_WIDTH             = @"#screen_wid
 static NSString * const COMMON_PROPERTY_IS_FOREGROUND            = @"#is_foreground";
 static NSString * const COMMON_PROPERTY_EVENT_DURATION           = @"#event_duration";
 static NSString * const COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID    = @"#ias_ooid";
+static NSString * const COMMON_PROPERTY_ZONE_OFFSET              = @"#zone_offset";
 
 static NSString * const DT_CRASH_REASON                     = @"#app_crashed_reason";
 static NSString * const DT_RESUME_FROM_BACKGROUND           = @"#resume_from_background";
