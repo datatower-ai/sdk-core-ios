@@ -16,7 +16,7 @@
         self.systemUpTime = self.systemUpTime - 0.25;
     }
     NSMutableDictionary *dict = [super jsonObject];
-    dict[COMMON_PROPERTY_IS_FOREGROUND] = @(NO);
+    self.properties[COMMON_PROPERTY_IS_FOREGROUND] = @(NO);
     return dict;
 }
 
