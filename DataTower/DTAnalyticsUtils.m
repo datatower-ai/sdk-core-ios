@@ -29,7 +29,7 @@
 /// - Parameters:
 ///    - eventName:事件的名称
 + (void)trackTimerEnd:(NSString *)eventName {
-    [[DTAnalyticsManager shareInstance] track:eventName];
+    [[DTAnalyticsManager shareInstance] trackTimeEvent:eventName properties:nil];
 }
 
 /// 停止事件的计时器
@@ -37,6 +37,6 @@
 ///    - eventName:事件的名称
 ///    - properties:自定义事件的属性
 + (void)trackTimerEnd:(NSString *)eventName properties:(NSDictionary *)properties {
-    [[DTAnalyticsManager shareInstance] track:eventName properties:properties];
+    [[DTAnalyticsManager shareInstance] trackTimeEvent:eventName properties:properties];
 }
 @end

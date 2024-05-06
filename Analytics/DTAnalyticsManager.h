@@ -25,9 +25,6 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 /// 属性插件，用于采集系统属性
 @property (nonatomic, strong) DTPropertyPluginManager *propertyPluginManager;
 
-/// 公共属性
-@property (nonatomic, strong) DTSuperProperty *superProperty;
-
 /// 预置属性
 @property (nonatomic, strong) DTPresetProperties *presetProperty;
 
@@ -73,6 +70,8 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 
 - (void)timeEventUpdate:(NSString *)event withState:(BOOL)state;
 
+- (void)trackTimeEvent:(NSString *)event properties:(nullable NSDictionary *)propertieDict;
+
 - (void)enableAutoTrack:(DTAutoTrackEventType)eventType;
 
 - (void)autoTrackWithEvent:(DTAutoTrackEvent *)event properties:(NSDictionary *)properties;
@@ -85,6 +84,9 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 
 - (NSDictionary *)currentSuperProperties;
 
+- (NSDictionary *)currentDynamicProperties;
+
+- (void)registerDynamicSuperProperties:(NSDictionary<NSString *, id> *(^ _Nullable)(void))dynamicSuperProperties;
 
 - (void)user_set:(NSDictionary *)properties;
 
@@ -173,6 +175,15 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 - (void)setIasOriginalOrderId:(NSString *)oorderId;
 
 - (NSString *)getDTid;
+
+- (void)setInMemoryCommonProperties:(NSDictionary *)properties;
+
+- (void)unsetInMomoryCommonProperty:(NSString *)propertyKey;
+
+- (void)clearInMemoryCommonProperties;
+
+- (NSDictionary *)currentInMemoryCommonProperties;
+
 @end
 
 NS_ASSUME_NONNULL_END

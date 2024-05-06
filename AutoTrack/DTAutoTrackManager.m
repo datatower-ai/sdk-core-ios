@@ -96,7 +96,7 @@
                 }
             }
             DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
-            [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
+            [instance setInMemoryCommonProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
             
             [self.appColdStartTracker trackWithInstanceTag:appid event:event params:nil];
         };
@@ -156,7 +156,7 @@
                     }
                 }
                 DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
-                [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
+                [instance setInMemoryCommonProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@YES}];
                 
                 [self.appHotStartTracker trackWithInstanceTag:appid event:event params:@{}];
             }
@@ -173,7 +173,7 @@
             if (type & DTAutoTrackEventTypeAppEnd) {
                 DTAppEndEvent *event = [[DTAppEndEvent alloc] initWithName:DT_APP_END_EVENT];
                 DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
-                [instance setSuperProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@NO}];
+                [instance setInMemoryCommonProperties:@{COMMON_PROPERTY_IS_FOREGROUND:@NO}];
                 [self.appEndTracker trackWithInstanceTag:appid event:event params:@{}];
             }
             

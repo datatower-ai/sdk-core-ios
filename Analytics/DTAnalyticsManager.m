@@ -17,6 +17,9 @@
 
 @interface DTAnalyticsManager ()
 
+/// 公共属性
+@property (nonatomic, strong) DTSuperProperty *superProperty;
+
 /// 事件时长统计
 @property (nonatomic, strong)DTTrackTimer *trackTimer;
 
@@ -29,6 +32,8 @@
 @property (strong, nonatomic) DTFile *file;
 
 @property (nonatomic, assign) BOOL hasSetUserOnce;
+
+@property (nonatomic, strong) NSMutableDictionary *inMemoryCommonProps;
 
 @end
 
@@ -72,6 +77,8 @@ static dispatch_queue_t dt_trackQueue;
     [self appLifeCycleObserver];
     //采集预置事件
     [self trackPresetEvents];
+    
+    self.inMemoryCommonProps = [[NSMutableDictionary alloc] init];
 }
 
 - (void)initLog {
@@ -203,6 +210,17 @@ static dispatch_queue_t dt_trackQueue;
     return [self.superProperty currentSuperProperties];
 }
 
+- (NSDictionary *)currentDynamicProperties {
+    return [self.superProperty obtainDynamicSuperProperties];
+}
+
+- (void)registerDynamicSuperProperties:(NSDictionary<NSString *, id> *(^ _Nullable)(void))dynamicSuperProperties {
+    
+    dispatch_async(dt_trackQueue, ^{
+        [self.superProperty registerDynamicSuperProperties:dynamicSuperProperties];
+    });
+}
+
 - (void)loadUserDefaultData {
     self.hasSetUserOnce = [[[NSUserDefaults standardUserDefaults] objectForKey:@"hasSetUserOnce"] boolValue];
 }
@@ -327,7 +345,7 @@ static dispatch_queue_t dt_trackQueue;
     if ([event isKindOfClass:[DTAppStartEvent class]]) {
         NSString *session = [[NSUUID UUID] UUIDString];
         event.properties[COMMON_PROPERTY_EVENT_SESSION] = session;
-        [self setSuperProperties:@{COMMON_PROPERTY_EVENT_SESSION:session}];
+        [self setInMemoryCommonProperties:@{COMMON_PROPERTY_EVENT_SESSION:session}];
     }
     
     //    如果没有开启上传，说明用户需要设置额外的属性，公共属性等到上传时再添加
@@ -340,8 +358,12 @@ static dispatch_queue_t dt_trackQueue;
         // 动态公共属性
         NSDictionary *superDynamicProperties = self.superProperty.obtainDynamicSuperProperties;
         
+        // 需要共享的公共属性,比如sessionid
+        NSDictionary *inMemoryCommonProperties = self.inMemoryCommonProps;
+
         [event.properties addEntriesFromDictionary:superProperties];
         [event.properties addEntriesFromDictionary:superDynamicProperties];
+        [event.properties addEntriesFromDictionary:inMemoryCommonProperties];
         event.hasSetCommonProperties = YES;
     }
 
@@ -451,6 +473,13 @@ static dispatch_queue_t dt_trackQueue;
         return;
     }
     [self.trackTimer updateTimerState:event withSystemUptime:NSProcessInfo.processInfo.systemUptime withState:state];
+}
+
+- (void)trackTimeEvent:(NSString *)event properties:(nullable NSDictionary *)propertieDict; {
+    if([self.trackTimer isExistEvent:event]){
+        [self track:event];
+        [self.trackTimer removeEvent:event];
+    }
 }
 
 
@@ -591,7 +620,7 @@ static dispatch_queue_t dt_trackQueue;
         DTLogError(@"oorderId invald", oorderId);
         return;
     }
-    [self setSuperProperties:@{COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID:oorderId}];
+    [self setInMemoryCommonProperties:@{COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID:oorderId}];
 }
 
 - (NSString *)getDTid {
@@ -609,6 +638,28 @@ static dispatch_queue_t dt_trackQueue;
         }
     }
     return ret;
+}
+
+- (void)setInMemoryCommonProperties:(NSDictionary *)properties {
+    dispatch_async(dt_trackQueue, ^{
+        [self.inMemoryCommonProps addEntriesFromDictionary:properties];
+    });
+}
+
+- (void)unsetInMomoryCommonProperty:(NSString *)propertyKey {
+    dispatch_async(dt_trackQueue, ^{
+        [self.inMemoryCommonProps removeObjectForKey:propertyKey];
+    });
+}
+
+- (void)clearInMemoryCommonProperties {
+    dispatch_async(dt_trackQueue, ^{
+        [self.inMemoryCommonProps removeAllObjects];
+    });
+}
+
+- (NSDictionary *)currentInMemoryCommonProperties {
+    return self.inMemoryCommonProps;
 }
 
 @end

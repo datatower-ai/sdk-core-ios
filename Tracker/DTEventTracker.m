@@ -304,13 +304,17 @@ static NSUInteger const kBatchSize = 10;
         
         DTAnalyticsManager *instance = [DTAnalyticsManager shareInstance];
         // 静态公共属性
-        NSDictionary *superProperties = instance.superProperty.currentSuperProperties;
+        NSDictionary *superProperties = instance.currentSuperProperties;
         
         // 动态公共属性
-        NSDictionary *superDynamicProperties = instance.superProperty.obtainDynamicSuperProperties;
+        NSDictionary *superDynamicProperties = instance.currentDynamicProperties;
+        
+        // 需要共享的公共属性
+        NSDictionary *inMemoryCommonProperties = instance.currentInMemoryCommonProperties;
         
         [temp addEntriesFromDictionary:superProperties];
         [temp addEntriesFromDictionary:superDynamicProperties];
+        [temp addEntriesFromDictionary:inMemoryCommonProperties];
         [eventMode.data setObject:temp forKey:@"properties"];
     }
     [eventMode.data removeObjectForKey:@"hasSetCommonProperties"];

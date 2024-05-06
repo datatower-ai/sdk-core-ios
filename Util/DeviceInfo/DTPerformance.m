@@ -86,7 +86,7 @@ DTFPSMonitor *fpsMonitor;
     if(![DTAPMPresetProperty disableZoneOffset])
     {
         NSTimeZone *timeZone = [NSTimeZone localTimeZone];
-        NSInteger offset = [timeZone secondsFromGMT] * 1000;
+        NSInteger offset = [timeZone secondsFromGMT] / (60 * 60);
         [dic setObject:@(offset) forKey:COMMON_PROPERTY_ZONE_OFFSET];
     }
     return dic;

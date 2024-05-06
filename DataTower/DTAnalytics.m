@@ -134,16 +134,15 @@
 
 + (void)setSuperProperties:(nullable NSDictionary *)superProps {
     if(!superProps || superProps.count == 0) {
-        [[DTAnalyticsManager shareInstance].superProperty clearSuperProperties];
+        [[DTAnalyticsManager shareInstance] clearSuperProperties];
     } else {
-        [[DTAnalyticsManager shareInstance].superProperty registerSuperProperties:superProps];
+        [[DTAnalyticsManager shareInstance] setSuperProperties:superProps];
     }
 }
 
 + (void)setDynamicSuperProperties:(NSDictionary<NSString *, id> *(^ _Nullable)(void))dynamicSuperProperties {
     
-    [[DTAnalyticsManager shareInstance].superProperty registerDynamicSuperProperties:dynamicSuperProperties
-    ];
+    [[DTAnalyticsManager shareInstance] registerDynamicSuperProperties:dynamicSuperProperties];
 }
 
 @end
