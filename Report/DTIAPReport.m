@@ -81,7 +81,7 @@
     propertiesCopy[PROPERTY_IAP_CURRENCY] = currency;
     propertiesCopy[PROPERTY_IAP_PLACEMENT] = placement;
     propertiesCopy[PROPERTY_IAP_SEQ] = seq;
-    DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_IAP_PURCHASED];
+    DTTrackEvent *event = [[DTReportEvent alloc] initWithName:EVENT_IAP_PURCHAS_SUCCESS];
     [[DTAnalyticsManager shareInstance] asyncTrackEventObject:event properties:propertiesCopy];
 }
 /**
