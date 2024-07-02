@@ -231,6 +231,9 @@ static NSUInteger const kBatchSize = 10;
     //事件时间已校准
     if (eventTime && [eventTime longValue] > 0){
         [eventMode.data removeObjectForKey:@"#event_su_time"];
+        [eventMode.data removeObjectForKey:@"#event_device_time"];
+        [eventMode.data removeObjectForKey:@"#process_sessionId"];
+
         [syns addObject:eventMode.eventSyn];
         [contents addObject:eventMode.data];
     } else {
@@ -244,6 +247,7 @@ static NSUInteger const kBatchSize = 10;
                 NSTimeInterval realTime = timeCalibrater.serverTime + outTime;
                 [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
                 [eventMode.data removeObjectForKey:@"#event_device_time"];
+                [eventMode.data removeObjectForKey:@"#process_sessionId"];
                 [eventMode.data removeObjectForKey:@"#event_su_time"];
                 [syns addObject:eventMode.eventSyn];
                 [contents addObject:eventMode.data];
@@ -288,6 +292,7 @@ static NSUInteger const kBatchSize = 10;
                 
                 [eventMode.data setValue:[self formatTime:realTime * 1000] forKey:@"#event_time"];
                 [eventMode.data removeObjectForKey:@"#event_device_time"];
+                [eventMode.data removeObjectForKey:@"#process_sessionId"];
                 [eventMode.data removeObjectForKey:@"#event_su_time"];
                 [syns addObject:eventMode.eventSyn];
                 [contents addObject:eventMode.data];
