@@ -51,6 +51,11 @@ static NSString * const COMMON_PROPERTY_EVENT_DURATION           = @"#event_dura
 static NSString * const COMMON_PROPERTY_IAS_ORIGINAL_ORDER_ID    = @"#ias_ooid";
 static NSString * const COMMON_PROPERTY_ZONE_OFFSET              = @"#zone_offset";
 
+static NSString * const COMMON_PROPERTY_FIREBASE_IID             = @"#firebase_iid";
+static NSString * const COMMON_PROPERTY_APPSFLYER_ID             = @"#appsflyer_id";
+static NSString * const COMMON_PROPERTY_ADJUST_ID                = @"#adjust_id";
+static NSString * const COMMON_PROPERTY_KOCHAVA_ID               = @"#kochava_id";
+
 static NSString * const DT_CRASH_REASON                     = @"#app_crashed_reason";
 static NSString * const DT_RESUME_FROM_BACKGROUND           = @"#resume_from_background";
 static NSString * const DT_START_REASON                     = @"#start_reason";

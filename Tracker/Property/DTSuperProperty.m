@@ -9,6 +9,9 @@
 #import "DTPropertyValidator.h"
 #import "DTLogging.h"
 #import "DTFile.h"
+#import "DTBaseEvent.h"
+
+#define ThirePartySaveKey @"ThirePartySaveKey"
 
 @interface DTSuperProperty ()
 /// 多实例的标识符
@@ -21,6 +24,8 @@
 @property (nonatomic, strong) DTFile *file;
 /// 是否是轻实例
 @property (nonatomic, assign) BOOL isLight;
+
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *thirdPartyProperties;
 
 @end
 
@@ -36,6 +41,8 @@
             self.file = [[DTFile alloc] initWithAppid:token];
             self.superProperties = [self.file unarchiveSuperProperties];
         }
+        
+        [self loadThirdPartyProperties];
     }
     return self;
 }
@@ -89,7 +96,9 @@
 - (NSDictionary *)currentSuperProperties {
     @synchronized (self) {
         if (self.superProperties) {
-            return [self.superProperties copy];
+            NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:[self.superProperties copy]];
+            [ret addEntriesFromDictionary:self.obtainThirdPartyProperties];
+            return ret;
         } else {
             return @{};
         }
@@ -112,6 +121,29 @@
             return validProperties;
         }
         return nil;
+    }
+}
+
+- (void)setThirdPartyId:(NSString *)key value:(NSString *)value {
+    if(value && ![value isEqualToString:@""]) {
+        self.thirdPartyProperties[key] = value;
+    } else {
+        [self.thirdPartyProperties removeObjectForKey:key];
+    }
+    [[NSUserDefaults standardUserDefaults] setObject:self.thirdPartyProperties forKey:ThirePartySaveKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (NSDictionary *)obtainThirdPartyProperties {
+    @synchronized (self) {
+        return self.thirdPartyProperties.count > 0 ? [self.thirdPartyProperties copy] : nil;
+    }
+}
+
+- (void)loadThirdPartyProperties {
+    self.thirdPartyProperties = [[NSUserDefaults standardUserDefaults] objectForKey:ThirePartySaveKey];
+    if(!self.thirdPartyProperties) {
+        self.thirdPartyProperties = [NSMutableDictionary new];
     }
 }
 

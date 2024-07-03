@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 获取动态公共属性
 - (NSDictionary *)obtainDynamicSuperProperties;
 
+- (void)setThirdPartyId:(NSString *)key value:(NSString *)value;
+
 @end
 
 NS_ASSUME_NONNULL_END

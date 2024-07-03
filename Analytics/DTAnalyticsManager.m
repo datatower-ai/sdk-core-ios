@@ -581,6 +581,7 @@ static dispatch_queue_t dt_trackQueue;
         return;
     }
     [self user_set:@{USER_PROPERTY_LATEST_FIREBASE_IID:fiid}];
+    [self.superProperty setThirdPartyId:COMMON_PROPERTY_FIREBASE_IID value:fiid];
 }
 
 /// 设置AppsFlyer的appsflyer_id
@@ -592,6 +593,7 @@ static dispatch_queue_t dt_trackQueue;
         return;
     }
     [self user_set:@{USER_PROPERTY_LATEST_APPSFLYER_ID:afid}];
+    [self.superProperty setThirdPartyId:COMMON_PROPERTY_APPSFLYER_ID value:afid];
 }
 
 /// 设置kochava iid
@@ -603,6 +605,7 @@ static dispatch_queue_t dt_trackQueue;
         return;
     }
     [self user_set:@{USER_PROPERTY_LATEST_KOCHAVA_ID:koid}];
+    [self.superProperty setThirdPartyId:COMMON_PROPERTY_KOCHAVA_ID value:koid];
 }
 
 /// 设置AdjustId
@@ -613,6 +616,7 @@ static dispatch_queue_t dt_trackQueue;
         return;
     }
     [self user_set:@{USER_PROPERTY_LATEST_ADJUST_ID:adjustId}];
+    [self.superProperty setThirdPartyId:COMMON_PROPERTY_ADJUST_ID value:adjustId];
 }
 
 - (void)setIasOriginalOrderId:(NSString *)oorderId {
