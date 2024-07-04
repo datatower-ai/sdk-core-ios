@@ -95,13 +95,16 @@
 
 - (NSDictionary *)currentSuperProperties {
     @synchronized (self) {
+        NSMutableDictionary *ret = [NSMutableDictionary new];
         if (self.superProperties) {
-            NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:[self.superProperties copy]];
-            [ret addEntriesFromDictionary:self.obtainThirdPartyProperties];
-            return ret;
-        } else {
-            return @{};
+            [ret addEntriesFromDictionary:[self.superProperties copy]];
+          
         }
+        if(self.thirdPartyProperties.count) {
+            [ret addEntriesFromDictionary:[self.thirdPartyProperties copy]];
+        }
+        
+        return ret;
     }
 }
 
@@ -134,16 +137,12 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (NSDictionary *)obtainThirdPartyProperties {
-    @synchronized (self) {
-        return self.thirdPartyProperties.count > 0 ? [self.thirdPartyProperties copy] : nil;
-    }
-}
-
 - (void)loadThirdPartyProperties {
-    self.thirdPartyProperties = [[NSUserDefaults standardUserDefaults] objectForKey:ThirePartySaveKey];
-    if(!self.thirdPartyProperties) {
-        self.thirdPartyProperties = [NSMutableDictionary new];
+    self.thirdPartyProperties = [NSMutableDictionary new];
+    
+    NSDictionary *cache = [[NSUserDefaults standardUserDefaults] objectForKey:ThirePartySaveKey];
+    if(cache) {
+        [self.thirdPartyProperties addEntriesFromDictionary:cache];
     }
 }
 

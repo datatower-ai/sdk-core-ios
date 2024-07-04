@@ -576,10 +576,14 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - fiid: Firebase 的 app_instance_id
 - (void)setFirebaseAppInstanceId:(NSString *)fiid {
-    if (![fiid isKindOfClass:[NSString class]] || fiid.length == 0) {
+   
+    if(!fiid) {
+        fiid = @"";
+    } else if (![fiid isKindOfClass:[NSString class]]) {
         DTLogError(@"FirebaseAppInstanceId invald", fiid);
         return;
     }
+    
     [self user_set:@{USER_PROPERTY_LATEST_FIREBASE_IID:fiid}];
     [self.superProperty setThirdPartyId:COMMON_PROPERTY_FIREBASE_IID value:fiid];
 }
@@ -588,7 +592,9 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - afuid: AppsFlyer的appsflyer_id
 - (void)setAppsFlyerId:(NSString *)afid {
-    if (![afid isKindOfClass:[NSString class]] || afid.length == 0) {
+    if(!afid) {
+        afid = @"";
+    } else if (![afid isKindOfClass:[NSString class]] ) {
         DTLogError(@"AppsFlyerId invald", afid);
         return;
     }
@@ -600,7 +606,9 @@ static dispatch_queue_t dt_trackQueue;
 /// - Parameters:
 ///   - afuid: AppsFlyer的appsflyer_id
 - (void)setKochavaId:(NSString *)koid {
-    if (![koid isKindOfClass:[NSString class]] || koid.length == 0) {
+    if(!koid) {
+        koid = @"";
+    } else if (![koid isKindOfClass:[NSString class]]) {
         DTLogError(@"KochavaId invald", koid);
         return;
     }
@@ -611,7 +619,9 @@ static dispatch_queue_t dt_trackQueue;
 /// 设置AdjustId
 /// - Parameter adjustId: AdjustId
 - (void)setAdjustId:(NSString *)adjustId {
-    if (![adjustId isKindOfClass:[NSString class]] || adjustId.length == 0) {
+    if(!adjustId) {
+        adjustId = @"";
+    } else if (![adjustId isKindOfClass:[NSString class]] ) {
         DTLogError(@"adjustId invald", adjustId);
         return;
     }
