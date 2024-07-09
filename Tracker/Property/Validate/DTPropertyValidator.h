@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)validateAutoTrackEventPropertyKey:(NSString *)key value:(NSString *)value error:(NSError **)error;
 
++ (void)validateCustomInputEventName:(NSString *)key error:(NSError **)error;
 
 /// 验证属性
 /// @param properties 属性

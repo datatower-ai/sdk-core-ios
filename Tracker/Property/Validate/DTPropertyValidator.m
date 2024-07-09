@@ -117,6 +117,15 @@ static NSRegularExpression *_regexForAutoTrackValidateKey;
     }
 }
 
++ (void)validateCustomInputEventName:(NSString *)name error:(NSError **)error {
+    if([name hasPrefix:@"#"] || [name hasPrefix:@"$"]) {
+        NSString *errorMsg = [NSString stringWithFormat:@"Property Key or Event name: [%@] is invalid.", name];
+        DTLogError(errorMsg);
+        *error = DTPropertyError(10009, errorMsg);
+        return;
+    }
+}
+
 /// 验证属性
 /// @param properties 属性
 + (NSMutableDictionary *)validateProperties:(NSDictionary *)properties {

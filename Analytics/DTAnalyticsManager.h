@@ -146,7 +146,7 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 /// 设置访客的id
 /// - Parameters:
 ///   - distinctId: 访客id
-- (void)setDistinctid:(NSString *)distinctId;
+//- (void)setDistinctid:(NSString *)distinctId;
 
 - (NSString *)currentDistinctID;
 

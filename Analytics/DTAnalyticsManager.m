@@ -272,6 +272,13 @@ static dispatch_queue_t dt_trackQueue;
 }
 
 - (void)track:(NSString *)event properties:(nullable NSDictionary *)properties time:(NSDate *)time timeZone:(NSTimeZone *)timeZone {
+    
+    NSError *error = nil;
+    [DTPropertyValidator validateCustomInputEventName:event error:&error];
+    if (error) {
+        return;
+    }
+    
     DTTrackEvent *trackEvent = [[DTTrackEvent alloc] initWithName:event];
     DTLogDebug(@"##### track %@ systemUpTime: %lf",event, trackEvent.systemUpTime);
     [self handleTimeEvent:trackEvent];
@@ -556,17 +563,17 @@ static dispatch_queue_t dt_trackQueue;
     }
 }
 
-- (void)setDistinctid:(NSString *)distinctId {
-    if (![distinctId isKindOfClass:[NSString class]] || distinctId.length == 0) {
-        DTLogError(@"distinctId invald", distinctId);
-        return;
-    }
-
-    self.distinctId = distinctId;
-    @synchronized (self.file) {
-        [self.file archiveDistinctId:self.distinctId];
-    }
-}
+//- (void)setDistinctid:(NSString *)distinctId {
+//    if (![distinctId isKindOfClass:[NSString class]] || distinctId.length == 0) {
+//        DTLogError(@"distinctId invald", distinctId);
+//        return;
+//    }
+//
+//    self.distinctId = distinctId;
+//    @synchronized (self.file) {
+//        [self.file archiveDistinctId:self.distinctId];
+//    }
+//}
 
 - (NSString *)currentDistinctID {
     return self.distinctId;

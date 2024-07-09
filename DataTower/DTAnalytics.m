@@ -75,9 +75,9 @@
     [[DTAnalyticsManager shareInstance] setAcid:accountId];
 }
 
-+ (void)setDistinctId:(NSString *)distinctId; {
-    [[DTAnalyticsManager shareInstance] setDistinctid:distinctId];
-}
+//+ (void)setDistinctId:(NSString *)distinctId; {
+//    [[DTAnalyticsManager shareInstance] setDistinctid:distinctId];
+//}
 
 /// 设置Firebase的app_instance_id
 /// - Parameters:
