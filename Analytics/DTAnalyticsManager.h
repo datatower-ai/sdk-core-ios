@@ -169,6 +169,11 @@ dispatch_sync(dispatch_get_main_queue(), block);\
 /// - Parameter adjustId: AdjustId
 - (void)setAdjustId:(NSString *)adjustId;
 
+
+/// 设置TenjinId
+/// - Parameter TenjinId: TenjinId
+- (void)setTenjinId:(NSString *)tenjinId;
+
 /// 设置订阅原始订单id
 /// - Parameters:
 ///   - oorderId : 订阅原始订单id

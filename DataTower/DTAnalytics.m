@@ -106,6 +106,12 @@
     [[DTAnalyticsManager shareInstance] setAdjustId:adjustId];
 }
 
+/// 设置TenjinId
+/// - Parameter TenjinId: TenjinId
++ (void)setTenjinId:(NSString *)tenjinId {
+    [[DTAnalyticsManager shareInstance] setTenjinId:tenjinId];
+}
+
 + (void)setIasOriginalOrderId:(NSString *)oorderId {
     [[DTAnalyticsManager shareInstance] setIasOriginalOrderId:oorderId];
 }

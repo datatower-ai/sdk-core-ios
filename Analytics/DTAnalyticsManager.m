@@ -636,6 +636,19 @@ static dispatch_queue_t dt_trackQueue;
     [self.superProperty setThirdPartyId:COMMON_PROPERTY_ADJUST_ID value:adjustId];
 }
 
+/// 设置TenjinId
+/// - Parameter TenjinId: TenjinId
+- (void)setTenjinId:(NSString *)tenjinId {
+    if(!tenjinId) {
+        tenjinId = @"";
+    } else if (![tenjinId isKindOfClass:[NSString class]] ) {
+        DTLogError(@"tenjinId invald", tenjinId);
+        return;
+    }
+    [self user_set:@{USER_PROPERTY_LATEST_TENJIN_ID:tenjinId}];
+    [self.superProperty setThirdPartyId:COMMON_PROPERTY_TENJIN_ID value:tenjinId];
+}
+
 - (void)setIasOriginalOrderId:(NSString *)oorderId {
     if (![oorderId isKindOfClass:[NSString class]] || oorderId.length == 0) {
         DTLogError(@"oorderId invald", oorderId);

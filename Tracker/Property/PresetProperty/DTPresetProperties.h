@@ -11,6 +11,7 @@ static NSString * const USER_PROPERTY_LATEST_KOCHAVA_ID           = @"#latest_ko
 static NSString * const USER_PROPERTY_LATEST_APP_VERSION_CODE     = @"#latest_app_version_code";
 static NSString * const USER_PROPERTY_LATEST_APP_VERSION_NAME     = @"#latest_app_version_name";
 static NSString * const USER_PROPERTY_LATEST_ADJUST_ID            = @"#latest_adjust_id";
+static NSString * const USER_PROPERTY_LATEST_TENJIN_ID            = @"#latest_tenjin_id";
 
 //active
 static NSString * const USER_PROPERTY_ACTIVE_MCC                 = @"#active_mcc";
