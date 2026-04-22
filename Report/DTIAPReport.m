@@ -74,7 +74,23 @@
                currency:(NSString *)currency
                     seq:(NSString *)seq
               placement:(NSString *)placement {
-    NSMutableDictionary *propertiesCopy = [NSMutableDictionary dictionary];
+    [self reportPurchased:order
+                      sku:sku
+                    price:price
+                 currency:currency
+                      seq:seq
+                placement:placement
+               properties:@{}];
+}
+
++ (void)reportPurchased:(NSString *)order
+                    sku:(NSString *)sku
+                  price:(NSNumber *)price
+               currency:(NSString *)currency
+                    seq:(NSString *)seq
+              placement:(NSString *)placement
+             properties:(NSDictionary *)properties {
+    NSMutableDictionary *propertiesCopy = [DTPropertyValidator validateProperties:properties validator:[DTTrackEvent alloc]];
     propertiesCopy[PROPERTY_IAP_ORDER] = order;
     propertiesCopy[PROPERTY_IAP_SKU] = sku;
     propertiesCopy[PROPERTY_IAP_PRICE] = price;

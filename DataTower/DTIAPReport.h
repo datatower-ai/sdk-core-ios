@@ -54,6 +54,25 @@ NS_ASSUME_NONNULL_BEGIN
                currency:(NSString *)currency
                     seq:(NSString *)seq
               placement:(NSString *)placement;
+
+/**
+ * 购买成功的时候上报，无论是否消耗，支持附加自定义属性
+ *
+ * @param order 订单
+ * @param sku 商品ID
+ * @param price 价格， 如 9.99
+ * @param currency 货币，如usd
+ * @param seq 系列行为标识
+ * @param placement 入口，可为空
+ * @param properties 自定义属性
+ */
++ (void)reportPurchased:(NSString *)order
+                    sku:(NSString *)sku
+                  price:(NSNumber *)price
+               currency:(NSString *)currency
+                    seq:(NSString *)seq
+              placement:(NSString *)placement
+             properties:(NSDictionary *)properties;
 /**
  * 购买失败的时候上报
  *
